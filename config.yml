@@ -1,0 +1,31 @@
+
+method_names:
+  bwa: "BWA MEM"
+  strobealign: "Strobealign"
+
+
+runs:
+  mapping:
+    name: "Mapping reads"
+    tools: [ "bwa", "strobealign" ]
+    output_file_ending: ".sam"
+    validate_equal: false
+    runs:
+      small: "length150_nreads1000"
+      big: "length150_nreads500000"
+
+
+truth_datasets:
+  hg002:
+    vcf_url: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv4.2.1/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz"
+
+  hg003:
+    vcf_url: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG003_NA24149_father/NISTv3.3.2/GRCh38/HG003_GRCh38_GIAB_highconf_CG-Illfb-IllsentieonHC-Ion-10XsentieonHC_CHROM1-22_v.3.3.2_highconf.vcf.gz"
+
+
+simulations:
+  dataset1:
+    genome: "hg38"
+    individual: "hg002"
+    coverage: 2
+    chromosomes: "chr20,chr21"

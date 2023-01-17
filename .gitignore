@@ -1,0 +1,5 @@
+*.shm
+.idea/
+data/
+.snakemake
+*.npz
