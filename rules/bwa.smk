@@ -14,7 +14,7 @@ rule bwa_index:
 
 rule bwa_map:
     input:
-        reads = "data/simulated_reads/{dataset}.fa",  # ["reads/{sample}.1.fastq", "reads/{sample}.2.fastq"], \
+        reads = "data/simulated_reads/{dataset}.fa",
         idx = multiext("data/reference_genomes/{dataset}",".amb",".ann",".bwt",".pac",".sa"),
     output:
         "data/mapping/bwa/{dataset}.sam",

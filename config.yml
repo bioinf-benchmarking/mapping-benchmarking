@@ -2,17 +2,18 @@
 method_names:
   bwa: "BWA MEM"
   strobealign: "Strobealign"
+  minimap2: "Minimap2"
 
 
 runs:
   mapping:
     name: "Mapping reads"
-    tools: [ "bwa", "strobealign" ]
+    tools: [ "bwa", "strobealign", "minimap2"]
     output_file_ending: ".sam"
     validate_equal: false
     runs:
-      small: "length150_nreads1000"
-      big: "length150_nreads500000"
+      small: "dataset1"
+      big: "dataset2"
 
 
 truth_datasets:
@@ -29,3 +30,9 @@ simulations:
     individual: "hg002"
     coverage: 2
     chromosomes: "chr20,chr21"
+
+  dataset2:
+    genome: "hg38"
+    individual: "hg002"
+    coverage: 2
+    chromosomes: "chr17,chr18,chr19,chr20,chr21"

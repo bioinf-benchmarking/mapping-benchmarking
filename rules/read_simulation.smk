@@ -26,6 +26,18 @@ rule prepare_simulation:
 
 
 
+"""
+rule simulate_reads_for_chromosome_and_haplotype:
+    input:
+        coordinate_map="data/simulated_reads/{reference}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
+        haplotype_reference="data/simulated_reads/{reference}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta",
+        haplotype_reference_fai="data/simulated_reads/{reference}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta.fai",
+    output:
+        "data/simulated_reads/{reference}/{individual}/raw_simulated_reads_chromosome{chromosome}_haplotype{haplotype}_coverage{coverage}.txt"
+    shell:
+        "graph_read_simulator simulate_reads -s 0.001 --deletion_prob 0.001 --insertion_prob 0.001 -D data/simulated_reads/{wildcards.reference}/{wildcards.individual}/ '{wildcards.chromosome} {wildcards.haplotype}' {wildcards.coverage} > {output}"
+"""
+
 rule simulate_reads_for_chromosome_and_haplotype:
     input:
         coordinate_map="data/simulated_reads/{reference}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
