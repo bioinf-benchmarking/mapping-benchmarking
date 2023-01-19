@@ -1,3 +1,4 @@
+use_conda: True
 
 method_names:
   bwa: "BWA MEM"
@@ -28,11 +29,14 @@ simulations:
   dataset1:
     genome: "hg38"
     individual: "hg002"
-    coverage: 2
+    n_reads: 2000
     chromosomes: "chr20,chr21"
+    mason_flags: ""
+    paired_type: "single-end" #  or paired-end
 
   dataset2:
     genome: "hg38"
     individual: "hg002"
-    coverage: 2
+    n_reads: 200000
     chromosomes: "chr17,chr18,chr19,chr20,chr21"
+

@@ -2,7 +2,7 @@
 
 rule minimap2_map:
     input:
-        query="data/simulated_reads/{dataset}.fa",
+        query="data/simulated_reads/{dataset}/simulated_reads.fq.gz",
         target="data/reference_genomes/{dataset}.fa"
     output:
         sam="data/mapping/minimap2/{dataset}.sam",

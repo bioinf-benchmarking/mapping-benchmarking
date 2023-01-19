@@ -1,4 +1,5 @@
 
+"""
 rule get_number_of_reads:
     input:
         "data/simulated_reads/{dataset}.readpositions"
@@ -6,8 +7,10 @@ rule get_number_of_reads:
         "data/simulated_reads/{dataset}.n_reads"
     shell:
         "wc -l {input} | cut -d ' ' -f 1 > {output}"
+"""
 
 
+"""
 rule store_truth_positions_as_np_data:
     input:
         positions="data/simulated_reads/{dataset}.readpositions",
@@ -18,16 +21,18 @@ rule store_truth_positions_as_np_data:
         n_reads=lambda wildcards: open("data/simulated_reads/" + wildcards.dataset + ".n_reads").read().strip()
     shell:
         "cat {input.positions} | numpy_alignments store truth {output} {params.n_reads}"
+"""
 
 
 rule store_alignments_as_np_data:
     input:
         alignments="data/mapping/{method}/{dataset}.sam",
-        n_reads="data/simulated_reads/{dataset}.n_reads",
+        #n_reads="data/simulated_reads/{dataset}.n_reads",
     output:
         "data/mapping/{method}/{dataset}.npz"
     params:
-        n_reads=lambda wildcards: open("data/simulated_reads/" + wildcards.dataset + ".n_reads").read().strip()
+        n_reads = lambda wildcards: config["simulations"][wildcards.dataset]["n_reads"]
+        #n_reads=lambda wildcards: open("data/simulated_reads/" + wildcards.dataset + ".n_reads").read().strip()
     shell:
         "cat {input.alignments} | numpy_alignments store sam {output} {params.n_reads}"
 
@@ -42,7 +47,7 @@ def get_result_files(wildcards):
 rule compare_read_mapping_against_truth:
     input:
         get_result_files,
-        truth="data/simulated_reads/{dataset}.truth.npz",
+        truth="data/simulated_reads/{dataset}/truth.npz",
         #bwa="data/mapping/bwa/{dataset}.npz",
         #strobealign="data/mapping/strobealign/{dataset}.npz",
         #minimap2="data/mapping/minimap2/{dataset}.npz",
