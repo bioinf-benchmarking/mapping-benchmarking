@@ -2,35 +2,37 @@
 
 rule download_truth_vcf:
     output:
-        "data/truth_variants/{individual}.vcf.gz"
+        "data/{genome_build}/{individual}/variants.vcf.gz"
     params:
-        url=lambda wildcards: config["truth_datasets"][wildcards.individual]["vcf_url"]
+        url=lambda wildcards: config["genomes"][wildcards.genome_build][wildcards.individual]["vcf_url"]
     shell:
         "wget -O {output} {params.url}"
 
 
+def get_individual_properties(wildcards, property):
+    return config["individuals"][wildcards.dataset][property]
+
 
 rule make_chromosome_haplotype_sequence_for_simulation:
     input:
-        vcf="data/truth_variants/{individual}.vcf.gz",
-        reference="data/reference_genomes/raw/{reference}.fa"
+        vcf="data/{genome_build}/{individual}/variants.vcf.gz",  # lambda wildcards: "data/truth_variants/" + config["individuals"][wildcards.dataset]["variant_source"] + ".vcf.gz",
+        reference="data/{genome_build}/reference.fa"
+        #reference= lambda wildcards: "data/reference_genomes/raw/"  + config["variant_sources"][config["individuals"][wildcards.dataset]["variant_source"]]["genome"] + ".fa"
 
     output:
-        coordinate_map="data/simulated_reads/{reference}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
-        haplotype_reference="data/simulated_reads/{reference}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta",
+        coordinate_map="data/{genome_build}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
+        haplotype_reference="data/{genome_build}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta",
+        #coordinate_map="data/simulated_reads/{dataset}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
+        #haplotype_reference="data/simulated_reads/{dataset}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta",
     shell:
         "graph_read_simulator prepare_simulation --chromosome {wildcards.chromosome} --haplotype {wildcards.haplotype} "
-        "--vcf {input.vcf} --reference {input.reference} -o data/simulated_reads/{wildcards.reference}/{wildcards.individual}/ "
+        "--vcf {input.vcf} --reference {input.reference} -o data/{wildcards.genome_build}/{wildcards.individual}/ "
 
 
 def get_input_files_for_haplotype_sequence(wildcards):
-
-    chromosomes = config["simulations"][wildcards.dataset]["chromosomes"].split(",")
-    genome_build = config["simulations"][wildcards.dataset]["genome"]
-    individual = config["simulations"][wildcards.dataset]["individual"]
-
+    chromosomes = config["genomes"][wildcards.genome_build][wildcards.individual][wildcards.size]["chromosomes"].split(",")
     return [
-        f"data/simulated_reads/{genome_build}/{individual}/chromosome{chromosome}_haplotype{wildcards.haplotype}_reference.fasta"
+        f"data/{wildcards.genome_build}/{wildcards.individual}/chromosome{chromosome}_haplotype{wildcards.haplotype}_reference.fasta"
         for chromosome in chromosomes
     ]
 
@@ -38,72 +40,96 @@ rule make_haplotype_sequence_for_simulation:
     input:
         get_input_files_for_haplotype_sequence
     output:
-        "data/simulated_reads/{dataset}/haplotype{haplotype}.fa",
+        "data/{genome_build}/{individual}/{size}/haplotype{haplotype}.fa",
     shell:
         """
         cat {input} > {output}
         """
 
 def get_haplotype_coordinate_maps(wildcards):
-
-    chromosomes = config["simulations"][wildcards.dataset]["chromosomes"].split(",")
-    genome_build = config["simulations"][wildcards.dataset]["genome"]
-    individual = config["simulations"][wildcards.dataset]["individual"]
-
+    chromosomes = config["genomes"][wildcards.genome_build][wildcards.individual][wildcards.size][
+        "chromosomes"].split(",")
     return [
-        f"data/simulated_reads/{genome_build}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{wildcards.haplotype}.npz"
+        f"data/{wildcards.genome_build}/{wildcards.individual}/coordinate_map_chromosome{chromosome}_haplotype{wildcards.haplotype}.npz"
         for chromosome in chromosomes
     ]
+
 
 rule merge_haplotype_coordinate_maps:
     input:
         get_haplotype_coordinate_maps
     output:
-        "data/simulated_reads/{dataset}/coordinate_map_haplotype{haplotype}.npz",
+        "data/{genome_build}/{individual}/{size}/coordinate_map_haplotype{haplotype}.npz",
     run:
         from shared_memory_wrapper import to_file
         from graph_read_simulator.simulation import CoordinateMap, MultiChromosomeCoordinateMap
-        chromosomes = config["simulations"][wildcards.dataset]["chromosomes"].split(",")
+        chromosomes = config["genomes"][wildcards.genome_build][wildcards.individual][wildcards.size]["chromosomes"].split(",")
         data = {}
         for chromosome, file in zip(chromosomes, input):
             data[chromosome] = CoordinateMap.from_file(file)
         to_file(MultiChromosomeCoordinateMap(data), output[0])
 
-"""
-rule simulate_reads_for_chromosome_and_haplotype:
-    input:
-        coordinate_map="data/simulated_reads/{reference}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
-        haplotype_reference="data/simulated_reads/{reference}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta",
-        haplotype_reference_fai="data/simulated_reads/{reference}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta.fai",
-    output:
-        "data/simulated_reads/{reference}/{individual}/raw_simulated_reads_chromosome{chromosome}_haplotype{haplotype}_coverage{coverage}.txt"
-    shell:
-        "graph_read_simulator simulate_reads -s 0.001 --deletion_prob 0.001 --insertion_prob 0.001 -D data/simulated_reads/{wildcards.reference}/{wildcards.individual}/ '{wildcards.chromosome} {wildcards.haplotype}' {wildcards.coverage} > {output}"
-"""
 
+def get_mason_error_parameters(wildcards):
+    profile = config["illumina_error_profiles"][wildcards.error_profile]
+    return " --illumina-prob-deletion " + str(profile["deletion_prob"]) + \
+            " --illumina-prob-insert " + str(profile["insertion_prob"]) + \
+            " --illumina-prob-mismatch-scale " + str(profile["mismatch_scale"])
 
 rule simulate_reads_for_chromosome_and_haplotype:
     input:
-        haplotype_reference="data/simulated_reads/{dataset}/haplotype{haplotype}.fa"
+        haplotype_reference="{individual}/haplotype{haplotype}.fa"
     output:
-        simulated_reads="data/simulated_reads/{dataset}/simulated_reads_haplotype{haplotype}.fq.gz",
-        truth_positions="data/simulated_reads/{dataset}/simulated_reads_haplotype{haplotype,\d+}.sam"
+        multiext("{individual}/whole_genome_single_end/{error_profile}/{n_reads}/{read_length}/{haplotype,\d+}", ".fq.gz", ".haplotype_truth.sam")
     conda:
         "../envs/mason.yml"
     params:
-        n_reads=lambda wildcards: config["simulations"][wildcards.dataset]["n_reads"] // 2  # divide by 2 for haplotype
+        error_parameters=get_mason_error_parameters,
+        n_reads=lambda wildcards: int(wildcards.n_reads) // 2
+    threads:
+        6
     shell:
         """
-        mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output.simulated_reads} -oa {output.truth_positions}
+        mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output[0]} -oa {output[1]} --num-threads 6 {params.error_parameters}
         """
+
+
+# finds out whether each truth alignment covers a variant and adds that information
+rule add_variant_info_to_truth_sam:
+    input:
+        truth_positions="{individual}/whole_genome_single_end/{config}/{haplotype,\d+}.haplotype_truth.sam",
+        coordinate_map="{individual}/coordinate_map_haplotype{haplotype}.npz",
+    output:
+        "{individual}/whole_genome_single_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
+    run:
+        from shared_memory_wrapper import from_file
+        coordinate_map = from_file(input.coordinate_map)
+        out_file = open(output[0], "w")
+        for line in open(input.truth_positions):
+            if line.startswith("@"):
+                out_file.write(line)
+                continue
+
+            l = line.split()
+            chromosome = l[2]
+            start = int(l[3])
+            length = len(l[9])
+            end = start + length
+            n_variants = 0
+            if coordinate_map.haplotype_has_variant_between(chromosome, start, end):
+                n_variants = 1
+
+            line = line.strip() + "\tNVARIANTS:i:" + str(n_variants) + "\n"
+            out_file.write(line)
 
 
 rule change_truth_alignments_to_reference_coordinates:
     input:
-        truth_positions = "data/simulated_reads/{dataset}/simulated_reads_haplotype{haplotype}.sam",
-        coordinate_map = "data/simulated_reads/{dataset}/coordinate_map_haplotype{haplotype}.npz",
+        truth_positions = "{individual}/whole_genome_single_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
+        coordinate_map="{individual}/coordinate_map_haplotype{haplotype}.npz",
     output:
-        "data/simulated_reads/{dataset}/simulated_reads_haplotype{haplotype,\d+}.reference_coordinates.sam"
+        "{individual}/whole_genome_single_end/{config}/{haplotype,\d+}.reference_coordinates.sam",
+        #"data/simulated_reads/{dataset}/simulated_reads_haplotype{haplotype,\d+}.reference_coordinates.sam"
     run:
         from shared_memory_wrapper import from_file
         coordinate_map = from_file(input.coordinate_map)
@@ -122,60 +148,32 @@ rule change_truth_alignments_to_reference_coordinates:
 
 rule merge_simulated_reads_for_haplotypes:
     input:
-        haplotype0="data/simulated_reads/{dataset}/simulated_reads_haplotype0.fq.gz",
-        haplotype1="data/simulated_reads/{dataset}/simulated_reads_haplotype1.fq.gz",
+        haplotype0="{config}/0.fq.gz",
+        haplotype1="{config}/1.fq.gz",
     output:
-        "data/simulated_reads/{dataset}/simulated_reads.fq.gz"
+        "{config}/reads.fq.gz"
     shell:
         "zcat {input} | python scripts/assign_ids_to_fq.py | gzip > {output} "
 
 
 rule merge_truth_alignments_for_haplotypes:
     input:
-        haplotype0 = "data/simulated_reads/{dataset}/simulated_reads_haplotype0.reference_coordinates.sam",
-        haplotype1 = "data/simulated_reads/{dataset}/simulated_reads_haplotype1.reference_coordinates.sam",
+        haplotype0 = "{config}/0.reference_coordinates.sam",
+        haplotype1 = "{config}/1.reference_coordinates.sam",
     output:
-        "data/simulated_reads/{dataset}/simulated_reads.sam"
+        "{config}/truth.sam"
     shell:
         "cat {input} | python scripts/assign_ids_to_sam.py  > {output} "
 
 
 rule store_truth_alignments:
     input:
-        "data/simulated_reads/{dataset}/simulated_reads.sam"
+        sam="data/simulated_reads/{individual}/whole_genome_single_end/{error_profile}/{n_reads}/{read_length}/truth.sam",
+        #coordinate_map="data/simulated_reads/{dataset}/"
     output:
-        "data/simulated_reads/{dataset}/truth.npz"
-    params:
-        n_reads = lambda wildcards: config["simulations"][wildcards.dataset]["n_reads"]
+        "data/simulated_reads/{individual}/whole_genome_single_end/{error_profile}/{n_reads}/{read_length}/truth.npz",
     shell:
         """
-        cat {input} | numpy_alignments store sam {output} {params.n_reads}
+        cat {input.sam} | numpy_alignments store sam {output} {wildcards.n_reads}
         """
 
-
-"""
-def get_simulation_tmp_datasets(wildcards):
-    haplotypes = [0, 1]
-    chromosomes = config["simulations"][wildcards.dataset]["chromosomes"].split(",")
-    genome_build = config["simulations"][wildcards.dataset]["genome"]
-    individual = config["simulations"][wildcards.dataset]["individual"]
-    coverage = str(config["simulations"][wildcards.dataset]["coverage"])
-
-    files = []
-    for chromosome in chromosomes:
-        for haplotype in haplotypes:
-            files.append("data/simulated_reads/" + genome_build + "/" + individual + "/raw_simulated_reads_chromosome" + chromosome + "_haplotype" + str(haplotype) + "_coverage" + coverage + ".txt")
-
-    return files
-
-
-rule simulate_reads:
-    input:
-        get_simulation_tmp_datasets
-    output:
-        reads="data/simulated_reads/{dataset}.fa",
-        read_positions="data/simulated_reads/{dataset}.readpositions"
-    shell:
-        "cat {input} | graph_read_simulator assign_ids {output.read_positions} {output.reads}"
-
-"""

@@ -2,18 +2,16 @@
 
 rule download_reference:
     output:
-        "data/reference_genomes/raw/{reference}.2bit"
+        "data/{reference}/reference.2bit"
     shell:
         "wget -O {output} https://hgdownload.soe.ucsc.edu/goldenPath/{wildcards.reference}/bigZips/{wildcards.reference}.2bit"
 
 
 rule convert_reference_genome_to_fasta:
     input:
-        "data/reference_genomes/raw/{sample}.2bit"
+        "data/{sample}/reference.2bit"
     output:
-        "data/reference_genomes/raw/{sample}.fa"
-    log:
-        "logs/{sample}.2bit_to_fa.log"
+        "data/{sample,\w+}/reference.fa"
     wrapper:
         "v1.21.2/bio/ucsc/twoBitToFa"
 
@@ -35,29 +33,30 @@ rule samtools_index2:
         "v1.21.2/bio/samtools/faidx"
 
 
+"""
 rule get_single_chromosome_reference:
     input:
-        ref="data/reference_genome/raw/{build}.fa",
-        index="data/reference_genome/raw/{build}.fa.fai",
+        ref="data/{build}/reference.fa",
+        index="data/{build}/reference.fa.fai",
     output:
-        "data/reference_genome/raw/{build}_{chromosome}.fa"
+        "data/{build}/raw/{build}_{chromosome}.fa"
     params:
         "{chromosome}"
     wrapper:
         "v1.21.2/bio/samtools/faidx"
-
+"""
 
 rule get_dataset_reference:
     input:
-        ref=lambda wildcards: "data/reference_genomes/raw/" + config["simulations"][wildcards.dataset]["genome"]  + ".fa",
-        index=lambda wildcards: "data/reference_genomes/raw/" + config["simulations"][wildcards.dataset]["genome"]  + ".fa.fai",
+        ref = "data/{reference}/reference.fa",
+        index = "data/{reference}/reference.fa.fai",
+        #ref=lambda wildcards: "data/reference_genomes/raw/" + config["variant_sources"][config["individuals"][wildcards.individual]["variant_source"]]["genome"]  + ".fa",
+        #index=lambda wildcards: "data/reference_genomes/raw/" + config["variant_sources"][config["individuals"][wildcards.individual]["variant_source"]]["genome"]  + ".fa.fai",
     output:
-        "data/reference_genomes/{dataset}.fa"
+        "data/{reference}/{individual}/{size}/reference.fa"
     conda:
         "envs/samtools.yml"
     params:
-        regions=lambda wildcards: config["simulations"][wildcards.dataset]["chromosomes"].replace(",", " ")
+        regions=lambda wildcards: config["genomes"][wildcards.reference][wildcards.individual][wildcards.size]["chromosomes"].replace(",", " ")
     shell:
         "samtools faidx {input.ref} {params.regions} > {output}"
-    #wrapper:
-    #    "v1.21.2/bio/samtools/faidx"
