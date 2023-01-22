@@ -14,10 +14,10 @@ rule bwa_index:
 
 rule bwa_map_single_end:
     input:
-        reads = "data/simulated_reads/{individual}/{config}/reads.fq.gz",
-        idx = multiext("data/simulated_reads/{individual}/reference_genome",".amb",".ann",".bwt",".pac",".sa"),
+        reads = "data/{individual}/whole_genome_single_end/{config}/reads.fq.gz",
+        idx = multiext("data/{individual}/reference",".amb",".ann",".bwt",".pac",".sa"),
     output:
-        "data/simulated_reads/{individual,[a-z0-9_]+}/{config}/bwa/mapped.bam",
+        "data/{individual}/whole_genome_single_end/{config}/bwa/mapped.bam",
     params:
         extra=r"-R '@RG\tID:{individual}\tSM:{individual}'",
         sorting="none",# Can be 'none', 'samtools' or 'picard'.
