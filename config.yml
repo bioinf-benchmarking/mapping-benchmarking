@@ -2,15 +2,15 @@ use_conda: True
 
 method_names:
   bwa: "BWA MEM"
-  strobealign: "Strobealign"
-  minimap2: "Minimap2"
+  #strobealign: "Strobealign"
+  #minimap2: "Minimap2"
 
 
 runs:
   mapping:
     name: "Mapping reads"
-    tools: [ "bwa", "strobealign", "minimap2"]
-    output_file_ending: ".sam"
+    tools: [ "bwa" ]
+    output_file_ending: ".bam"
     validate_equal: false
     runs:
       small: "dataset1"

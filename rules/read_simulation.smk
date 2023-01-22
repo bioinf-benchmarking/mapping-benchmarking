@@ -80,7 +80,7 @@ rule simulate_reads_for_chromosome_and_haplotype:
     input:
         haplotype_reference="{individual}/haplotype{haplotype}.fa"
     output:
-        multiext("{individual}/whole_genome_single_end/{error_profile}/{n_reads}/{read_length}/{haplotype,\d+}", ".fq.gz", ".haplotype_truth.sam")
+        multiext("{individual}/whole_genome_single_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", ".fq.gz", ".haplotype_truth.sam")
     conda:
         "../envs/mason.yml"
     params:
@@ -93,14 +93,56 @@ rule simulate_reads_for_chromosome_and_haplotype:
         mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output[0]} -oa {output[1]} --num-threads 6 {params.error_parameters}
         """
 
+rule simulate_reads_for_chromosome_and_haplotype_paired_end:
+    input:
+        haplotype_reference="{individual}/haplotype{haplotype}.fa"
+    output:
+        reads1="{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}-1.fq.gz",
+        reads2="{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}-2.fq.gz",
+        truth1="{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}.haplotype_truth.sam",
+    conda:
+        "../envs/mason.yml"
+    params:
+        error_parameters=get_mason_error_parameters,
+        n_reads=lambda wildcards: int(wildcards.n_reads) // 4  # divide by 4 for paird end since mason simulates n fragments
+    threads:
+        6
+    shell:
+        """
+        mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output.reads1} -or {output.reads2} -oa {output.truth1} --num-threads 6 {params.error_parameters}
+        """
+
+rule merge_paired_end_reads:
+    input:
+        r1="{data}/{haplotype}-1.fq.gz",
+        r2= "{data}/{haplotype}-2.fq.gz"
+    output:
+        merged="{data}/{haplotype,\d+}.fq.gz"
+    params:
+        compress_lvl=9,
+    threads: 4
+    wrapper:
+        "v1.21.4/bio/seqtk/mergepe"
+
+
+rule deinterleave_fastq:
+    input:
+        "{data}/reads.fq.gz"
+    output:
+        "{data}/reads{n}.fq.gz"
+    params:
+        extra="-{n}",
+    wrapper:
+        "v1.21.4/bio/seqtk/seq"
+
 
 # finds out whether each truth alignment covers a variant and adds that information
 rule add_variant_info_to_truth_sam:
     input:
-        truth_positions="{individual}/whole_genome_single_end/{config}/{haplotype,\d+}.haplotype_truth.sam",
+        truth_positions="{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.haplotype_truth.sam",
         coordinate_map="{individual}/coordinate_map_haplotype{haplotype}.npz",
     output:
-        "{individual}/whole_genome_single_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
+        "{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
     run:
         from shared_memory_wrapper import from_file
         coordinate_map = from_file(input.coordinate_map)
@@ -125,10 +167,10 @@ rule add_variant_info_to_truth_sam:
 
 rule change_truth_alignments_to_reference_coordinates:
     input:
-        truth_positions = "{individual}/whole_genome_single_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
+        truth_positions = "{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
         coordinate_map="{individual}/coordinate_map_haplotype{haplotype}.npz",
     output:
-        "{individual}/whole_genome_single_end/{config}/{haplotype,\d+}.reference_coordinates.sam",
+        "{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.reference_coordinates.sam",
         #"data/simulated_reads/{dataset}/simulated_reads_haplotype{haplotype,\d+}.reference_coordinates.sam"
     run:
         from shared_memory_wrapper import from_file
@@ -168,10 +210,10 @@ rule merge_truth_alignments_for_haplotypes:
 
 rule store_truth_alignments:
     input:
-        sam="data/simulated_reads/{individual}/whole_genome_single_end/{error_profile}/{n_reads}/{read_length}/truth.sam",
+        sam="{data}/{n_reads}/truth.sam",
         #coordinate_map="data/simulated_reads/{dataset}/"
     output:
-        "data/simulated_reads/{individual}/whole_genome_single_end/{error_profile}/{n_reads}/{read_length}/truth.npz",
+        "{data}/{n_reads,\d+}/truth.npz",
     shell:
         """
         cat {input.sam} | numpy_alignments store sam {output} {wildcards.n_reads}
