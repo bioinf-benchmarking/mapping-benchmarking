@@ -10,11 +10,6 @@ runs:
   mapping:
     name: "Mapping reads"
     tools: [ "bwa" ]
-    output_file_ending: ".bam"
-    validate_equal: false
-    runs:
-      small: "dataset1"
-      big: "dataset2"
 
 
 variant_sources:
@@ -49,15 +44,14 @@ illumina_error_profiles:
 # each genomes can have multiple individuals
 # simulated_reads should not be directory
 
-individuals:
-  hg002_small:
-    variant_source: "hg002"
-    chromosomes: "chr20,chr21"
-
-  hg002_medium:
-    variant_source: "hg002"
-    chromosomes: "chr17,chr18,chr19,chr20,chr21"
-
+#individuals:
+#  hg002_small:
+#    variant_source: "hg002"
+#    chromosomes: "chr20,chr21"
+#
+#  hg002_medium:
+#    variant_source: "hg002"
+#    chromosomes: "chr17,chr18,chr19,chr20,chr21"
 
 
 genomes:
