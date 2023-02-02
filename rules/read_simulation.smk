@@ -9,6 +9,17 @@ rule download_truth_vcf:
         "wget -O {output} {params.url}"
 
 
+rule download_truth_regions:
+    output:
+        "data/{genome_build}/{individual}/truth_regions.bed"
+    params:
+        url=lambda wildcards: config["genomes"][wildcards.genome_build][wildcards.individual]["truth_regions"]
+    conda:
+        "../envs/bcftools.yml"
+    shell:
+        "wget -O {output} {params.url}"
+
+
 def get_individual_properties(wildcards, property):
     return config["individuals"][wildcards.dataset][property]
 

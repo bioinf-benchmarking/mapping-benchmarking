@@ -38,4 +38,12 @@ rule make_mapping_report:
 
 
 
+rule get_accuracy_result:
+    input:
+        alignments="{config}/mapped.npz",
+        truth=lambda wildcards: "/".join(wildcards.config.split("/")[:-2])  + "/truth.npz"  # hacky, get truth file two dirs down
+    output:
+        "{config}/{mapq}/{variant_filter}/{type}.txt"  # type is recall, one_minus_precision or f1_score
+    shell:
+        "numpy_alignments get_correct_rates --report-type {wildcards.type} -m {wildcards.mapq} {input.truth} {input.alignments} {wildcards.variant_filter} > {output}"
 

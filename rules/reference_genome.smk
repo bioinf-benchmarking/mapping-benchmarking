@@ -55,8 +55,19 @@ rule get_dataset_reference:
     output:
         "data/{reference}/{individual}/{size}/reference.fa"
     conda:
-        "envs/samtools.yml"
+        "../envs/samtools.yml"
     params:
         regions=lambda wildcards: config["genomes"][wildcards.reference][wildcards.individual][wildcards.size]["chromosomes"].replace(",", " ")
     shell:
         "samtools faidx {input.ref} {params.regions} > {output}"
+
+
+rule tabix:
+    input:
+        "{prefix}.vcf.gz",
+    output:
+        "{prefix}.vcf.gz.tbi",
+    params:
+        "-p vcf",
+    wrapper:
+        "v1.21.6/bio/tabix/index"
