@@ -1,3 +1,6 @@
+import plotly.express as px
+from hierarchical_results.hierarchical_results import HierarchicalResults, Parameters
+hr = HierarchicalResults(config["parameter_types"],config["result_types"], prefix="data/")
 
 
 # reports/plots/f1_score_bar/hg38/hg002/small/whole_genome_single_end/low_error/150/1000/all_methods/4/5/variants/plot.png
@@ -49,6 +52,35 @@ def get_plot_input_files(wildcards):
     return files
 
 
+def get_parameter_combinations_and_result_names(wildcards):
+    parameter_combinations = Parameters.from_path(hr.get_names(), wildcards.path)
+
+    type = wildcards.plot_type
+    x_axis = config["plot_types"][type]["x_axis"]
+    y_axis = config["plot_types"][type]["y_axis"]
+
+    result_names = []
+
+    for axis in [x_axis, y_axis]:
+        if axis in config["parameter_types"]:
+            parameter_group = get_parameter_from_config_path(axis, wildcards.path)
+            assert parameter_group in config["parameter_groups"]
+            values = config["parameter_groups"][parameter_group]["values"]
+            parameter_name = config["parameter_groups"][parameter_group]["parameter_type"]
+            parameter_combinations.set(parameter_name, values)
+        elif axis in config["result_types"]:
+            result_names.append(axis)
+
+    return parameter_combinations, result_names
+
+
+def get_plot_input_files2(wildcards):
+    parameter_combinations, result_names = get_parameter_combinations_and_result_names(wildcards)
+    files = hr.get_result_file_names(parameter_combinations, result_names)
+    files = [f for f in files]
+    return files
+
+
 def get_input_file_for_x_and_y_parameters(path, x, y):
     assert y in config["result_types"], "Y must be a result type, now %s" % y
     file_name = path + "/" + y + ".txt"
@@ -63,33 +95,21 @@ def get_result_file(path, x_parameter, x_value, y_parameter):
 
 
 rule make_plot:
-    input: get_plot_input_files
+    input: get_plot_input_files2
     output:
         #"reports/plots/{plot_type}/{genome_build}/{individual}/{dataset_size}/{read_type}/" + \
         #"{error_profile}/{read_length}/{n_reads}/{method}/{n_threads}/{min_mapq}/{variant_filter}/plot.png"
-        "reports/plots/{plot_type, \w+}/{path}/plot.png"
+        plot="reports/plots/{plot_type, \w+}/{path}/plot.png",
+        plot_html="reports/plots/{plot_type, \w+}/{path}/plot.html",
+        data="reports/plots/{plot_type, \w+}/{path}/plot.csv",
     run:
+        parameter_combinations, result_names = get_parameter_combinations_and_result_names(wildcards)
+        df = hr.get_results_dataframe(parameter_combinations, result_names)
+        df.to_csv(output.data)
+        print(df)
+
         plot_config = config["plot_types"][wildcards.plot_type]
-        if plot_config["type"] == "bar":
-            y = plot_config["y_axis"]
-            x = plot_config["x_axis"]
-            assert y in config["result_types"], "y value %s" % y
-
-            # x can also potentially be a result_type
-            assert x in config["parameter_types"], "x values %s" % x
-
-            x_values = get_parameter_from_config_path(x, wildcards.path)
-            assert x_values in config["parameter_groups"], "x values %s not in config"
-
-            x_values = config["parameter_groups"][x_values]["values"]
-
-            y_files = [get_result_file(wildcards.path, x, x_value, y) for x_value in x_values]
-            y_values = [float(open(y_file).read().strip()) for y_file in y_files]
-
-            import plotly.express as px
-            fig = px.bar(x=x_values, y=y_values)
-            fig.write_image(output[0])
-
-        else:
-            assert False, "not implemented"
+        fig = px.bar(df, x=plot_config["x_axis"], y=plot_config["y_axis"])
+        fig.write_image(output.plot)
+        fig.write_html(output.plot_html)
 
