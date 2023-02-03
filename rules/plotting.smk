@@ -2,6 +2,11 @@ import plotly.express as px
 from hierarchical_results.hierarchical_results import HierarchicalResults, Parameters
 hr = HierarchicalResults(config["parameter_types"],config["result_types"], prefix="data/")
 
+plotting_functions = {
+    "bar": px.bar,
+    "line": px.line
+}
+
 
 # reports/plots/f1_score_bar/hg38/hg002/small/whole_genome_single_end/low_error/150/1000/all_methods/4/5/variants/plot.png
 
@@ -23,45 +28,17 @@ def permute_files(files, parameter, values):
     return new_files
 
 
-def get_plot_input_files(wildcards):
-    type = wildcards.plot_type
-    print("Plot type: ", type)
-    x_axis = config["plot_types"][type]["x_axis"]
-    y_axis = config["plot_types"][type]["y_axis"]
-    print("x axis / yaxis", x_axis, y_axis)
-
-    files = [wildcards.path + "/result_type.txt"]
-    result_type = None
-
-    for axis in [x_axis, y_axis]:
-        if axis in config["parameter_types"]:
-            print("AXIS: ", axis)
-            parameter_group = get_parameter_from_config_path(axis, wildcards.path)
-            print("Parameter group: ", parameter_group)
-            assert parameter_group in config["parameter_groups"]
-            values = config["parameter_groups"][parameter_group]["values"]
-            print("Values: ", values)
-            files = permute_files(files, config["parameter_groups"][parameter_group]["parameter_type"], values)
-        elif axis in config["result_types"]:
-            result_type = axis
-
-    assert result_type is not None, "One of the axis for plot must be a result type"
-    files = [f.replace("result_type", result_type) for f in files]
-    files = ["data/" + f for f in files]
-    print(files)
-    return files
-
-
 def get_parameter_combinations_and_result_names(wildcards):
     parameter_combinations = Parameters.from_path(hr.get_names(), wildcards.path)
 
     type = wildcards.plot_type
     x_axis = config["plot_types"][type]["x_axis"]
     y_axis = config["plot_types"][type]["y_axis"]
+    category = config["plot_types"][type]["category_variable"]
 
     result_names = []
 
-    for axis in [x_axis, y_axis]:
+    for axis in [x_axis, y_axis, category]:
         if axis in config["parameter_types"]:
             parameter_group = get_parameter_from_config_path(axis, wildcards.path)
             assert parameter_group in config["parameter_groups"]
@@ -74,7 +51,7 @@ def get_parameter_combinations_and_result_names(wildcards):
     return parameter_combinations, result_names
 
 
-def get_plot_input_files2(wildcards):
+def get_plot_input_files(wildcards):
     parameter_combinations, result_names = get_parameter_combinations_and_result_names(wildcards)
     files = hr.get_result_file_names(parameter_combinations, result_names)
     files = [f for f in files]
@@ -95,7 +72,7 @@ def get_result_file(path, x_parameter, x_value, y_parameter):
 
 
 rule make_plot:
-    input: get_plot_input_files2
+    input: get_plot_input_files
     output:
         #"reports/plots/{plot_type}/{genome_build}/{individual}/{dataset_size}/{read_type}/" + \
         #"{error_profile}/{read_length}/{n_reads}/{method}/{n_threads}/{min_mapq}/{variant_filter}/plot.png"
@@ -109,7 +86,11 @@ rule make_plot:
         print(df)
 
         plot_config = config["plot_types"][wildcards.plot_type]
-        fig = px.bar(df, x=plot_config["x_axis"], y=plot_config["y_axis"])
+        plot_type = plot_config["type"]
+        assert plot_type in plotting_functions, "Plot type %s not supported"
+        func = plotting_functions[plot_type]
+
+        fig = func(df, x=plot_config["x_axis"], y=plot_config["y_axis"], color=plot_config["category_variable"])
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)
 

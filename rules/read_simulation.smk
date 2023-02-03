@@ -96,13 +96,18 @@ rule simulate_reads_for_chromosome_and_haplotype:
         "../envs/mason.yml"
     params:
         error_parameters=get_mason_error_parameters,
-        n_reads=lambda wildcards: int(wildcards.n_reads) // 2
+        n_reads=lambda wildcards: int(wildcards.n_reads) // 2,
+        mean_fragment_size=lambda wildcards: int(wildcards.read_length) * 3,
+        min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
+        max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
     threads:
         6
     shell:
-        """
-        mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output[0]} -oa {output[1]} --num-threads 6 {params.error_parameters}
-        """
+        "mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output[0]} -oa {output[1]} --num-threads 6 {params.error_parameters} "
+        "--illumina-read-length {wildcards.read_length} "
+        "--fragment-mean-size {params.mean_fragment_size} "
+        "--fragment-min-size {params.min_fragment_size} "
+        "--fragment-max-size {params.max_fragment_size} "
 
 rule simulate_reads_for_chromosome_and_haplotype_paired_end:
     input:
@@ -115,13 +120,18 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end:
         "../envs/mason.yml"
     params:
         error_parameters=get_mason_error_parameters,
-        n_reads=lambda wildcards: int(wildcards.n_reads) // 4  # divide by 4 for paird end since mason simulates n fragments
+        n_reads=lambda wildcards: int(wildcards.n_reads) // 4,  # divide by 4 for paird end since mason simulates n fragments
+        mean_fragment_size= lambda wildcards: wildcards.read_length * 3,
+        min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
+        max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
     threads:
         6
     shell:
-        """
-        mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output.reads1} -or {output.reads2} -oa {output.truth1} --num-threads 6 {params.error_parameters}
-        """
+        "mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output.reads1} -or {output.reads2} -oa {output.truth1} --num-threads 6 {params.error_parameters} "
+        "--illumina-read-length {wildcards.read_length} "
+        "--fragment-mean-size {params.mean_fragment_size} "
+        "--fragment-min-size {params.min_fragment_size} "
+        "--fragment-max-size {params.max_fragment_size} "
 
 rule merge_paired_end_reads:
     input:
