@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import plotly.express as px
 from hierarchical_results.hierarchical_results import HierarchicalResults, Parameters
 hr = HierarchicalResults(config["parameter_types"],config["result_types"], prefix="data/")
@@ -32,21 +34,25 @@ def get_parameter_combinations_and_result_names(wildcards):
     parameter_combinations = Parameters.from_path(hr.get_names(), wildcards.path)
 
     type = wildcards.plot_type
-    x_axis = config["plot_types"][type]["x_axis"]
-    y_axis = config["plot_types"][type]["y_axis"]
-    category = config["plot_types"][type]["category_variable"]
+
+    dimensions = []
+    for possible_dimension in config["plotting_dimensions"]:
+        if possible_dimension in config["plot_types"][type]:
+            dimensions.append(config["plot_types"][type][possible_dimension])
 
     result_names = []
 
-    for axis in [x_axis, y_axis, category]:
-        if axis in config["parameter_types"]:
-            parameter_group = get_parameter_from_config_path(axis, wildcards.path)
-            assert parameter_group in config["parameter_groups"]
+    for dimension in dimensions:
+        if dimension in config["parameter_types"]:
+            parameter_group = get_parameter_from_config_path(dimension, wildcards.path)
+            assert parameter_group in config["parameter_groups"], "Parameter group %s invalid" % parameter_group
             values = config["parameter_groups"][parameter_group]["values"]
             parameter_name = config["parameter_groups"][parameter_group]["parameter_type"]
             parameter_combinations.set(parameter_name, values)
-        elif axis in config["result_types"]:
-            result_names.append(axis)
+        elif dimension in config["result_types"]:
+            result_names.append(dimension)
+        else:
+            raise Exception("Could not link %s to a parameter type or result type" % dimension)
 
     return parameter_combinations, result_names
 
@@ -58,24 +64,19 @@ def get_plot_input_files(wildcards):
     return files
 
 
-def get_input_file_for_x_and_y_parameters(path, x, y):
-    assert y in config["result_types"], "Y must be a result type, now %s" % y
-    file_name = path + "/" + y + ".txt"
-    if x in config["parameter_types"]:
-        pass
-
-def get_result_file(path, x_parameter, x_value, y_parameter):
-    path = path.split("/")
-    # replace x value
-    path[config["parameter_types"].index(x_parameter)] = x_value
-    return "data/" + "/".join(path) + "/"  + y_parameter + ".txt"
+def parse_plot_specification(plot_type):
+    specification = {}
+    for dimension in config["plotting_dimensions"]:
+        if dimension in config["plot_types"][plot_type]:
+            specification[dimension] = config["plot_types"][plot_type][dimension]
+        else:
+            specification[dimension] = None
+    return specification
 
 
 rule make_plot:
     input: get_plot_input_files
     output:
-        #"reports/plots/{plot_type}/{genome_build}/{individual}/{dataset_size}/{read_type}/" + \
-        #"{error_profile}/{read_length}/{n_reads}/{method}/{n_threads}/{min_mapq}/{variant_filter}/plot.png"
         plot="reports/plots/{plot_type, \w+}/{path}/plot.png",
         plot_html="reports/plots/{plot_type, \w+}/{path}/plot.html",
         data="reports/plots/{plot_type, \w+}/{path}/plot.csv",
@@ -87,10 +88,17 @@ rule make_plot:
 
         plot_config = config["plot_types"][wildcards.plot_type]
         plot_type = plot_config["type"]
-        assert plot_type in plotting_functions, "Plot type %s not supported"
-        func = plotting_functions[plot_type]
+        if plot_type == "scatter_and_line":
+           specification = parse_plot_specification(wildcards.plot_type)
+           fig = px.scatter(df, **specification)
+           fig.add_traces(px.line(df, **specification).data)
+        else:
+            assert plot_type in plotting_functions, "Plot type %s not supported"
+            func = plotting_functions[plot_type]
+            fig = func(df, **parse_plot_specification(wildcards.plot_type))
 
-        fig = func(df, x=plot_config["x_axis"], y=plot_config["y_axis"], color=plot_config["category_variable"])
+        fig.update_layout(font=dict(size=20))
+        fig.show()
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)
 
