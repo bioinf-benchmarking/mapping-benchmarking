@@ -86,6 +86,9 @@ rule make_plot:
         df.to_csv(output.data)
         print(df)
 
+        if wildcards.plot_type not in config["plot_types"]:
+            print("Invalid plot type ", wildcards.plot_type, " not specified in config")
+
         plot_config = config["plot_types"][wildcards.plot_type]
         plot_type = plot_config["type"]
         if plot_type == "scatter_and_line":
@@ -101,4 +104,46 @@ rule make_plot:
         fig.show()
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)
+
+
+
+def get_plot_name(wildcards):
+    name = wildcards.name
+    assert name in config["plots"], "Plot name %s not defined in plots.yaml" % name
+    plot_config = config["plots"][name]
+    assert plot_config["plot_type"] in config["plot_types"], "Plot specifies a plot type %s that is not in config.plot_types" % plot_config["plot_type"]
+    plot_type_config = config["plot_types"][plot_config["plot_type"]]
+
+    # Parameters that can vary for this plot:
+    variables = [plot_type_config[dimension] for dimension in config["plotting_dimensions"] if dimension in plot_type_config]
+    print(variables)
+
+    plot_path = []
+    for parameter in config["parameter_types"]:
+        print(parameter)
+        if parameter in plot_config["parameters"]:
+            parameter = plot_config["parameters"][parameter]
+        else:
+            # not specified, use default value
+            if parameter in variables:
+                # use parameter_group default value
+                parameter = config["default_parameter_groups"][parameter]
+            else:
+                # use default parameter
+                parameter = config["default_parameter_values"][parameter]
+        plot_path.append(parameter)
+
+    file = "reports/plots/" + plot_config["plot_type"] + "/" + "/".join(plot_path) + "/plot.png"
+    return file
+
+
+
+# Wrapper around the make_plot rule that uses default parameters
+# so that less stuff needs to be specified
+rule make_plot_from_name:
+    input: get_plot_name
+    output:
+        "reports/presets/{name}.png"
+    shell:
+        "cp {input} {output}"
 

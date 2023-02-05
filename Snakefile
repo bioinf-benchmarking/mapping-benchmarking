@@ -1,4 +1,5 @@
-configfile: "config.yaml"
+configfile: "config/config.yaml"
+configfile: "config/plots.yaml"
 workflow.use_conda = True
 
 include: "rules/bwa.smk"

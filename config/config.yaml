@@ -1,0 +1,150 @@
+use_conda: True
+
+# name of all methods
+methods: ["bwa", "minimap2"]
+
+# mapping from method IDs to names
+method_names:
+  bwa: "BWA MEM"
+  #strobealign: "Strobealign"
+  #minimap2: "Minimap2"
+
+
+# things that can be measured and represented as a
+# number for each method. These types can be specified on axis/facets for plot_types.
+result_types: [
+  "runtime",
+  "memory_usage",
+  "recall",
+  "one_minus_precision",
+  "f1_score",
+  "variant_calling_precision",
+  "variant_calling_recall",
+  "variant_calling_f1_score",
+]
+
+# The list of all parameters that can be changed to produce a result,
+# in order of Snakemake directory structure
+parameter_types: [
+  "genome_build",
+  "individual",
+  "dataset_size",
+  "read_type",
+  "error_profile",
+  "read_length",
+  "n_reads",
+  "method",
+  "n_threads",
+  "min_mapq",
+  "variant_filter"  # all, variants, nonvariants: Specifies type of reads to include (all, reads with genomic variants in them, reads with genomic variants)
+]
+
+
+default_parameter_values:
+  genome_build: "hg38"
+  individual: "hg002"
+  dataset_size: "small"
+  read_type: "whole_genome_paired_end"
+  error_profile: "medium_error"
+  read_length: "150"
+  n_reads: "10000"
+  method: "bwa"
+  n_threads: "4"
+  min_mapq: "0"
+  variant_filter: "all"
+
+
+
+# groups of parameters, to be used when creating a plot
+parameter_groups:
+  all_methods:
+    parameter_type: "method"
+    values: ["bwa", "minimap"]
+  read_lengths_rough:
+    parameter_type: "read_length"
+    values: [75, 150, 300]
+  read_lengths_fine:
+    variable: "read_length"
+    values: [50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300]
+  typical_n_threads:
+    parameter_type: "n_threads"
+    values: [1, 4, 8, 16]
+  mapqs:
+    parameter_type: "min_mapq"
+    values: [0, 10, 20, 30, 40, 50, 60]
+  variant_types:
+    parameter_type: "variant_filter"
+    values: ["all", "variants", "nonvariants"]
+  error_profiles:
+    parameter_type: "error_profile"
+    values: ["low_error", "medium_error", "high_error"]
+  all_genome_builds:
+    parameter_type: "genome_build"
+    values: ["hg38"]
+  all_individuals:
+    parameter_type: "individual"
+    values: ["hg002", "hg003"]
+  dataset_sizes:
+    parameter_type: "dataset_size"
+    values: ["small", "medium", "big"]
+  read_types:
+    parameter_type: "read_type"
+    values: ["whole_genome_single_end", "whole_genome_paired_end"]
+  n_reads_rough:
+    parameter_type: n_reads
+    values: [1000, 10000, 100000, 1000000, 10000000]
+  variant_filters:
+    parameter_type: variant_filter
+    values: [all, nonvariants, variants]
+
+
+# Default parameter groups. Will be used for plotting if not overridden
+default_parameter_groups:
+  genome_build: all_genome_builds
+  individual: all_individuals
+  dataset_size: dataset_sizes
+  read_type: read_types
+  error_profile: error_profiles
+  read_length: read_lengths_rough
+  n_reads: n_reads_rough
+  method: all_methods
+  n_threads: typical_n_threads
+  min_mapq: mapqs
+  variant_filter: variant_filters
+
+
+genomes:
+  hg38:  # UCSC id of reference genome
+    hg002:  # a descriptive name [a-zA-z0-9]
+      # url to the genomic variants and truth regions for this individual
+      vcf_url: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv4.2.1/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz"
+      truth_regions: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv4.2.1/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark_noinconsistent.bed"
+
+      # "genomes" that are used for benchmarking
+      # Specify small and medium for quicker runs.
+      # The big should be the full genome (* means all chromosomes)
+      small:
+        chromosomes: "chr20,chr21"
+      medium:
+        chromosomes: "chr17,chr18,chr19,chr20,chr21"
+      big:
+        chromosomes: "*"
+    hg003:
+      #
+
+# Error profiles. The names (e.g. low_error) are used as parameters
+illumina_error_profiles:
+  low_error:
+    deletion_prob: 0.00001
+    insertion_prob: 0.00001
+    mismatch_scale: 0.2
+
+  medium_error:
+    deletion_prob: 0.00005
+    insertion_prob: 0.00005
+    mismatch_scale: 1.0
+
+  high_error:
+    deletion_prob: 0.0005
+    insertion_prob: 0.0005
+    mismatch_scale: 3.0

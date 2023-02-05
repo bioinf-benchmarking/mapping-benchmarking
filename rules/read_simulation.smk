@@ -109,6 +109,7 @@ rule simulate_reads_for_chromosome_and_haplotype:
         "--fragment-min-size {params.min_fragment_size} "
         "--fragment-max-size {params.max_fragment_size} "
 
+
 rule simulate_reads_for_chromosome_and_haplotype_paired_end:
     input:
         haplotype_reference="{individual}/haplotype{haplotype}.fa"

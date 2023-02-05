@@ -14,7 +14,7 @@ rule minimap_single_end:
         sort_extra = "",  # optional: extra arguments for samtools/picard
 
     benchmark:
-        "{data}/whole_genome_single_end/{config}/bwa/{n_threads}/benchmark.csv",
+        "{data}/whole_genome_single_end/{config}/minimap/{n_threads}/benchmark.csv",
     threads: lambda wildcards: int(wildcards.n_threads)
     wrapper:
         "v1.21.2/bio/minimap2/aligner"

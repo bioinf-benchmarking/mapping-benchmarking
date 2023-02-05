@@ -1,0 +1,79 @@
+# This file contains all configuration for the plots (reports) that can be generated
+
+# List of plots that will be generated every night
+nightly_plots: []
+
+
+# Plots
+plots:
+  plot1:
+    plot_type: "accuracy_vs_read_length"
+    parameters:
+      read_type: "whole_genome_single_end"
+
+
+plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
+
+
+# plot_typoes define different type of plots
+# they only describe the structure of the plot, not what values are used for the variables
+# a plot tyope has:
+# type: line/bar
+# x_axis, y_axis, category_variable:
+#   each of these should be either a result_type or a parameter_type
+
+plot_types:
+  f1_score_bar:
+    type: "bar"
+    x: "method"
+    y: "f1_score"
+  accuracy:
+    type: "scatter_and_line"
+    x: "one_minus_precision"
+    y: "recall"
+    labels: "min_mapq"
+    color: "method"
+  accuracy_facet:
+    type: "scatter_and_line"
+    x: "one_minus_precision"
+    y: "recall"
+    labels: "min_mapq"
+    color: "method"
+    facet_col: "read_length"
+  accuracy_vs_read_length_single_method:
+    type: "line"
+    x: "read_length"
+    y: "f1_score"
+  accuracy_vs_read_length:
+    type: "line"
+    x: "read_length"
+    y: "f1_score"
+    color: "method"
+    facet_col: "variant_filter"
+    facet_row: "error_profile"
+  runtime_simple:
+    type: "bar"
+    y: "runtime"
+    x: "method"
+
+    # x_axis is by default methods if not specified
+
+# A plot type can then be used to generate a plot with specified values specified by path:
+# reports/plots/accuracy/... config matching read config but can contain variable groups ...
+# example:
+# reports/plots/accuracy/hg38/hg002/small/whole_genome_single_end/low_error/150/1000/all_methods/4/plot.png
+# all_methods is here a variable group. An accuracy plot will then be generated with methods specified by all_methods
+# example with read length as a group:
+# reports/plots/accuracy_vs_read_length/hg38/hg002/small/whole_genome_single_end/low_error/read_lengths_rough/1000/all_methods/4/plot.png
+#
+# In the last example, the engine knows that accuracy_vs_read_length will need that read_length is a parameter_group with parameter_type read_length
+# since the x_axis is read_length. Similarily, since category_variable is "method", it will ned a method parameter_group
+# it will then generate a plot with those methods as category variable and the read lengths as x_axis
+#
+# bar plot of f1 score for reads with variant and min mapq 5
+# reports/plots/f1_score_bar/hg38/hg002/small/whole_genome_single_end/low_error/150/1000/all_methods/4/5/variants/plot.png
+
+
+# Configuration for "genomes" (individuals) that reads can be sequenced from
+# Genomes are based on a reference genome
+# each reference genome can have multiple individuals

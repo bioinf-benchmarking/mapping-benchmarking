@@ -47,3 +47,12 @@ rule get_accuracy_result:
     shell:
         "numpy_alignments get_correct_rates --report-type {wildcards.type} -m {wildcards.mapq} {input.truth} {input.alignments} {wildcards.variant_filter} > {output}"
 
+
+
+rule get_runtime:
+    input:
+        "{path}/benchmark.csv"
+    output:
+        "{path}/runtime.txt"
+    shell:
+        "cat {input} | tail -n 1 | cut -f 1 > {output}"
