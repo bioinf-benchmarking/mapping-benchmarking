@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 import plotly.express as px
-from hierarchical_results.hierarchical_results import HierarchicalResults, Parameters
+from hierarchical_results.hierarchical_results import HierarchicalResults, ParameterCombinations
 hr = HierarchicalResults(config["parameter_types"],config["result_types"], prefix="data/")
 
 plotting_functions = {
@@ -31,7 +31,7 @@ def permute_files(files, parameter, values):
 
 
 def get_parameter_combinations_and_result_names(wildcards):
-    parameter_combinations = Parameters.from_path(hr.get_names(), wildcards.path)
+    parameter_combinations = ParameterCombinations.from_path(hr.get_names(), wildcards.path)
 
     type = wildcards.plot_type
 
