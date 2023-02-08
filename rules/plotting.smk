@@ -12,7 +12,6 @@ plotting_functions = {
 
 # reports/plots/f1_score_bar/hg38/hg002/small/whole_genome_single_end/low_error/150/1000/all_methods/4/5/variants/plot.png
 
-
 def get_parameter_from_config_path(parameter, path):
     print(parameter, path)
     assert parameter in config["parameter_types"]
@@ -93,18 +92,17 @@ rule make_plot:
         plot_type = plot_config["type"]
         if plot_type == "scatter_and_line":
            specification = parse_plot_specification(wildcards.plot_type)
-           fig = px.scatter(df, **specification)
+           fig = px.scatter(df, **specification, template="simple_white")
            fig.add_traces(px.line(df, **specification).data)
         else:
             assert plot_type in plotting_functions, "Plot type %s not supported"
             func = plotting_functions[plot_type]
-            fig = func(df, **parse_plot_specification(wildcards.plot_type))
+            fig = func(df, **parse_plot_specification(wildcards.plot_type), template="simple_white")
 
         fig.update_layout(font=dict(size=20))
         fig.show()
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)
-
 
 
 def get_plot_name(wildcards):
@@ -120,8 +118,7 @@ def get_plot_name(wildcards):
 
     plot_path = []
     for parameter in config["parameter_types"]:
-        print(parameter)
-        if parameter in plot_config["parameters"]:
+        if "parameters" in plot_config and parameter in plot_config["parameters"]:
             parameter = plot_config["parameters"][parameter]
         else:
             # not specified, use default value
@@ -135,7 +132,6 @@ def get_plot_name(wildcards):
 
     file = "reports/plots/" + plot_config["plot_type"] + "/" + "/".join(plot_path) + "/plot.png"
     return file
-
 
 
 # Wrapper around the make_plot rule that uses default parameters

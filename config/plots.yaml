@@ -2,17 +2,18 @@
 
 # List of plots that will be generated every night
 nightly_plots: []
+plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 
 
 # Plots
 plots:
   plot1:
-    plot_type: "accuracy_vs_read_length"
+    plot_type: accuracy_vs_read_length
     parameters:
-      read_type: "whole_genome_single_end"
+      read_type: whole_genome_single_end
+  my_plot:
+    plot_type: accuracy_vs_read_length
 
-
-plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 
 
 # plot_typoes define different type of plots

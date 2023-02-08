@@ -122,7 +122,7 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end:
     params:
         error_parameters=get_mason_error_parameters,
         n_reads=lambda wildcards: int(wildcards.n_reads) // 4,  # divide by 4 for paird end since mason simulates n fragments
-        mean_fragment_size= lambda wildcards: wildcards.read_length * 3,
+        mean_fragment_size= lambda wildcards: int(wildcards.read_length) * 3,
         min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
         max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
     threads:
