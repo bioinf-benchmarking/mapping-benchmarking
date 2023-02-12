@@ -13,7 +13,18 @@ plots:
       read_type: whole_genome_single_end
   my_plot:
     plot_type: accuracy_vs_read_length
-
+  accuracy:
+    plot_type: accuracy
+  accuracy_f1_score:
+    plot_type: accuracy_f1_score
+  memory:
+    plot_type: memory_usage
+  variant_calling_accuracy:
+    parameters:
+      n_reads: "5000000"
+    plot_type: variant_calling_accuracy
+  runtime_simple:
+    plot_type: runtime_simple
 
 
 # plot_typoes define different type of plots
@@ -56,6 +67,21 @@ plot_types:
     type: "bar"
     y: "runtime"
     x: "method"
+  memory_usage:
+    type: bar
+    y: memory_usage
+    x: method
+  variant_calling_accuracy:
+    type: "scatter"
+    y: variant_calling_recall_snps
+    x: variant_calling_precision_snps
+    color: method
+  accuracy_f1_score:
+    type: bar
+    y: f1_score
+    x: method
+
+
 
     # x_axis is by default methods if not specified
 

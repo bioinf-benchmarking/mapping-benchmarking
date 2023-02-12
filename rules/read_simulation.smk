@@ -26,15 +26,12 @@ def get_individual_properties(wildcards, property):
 
 rule make_chromosome_haplotype_sequence_for_simulation:
     input:
-        vcf="data/{genome_build}/{individual}/variants.vcf.gz",  # lambda wildcards: "data/truth_variants/" + config["individuals"][wildcards.dataset]["variant_source"] + ".vcf.gz",
+        vcf="data/{genome_build}/{individual}/variants.vcf.gz",
         reference="data/{genome_build}/reference.fa"
-        #reference= lambda wildcards: "data/reference_genomes/raw/"  + config["variant_sources"][config["individuals"][wildcards.dataset]["variant_source"]]["genome"] + ".fa"
 
     output:
         coordinate_map="data/{genome_build}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
         haplotype_reference="data/{genome_build}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta",
-        #coordinate_map="data/simulated_reads/{dataset}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
-        #haplotype_reference="data/simulated_reads/{dataset}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta",
     shell:
         "graph_read_simulator prepare_simulation --chromosome {wildcards.chromosome} --haplotype {wildcards.haplotype} "
         "--vcf {input.vcf} --reference {input.reference} -o data/{wildcards.genome_build}/{wildcards.individual}/ "

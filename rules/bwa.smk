@@ -23,7 +23,7 @@ rule bwa_map_single_end:
         sort_extra="",# Extra args for samtools/picard.
     benchmark:
         "{data}/whole_genome_single_end/{config}/bwa/{n_threads}/benchmark.csv",
-    threads: lambda wildcards: int(wildcards.n_threads)
+    threads: 4 # lambda wildcards: int(wildcards.n_threads)
     wrapper:
         "v1.21.2/bio/bwa/mem"
 
@@ -39,6 +39,8 @@ rule bwa_map_paired_end:
         sorting="none",# Can be 'none', 'samtools' or 'picard'.
         sort_order="queryname",# Can be 'queryname' or 'coordinate'.
         sort_extra="",# Extra args for samtools/picard.
-    threads: lambda wildcards: int(wildcards.n_threads)
+    benchmark:
+        "{data}/whole_genome_paired_end/{config}/bwa/{n_threads}/benchmark.csv",
+    threads: 4  # lambda wildcards: int(wildcards.n_threads)
     wrapper:
         "v1.21.2/bio/bwa/mem"

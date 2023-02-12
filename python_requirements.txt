@@ -1,2 +1,6 @@
+numpy
+pandas
+plotly
 graph_read_simulator
 numpy_alignments
+hierarchical_results

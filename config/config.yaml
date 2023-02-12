@@ -1,7 +1,7 @@
 use_conda: True
 
 # name of all methods
-methods: ["bwa", "minimap2"]
+methods: ["bwa", "bowtie2", "minimap2"]
 
 # mapping from method IDs to names
 method_names:
@@ -18,9 +18,12 @@ result_types: [
   "recall",
   "one_minus_precision",
   "f1_score",
-  "variant_calling_precision",
-  "variant_calling_recall",
-  "variant_calling_f1_score",
+  "variant_calling_precision_indels",
+  "variant_calling_recall_indels",
+  "variant_calling_f1score_indels",
+  "variant_calling_precision_snps",
+  "variant_calling_recall_snps",
+  "variant_calling_f1score_snps",
 ]
 
 # The list of all parameters that can be changed to produce a result,
@@ -56,10 +59,10 @@ default_parameter_values:
 
 
 # groups of parameters, to be used when creating a plot
-parameter_groups:
+parameter_sets:
   all_methods:
     parameter_type: "method"
-    values: ["bwa", "minimap"]
+    values: ["bwa", "bowtie2"]
   read_lengths_rough:
     parameter_type: "read_length"
     values: [75, 150, 300]
@@ -99,7 +102,7 @@ parameter_groups:
 
 
 # Default parameter groups. Will be used for plotting if not overridden
-default_parameter_groups:
+default_parameter_sets:
   genome_build: all_genome_builds
   individual: all_individuals
   dataset_size: dataset_sizes

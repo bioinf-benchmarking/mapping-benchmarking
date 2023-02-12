@@ -44,9 +44,9 @@ def get_parameter_combinations_and_result_names(wildcards):
     for dimension in dimensions:
         if dimension in config["parameter_types"]:
             parameter_group = get_parameter_from_config_path(dimension, wildcards.path)
-            assert parameter_group in config["parameter_groups"], "Parameter group %s invalid" % parameter_group
-            values = config["parameter_groups"][parameter_group]["values"]
-            parameter_name = config["parameter_groups"][parameter_group]["parameter_type"]
+            assert parameter_group in config["parameter_sets"], "Parameter group %s invalid" % parameter_group
+            values = config["parameter_sets"][parameter_group]["values"]
+            parameter_name = config["parameter_sets"][parameter_group]["parameter_type"]
             parameter_combinations.set(parameter_name, values)
         elif dimension in config["result_types"]:
             result_names.append(dimension)
@@ -90,10 +90,11 @@ rule make_plot:
 
         plot_config = config["plot_types"][wildcards.plot_type]
         plot_type = plot_config["type"]
-        if plot_type == "scatter_and_line":
-           specification = parse_plot_specification(wildcards.plot_type)
-           fig = px.scatter(df, **specification, template="simple_white")
-           fig.add_traces(px.line(df, **specification).data)
+        if plot_type in ("scatter", "scatter_and_line"):
+            specification = parse_plot_specification(wildcards.plot_type)
+            fig = px.scatter(df, **specification, template="simple_white")
+            if "line" in plot_type:
+                fig.add_traces(px.line(df, **specification).data)
         else:
             assert plot_type in plotting_functions, "Plot type %s not supported"
             func = plotting_functions[plot_type]
@@ -124,7 +125,7 @@ def get_plot_name(wildcards):
             # not specified, use default value
             if parameter in variables:
                 # use parameter_group default value
-                parameter = config["default_parameter_groups"][parameter]
+                parameter = config["default_parameter_sets"][parameter]
             else:
                 # use default parameter
                 parameter = config["default_parameter_values"][parameter]

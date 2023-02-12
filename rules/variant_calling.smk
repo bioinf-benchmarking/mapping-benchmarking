@@ -25,9 +25,21 @@ rule sambamba_sort:
         "v1.21.4/bio/sambamba/sort"
 
 
+rule index_bam:
+    input:
+        "{file}.bam"
+    output:
+        "{file}.bam.bai"
+    conda:
+        "../envs/samtools.yml"
+    shell:
+        "samtools index {input}"
+
+
 rule call_variants:
     input:
         sorted_bam = "data/{genome_build}/{individual}/{size}/whole_genome_{pairing}_end/{config}/mapped.sorted.bam",
+        bamindex = "data/{genome_build}/{individual}/{size}/whole_genome_{pairing}_end/{config}/mapped.sorted.bam.bai",
         reference = "data/{genome_build}/{individual}/{size}/reference.fa",
         reference_index = "data/{genome_build}/{individual}/{size}/reference.fa.fai",
         reference_dict = "data/{genome_build}/{individual}/{size}/reference.dict",
@@ -68,7 +80,8 @@ rule run_happy:
         truth_regions="data/{genome_build}/{individual}/truth_regions.bed",
         ref="data/{genome_build}/reference.fa"
     output:
-        "data/{genome_build,\w+}/{individual,\w+}/{size,\w+}/{config}/happy.extended.csv"
+        "data/{genome_build,\w+}/{individual,\w+}/{size,\w+}/{config}/happy.extended.csv",
+        "data/{genome_build,\w+}/{individual,\w+}/{size,\w+}/{config}/happy.summary.csv",
     conda:
         "../envs/happy.yml"
     shell:
@@ -80,4 +93,25 @@ rule run_happy:
         -f {input.truth_regions} \
         --no-decompose --engine=vcfeval 
         """
+
+rule get_variant_calling_result:
+    input:
+        f"data/{parameters.until('n_threads')}/happy.summary.csv"
+    output:
+        f"data/{parameters}/variant_calling_{{type, recall|precision|f1score}}_{{variant_type, snps|indels}}.txt"
+    run:
+        import pandas as pd
+        data = pd.read_csv(input[0])
+
+        index = 2
+        if wildcards.variant_type == "indels":
+            index = 0
+
+        names = {"recall": "METRIC.Recall",
+                 "precision": "METRIC.Precision",
+                 "f1score": "METRIC.F1_Score"}
+
+        result = data.iloc[index][names[wildcards.type]]
+        with open(output[0], "w") as f:
+            f.write(str(result) + "\n")
 

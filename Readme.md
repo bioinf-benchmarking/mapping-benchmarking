@@ -1,9 +1,9 @@
-# Community-driven snakemake pipeline for benchmarking read mappers
+# Snakemake pipeline for benchmarking read mappers
 
-This is an attempt at a community-driven Snakemake pipeline for benchmarking read mappers. The idea behind this repository is:
+This is an attempt at an open Snakemake pipeline for benchmarking read mappers. The idea behind this repository is:
 
-* Instead of everyone making their own scripts for benchmarking read mappers, we will all save time if we instead develop one clean and easy-to-use pipeline that anyone can use.
-* It is impossible to test and present accuracy/performance across all combinations of paramaters (read length, error rate, error profiles, genome diversity, etc.) when presenting benchmark results in a paper. With this pipeline, each person can instead run the benchmarks they find interesting.  
+* It can be used to benchmark new read mappers (no need to spend time writing your own benchmarking scripts).
+* It is difficult to test and present accuracy/performance across all combinations of paramaters (read length, error rate, error profiles, genome diversity, etc.) when presenting benchmark results in a paper. this pipeline, each person can instead run the benchmarks they find interesting when assessing read mappers.  
 * With the help of Snakemake and Conda, anyone should be able to clone this repository and easily test read mappers using a configuration of their choice. In addition, we try to run benchmarks on a limited set of cases each night and present them here so that one can get an overview of how mappers perform on the most common cases.
 
 ## How to use
@@ -11,9 +11,9 @@ There are typically three ways to use this repository:
 
 1) Look at the [latest benchmarking results](...).
 2) Run benchmarks locally for a given set of parameters.
-3) Contribute by adding read-mapper to this repository or changing configuration settings
+3) Contribute by adding read-mapper to this repository or changing configurations/settings
 
-Below, we provide in-detail guides for these options.
+Below are more detailed guides for these:
 
 ### Latest benchmarking results
 You will find the latest results [here](). If you want these to include other parameters/settings, feel free to edit the configuration files and make a pull-request (see guide further down).
