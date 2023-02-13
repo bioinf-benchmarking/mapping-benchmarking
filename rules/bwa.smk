@@ -10,6 +10,7 @@ rule bwa_index:
         "v1.21.2/bio/bwa/index"
 
 
+"""
 rule bwa_map_single_end:
     input:
         reads = "{data}/whole_genome_single_end/{config}/reads.fq.gz",
@@ -23,10 +24,32 @@ rule bwa_map_single_end:
         sort_extra="",# Extra args for samtools/picard.
     benchmark:
         "{data}/whole_genome_single_end/{config}/bwa/{n_threads}/benchmark.csv",
-    threads: 4 # lambda wildcards: int(wildcards.n_threads)
+    threads: lambda wildcards: int(wildcards.n_threads)
     wrapper:
         "v1.21.2/bio/bwa/mem"
+"""
 
+def get_input_reads(wildcards):
+    if "whole_genome_single_end" in wildcards.read_type:
+        pass
+
+
+rule bwa_map_single_end:
+    input:
+        reads = "{data}/whole_genome_single_end/{config}/reads.fq.gz",
+        idx = multiext("{data}/reference",".amb",".ann",".bwt",".pac",".sa"),
+    output:
+        "{data}/whole_genome_single_end/{config}/bwa/{n_threads}/mapped.bam",
+    benchmark:
+        "{data}/whole_genome_single_end/{config}/bwa/{n_threads}/benchmark.csv",
+    threads: lambda wildcards: int(wildcards.n_threads)
+    conda: "../envs/bwa.yml"
+    shell:
+        """
+        bwa mem -t {wildcards.n_threads} -R "@RG\\tID:sample\\tSM:sample" {wildcards.data}/reference {input.reads} > {output}
+        """
+    #wrapper:
+    #    "v1.21.2/bio/bwa/mem"
 
 rule bwa_map_paired_end:
     input:
@@ -41,6 +64,11 @@ rule bwa_map_paired_end:
         sort_extra="",# Extra args for samtools/picard.
     benchmark:
         "{data}/whole_genome_paired_end/{config}/bwa/{n_threads}/benchmark.csv",
-    threads: 4  # lambda wildcards: int(wildcards.n_threads)
-    wrapper:
-        "v1.21.2/bio/bwa/mem"
+    threads: lambda wildcards: int(wildcards.n_threads)
+    conda: "../envs/bwa.yml"
+    shell:
+        """
+        bwa mem -t {wildcards.n_threads} -R "@RG\\tID:sample\\tSM:sample" {wildcards.data}/reference {input.reads} > {output}
+        """
+    #wrapper:
+    #    "v1.21.2/bio/bwa/mem"

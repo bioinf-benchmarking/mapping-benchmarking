@@ -52,9 +52,9 @@ rule get_accuracy_result:
 
 rule get_runtime:
     input:
-        "{path}/benchmark.csv"
+        f"data/{parameters.until('n_threads')}/benchmark.csv"
     output:
-        "{path}/runtime.txt"
+        f"data/{parameters}/runtime.txt"
     shell:
         "cat {input} | tail -n 1 | cut -f 1 > {output}"
 

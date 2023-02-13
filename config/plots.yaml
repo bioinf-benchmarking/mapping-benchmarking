@@ -25,7 +25,8 @@ plots:
     plot_type: variant_calling_accuracy
   runtime_simple:
     plot_type: runtime_simple
-
+  runtime_complex:
+    plot_type: runtime_complex
 
 # plot_typoes define different type of plots
 # they only describe the structure of the plot, not what values are used for the variables
@@ -67,6 +68,11 @@ plot_types:
     type: "bar"
     y: "runtime"
     x: "method"
+  runtime_complex:
+    type: line
+    y: runtime
+    x: n_threads
+    color: method
   memory_usage:
     type: bar
     y: memory_usage
@@ -80,6 +86,7 @@ plot_types:
     type: bar
     y: f1_score
     x: method
+    facet_col: read_type
 
 
 

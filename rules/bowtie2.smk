@@ -21,7 +21,7 @@ rule bowtie2_index:
 
 rule bowtie2_map_single_end:
     input:
-        sample = "{data}/whole_genome_single_end/{config}/reads.fq.gz",
+        sample = ["{data}/whole_genome_single_end/{config}/reads.fq.gz"],
         #sample=["reads/{sample}.1.fastq", "reads/{sample}.2.fastq"],
         idx=multiext(
             "{data}/reference",

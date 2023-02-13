@@ -23,6 +23,18 @@ class Parameters:
         assert parameter in self.parameters
         return self[0:self.parameters.index(parameter)+1]
 
+    def __call__(self, **filters):
+        """
+        Returns a format-string with parameters given in filters set to values instead of wildcards
+        """
+        out = []
+        for parameter in self.parameters:
+            if parameter in filters:
+                out.append(filters[parameter])
+            else:
+                out.append("{" + parameter + "}")
+        return "/".join(out)
+
 
 parameters = Parameters(config["parameter_types"])
 
@@ -36,4 +48,13 @@ include: "rules/analysis.smk"
 include: "rules/reports.smk"
 include: "rules/variant_calling.smk"
 include: "rules/plotting.smk"
+
+
+rule test:
+    output:
+        touch(f"{parameters(genome='test123')}/test.txt")
+    run:
+        print(wildcards)
+
+
 
