@@ -3,6 +3,23 @@ configfile: "config/config.yaml"
 configfile: "config/plots.yaml"
 workflow.use_conda = True
 
+
+def paired_end_reads(wildcards=None):
+    return [f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/reads" + n + ".fq.gz" for n in
+            ("1", "2")]
+
+
+def single_end_reads(wildcards=None):
+    return f"data/{parameters.until('n_reads')(read_type='whole_genome_single_end')}/reads.fq.gz"
+
+
+def get_input_reads(wildcards):
+    if "paired_end" in wildcards.read_type:
+        return paired_end_reads()
+    else:
+        return single_end_reads()
+
+
 class Parameters:
     """
     Utility class for generating a snakemake string of all parameters

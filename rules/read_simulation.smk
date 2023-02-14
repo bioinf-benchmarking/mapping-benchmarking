@@ -151,8 +151,10 @@ rule deinterleave_fastq:
         "{data}/reads{n}.fq.gz"
     params:
         extra="-{n}",
-    wrapper:
-        "v1.21.4/bio/seqtk/seq"
+    conda:
+        "../envs/seqtk.yml"
+    shell:
+        "seqtk seq -{wildcards.n} {input} | gzip -c > {output}"
 
 
 # finds out whether each truth alignment covers a variant and adds that information

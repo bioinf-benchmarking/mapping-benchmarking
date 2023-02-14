@@ -4,7 +4,7 @@ rule bowtie2_index:
         ref="{genome}.fa",
     output:
         multiext(
-            "{genome}",
+            "{genome}.fa",
             ".1.bt2l",
             ".2.bt2l",
             ".3.bt2l",
@@ -19,48 +19,54 @@ rule bowtie2_index:
         "v1.23.1/bio/bowtie2/build"
 
 
+
 rule bowtie2_map_single_end:
     input:
-        sample = ["{data}/whole_genome_single_end/{config}/reads.fq.gz"],
-        #sample=["reads/{sample}.1.fastq", "reads/{sample}.2.fastq"],
+        reads = single_end_reads,
         idx=multiext(
-            "{data}/reference",
-            ".1.bt2l",
-            ".2.bt2l",
-            ".3.bt2l",
-            ".4.bt2l",
-            ".rev.1.bt2l",
-            ".rev.2.bt2l",
+            f"data/{parameters.until('dataset_size')}/reference",
+            ".fa",
+            ".fa.1.bt2l",
+            ".fa.2.bt2l",
+            ".fa.3.bt2l",
+            ".fa.4.bt2l",
+            ".fa.rev.1.bt2l",
+            ".fa.rev.2.bt2l",
         ),
     output:
-        "{data}/whole_genome_single_end/{config}/bowtie2/{n_threads}/mapped.bam",
+        f"data/{parameters.until('n_threads')(method='bowtie2', read_type='whole_genome_single_end')}/mapped.bam"
     benchmark:
-        "{data}/whole_genome_single_end/{config}/bowtie2/{n_threads}/benchmark.csv",
-    params:
-        extra="--rg-id sample --rg SM:sample",  # optional parameters
-    threads: 2  # Use at least two threads
-    wrapper:
-        "v1.23.1/bio/bowtie2/align"
+        f"data/{parameters.until('n_threads')(method='bowtie2', read_type='whole_genome_single_end')}/benchmark.csv"
+    threads: lambda wildcards: int(wildcards.n_threads)
+    conda: "../envs/bowtie2.yml"
+    shell:
+        """
+        bowtie2 --rg-id sample --rg "SM:sample" -x {input.idx[0]} -p {wildcards.n_threads} -U {input.reads} | samtools view -b -h - > {output} 
+        """
 
 
 rule bowtie2_map_paired_end:
     input:
-        sample = ["{data}/whole_genome_paired_end/{config}/reads" + n + ".fq.gz" for n in ("1", "2")],
+        reads=paired_end_reads,
         idx=multiext(
-            "{data}/reference",
-            ".1.bt2l",
-            ".2.bt2l",
-            ".3.bt2l",
-            ".4.bt2l",
-            ".rev.1.bt2l",
-            ".rev.2.bt2l",
+            f"data/{parameters.until('dataset_size')}/reference",
+            ".fa",
+            ".fa.1.bt2l",
+            ".fa.2.bt2l",
+            ".fa.3.bt2l",
+            ".fa.4.bt2l",
+            ".fa.rev.1.bt2l",
+            ".fa.rev.2.bt2l",
         ),
     output:
-        "{data}/whole_genome_paired_end/{config}/bowtie2/{n_threads}/mapped.bam",
-    params:
-        extra="--rg-id sample --rg SM:sample",  # optional parameters
+        f"data/{parameters.until('n_threads')(method='bowtie2', read_type='whole_genome_paired_end')}/mapped.bam"
     benchmark:
-        "{data}/whole_genome_paired_end/{config}/bowtie2/{n_threads}/benchmark.csv",
-    threads: 2  # Use at least two threads
-    wrapper:
-        "v1.23.1/bio/bowtie2/align"
+        f"data/{parameters.until('n_threads')(method='bowtie2', read_type='whole_genome_paired_end')}/benchmark.csv"
+    threads: lambda wildcards: int(wildcards.n_threads)
+    conda: "../envs/bowtie2.yml"
+    shell:
+        """
+        bowtie2 --rg-id sample --rg "SM:sample" -x {input.idx[0]} -p {wildcards.n_threads} -1 {input.reads[0]} -2 {input.reads[1]} | samtools view -b -h - > {output} 
+        """
+
+

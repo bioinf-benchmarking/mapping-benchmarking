@@ -73,6 +73,7 @@ plot_types:
     y: runtime
     x: n_threads
     color: method
+    facet_col: read_type
   memory_usage:
     type: bar
     y: memory_usage

@@ -20,7 +20,7 @@ rule sambamba_sort:
         "{dir}/mapped.sorted.bam"
     params:
         ""  # optional parameters
-    threads: 8
+    threads: 2
     wrapper:
         "v1.21.4/bio/sambamba/sort"
 
@@ -47,6 +47,8 @@ rule call_variants:
         "{data}/{genome_build}/{individual}/{size}/whole_genome_{pairing}_end/{config}/variant_calls.vcf.gz"
     params:
         chromosome=get_variant_calling_chromosome
+    threads:
+        1
     conda:
         "../envs/gatk.yml"
     shell:

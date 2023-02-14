@@ -10,8 +10,6 @@ plotting_functions = {
 }
 
 
-# reports/plots/f1_score_bar/hg38/hg002/small/whole_genome_single_end/low_error/150/1000/all_methods/4/5/variants/plot.png
-
 def get_parameter_from_config_path(parameter, path):
     print(parameter, path)
     assert parameter in config["parameter_types"]

@@ -10,13 +10,6 @@ rule bwa_index:
         "v1.21.2/bio/bwa/index"
 
 
-def get_input_reads(wildcards):
-    if "paired_end" in wildcards.read_type:
-        return [f"data/{parameters.until('n_reads')}/reads" + n + ".fq.gz" for n in
-         ("1", "2")]
-    else:
-        return f"data/{parameters.until('n_reads')}/reads.fq.gz"
-
 rule bwa_map:
     input:
         reads = get_input_reads,
@@ -29,5 +22,6 @@ rule bwa_map:
     conda: "../envs/bwa.yml"
     shell:
         """
-        bwa mem -t {wildcards.n_threads} -R "@RG\\tID:sample\\tSM:sample" {input.idx[0]} {input.reads} > {output}
+        bwa mem -t {wildcards.n_threads} -R "@RG\\tID:sample\\tSM:sample" {input.idx[0]} {input.reads} | samtools view -b -h - > {output}
         """
+
