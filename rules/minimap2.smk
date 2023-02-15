@@ -29,8 +29,9 @@ rule minimap_single_end:
     conda:
         "../envs/minimap2.yml"
     shell:
+        # hack with removing column 16, gatk does not handle the tp:A:P field
         """
-        minimap2 -t {wildcards.n_threads} --MD -ax sr -R '@RG\\tID:sample\\tSM:sample' -a {input} | samtools view -b -h - > {output}
+        minimap2 -t {wildcards.n_threads} --MD -ax sr -R '@RG\\tID:sample\\tSM:sample' -a {input} | cut --complement -f 17 | samtools view -b -h - > {output}
         """
     #wrapper:
     #    "v1.21.2/bio/minimap2/aligner"
@@ -52,8 +53,9 @@ rule minimap_paired_end:
     conda:
         "../envs/minimap2.yml"
     shell:
+        # hack with removing column 16, gatk does not handle the tp:A:P field
         """
-        minimap2 -t {wildcards.n_threads} --MD -ax sr -R '@RG\\tID:sample\\tSM:sample' -a {input} | samtools view -b -h - > {output}
+        minimap2 -t {wildcards.n_threads} --MD -ax sr -R '@RG\\tID:sample\\tSM:sample' -a {input} | cut --complement -f 17 | samtools view -b -h - > {output}
         """
     #wrapper:
     #    "v1.21.2/bio/minimap2/aligner"

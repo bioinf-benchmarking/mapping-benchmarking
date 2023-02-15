@@ -90,7 +90,9 @@ rule make_plot:
         plot_type = plot_config["type"]
         if plot_type in ("scatter", "scatter_and_line"):
             specification = parse_plot_specification(wildcards.plot_type)
+            specification["labels"] = config["pretty_names"]
             fig = px.scatter(df, **specification, template="simple_white")
+            fig.update_traces(marker_size=20)
             if "line" in plot_type:
                 fig.add_traces(px.line(df, **specification).data)
         else:

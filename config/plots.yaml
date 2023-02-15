@@ -4,6 +4,12 @@
 nightly_plots: []
 plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 
+# Axis/titles/etc that will be replaced in plots
+pretty_names:
+  variant_calling_precision_snps: Precision on SNPs
+  variant_calling_recall_snps: Recall on SNPs
+  variant_calling_precision_indels: Precision on indels
+
 
 # Plots
 plots:

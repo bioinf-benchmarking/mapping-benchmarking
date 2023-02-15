@@ -39,7 +39,8 @@ parameter_types: [
   "method",
   "n_threads",
   "min_mapq",
-  "variant_filter"  # all, variants, nonvariants: Specifies type of reads to include (all, reads with genomic variants in them, reads with genomic variants)
+  "variant_filter",  # all, variants, nonvariants: Specifies type of reads to include (all, reads with genomic variants in them, reads with genomic variants)
+  #variant_calling_type
 ]
 
 
@@ -55,6 +56,7 @@ default_parameter_values:
   n_threads: "4"
   min_mapq: "0"
   variant_filter: "all"
+  variant_calling_type: "snps"
 
 
 
@@ -99,6 +101,9 @@ parameter_sets:
   variant_filters:
     parameter_type: variant_filter
     values: [all, nonvariants, variants]
+  variant_calling_types:
+    parameter_type: variant_calling_type
+    values: [snps, indels]
 
 
 # Default parameter groups. Will be used for plotting if not overridden
@@ -114,6 +119,7 @@ default_parameter_sets:
   n_threads: typical_n_threads
   min_mapq: mapqs
   variant_filter: variant_filters
+  variant_calling_type: variant_calling_types
 
 
 genomes:
