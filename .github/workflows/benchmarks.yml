@@ -21,11 +21,34 @@ jobs:
         with:
           directory: '.'
           snakefile: 'Snakefile'
-          args: '-F --cores 16 --use-conda reports/test.md'
+          args: '-F --cores 16 --use-conda reports/dummy.md'
           stagein: | # 'cd benchmarks' # additional preliminary commands to run (can be multiline)
             apt-get update
             apt-get -y install gcc
             python -m pip install --upgrade pip setuptools wheel
             pip install -r python_requirements.txt
+
+      - name: Save benchmarks results
+        run: |
+          git config --global user.email "github@action.com"
+          git config --global user.name "github action"
+          
+          git checkout benchmarks
+          git pull origin benchmarks
+          
+          git add -f reports/*.md
+          git add -f reports/presets/*.png
+          git commit -am 'Benchmark results'
+
+      - name: Push results to benchmark branch
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tags: true
+          force: false
+          branch: benchmarks
+
+
+
 
 

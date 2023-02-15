@@ -182,3 +182,10 @@ rule report:
         out += "\n\n".join("![](" + image + ")" for image in files)
         with open(output[0],"w") as f:
             f.write(out)
+
+
+
+rule dummy_report:
+    output: "reports/dummy.md"
+    shell:
+        "echo 'test' > {output}"
