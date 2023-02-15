@@ -1,6 +1,7 @@
 numpy
 pandas
 plotly
+kaleido
 graph_read_simulator
 numpy_alignments
 hierarchical_results

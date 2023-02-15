@@ -14,7 +14,7 @@ rule bowtie2_index:
         ),
     params:
         extra="--large-index",  # optional parameters
-    threads: 8
+    threads: 4
     wrapper:
         "v1.23.1/bio/bowtie2/build"
 

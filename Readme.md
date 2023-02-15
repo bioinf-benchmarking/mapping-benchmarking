@@ -1,19 +1,16 @@
 # Snakemake pipeline for benchmarking read mappers
 
-This is an attempt at an open Snakemake pipeline for benchmarking read mappers. The idea behind this repository is:
+This is an attempt at a clean Snakemake pipeline for benchmarking read mappers. The idea behind this pipeline is:
 
-* It can be used to benchmark new read mappers (no need to spend time writing your own benchmarking scripts).
-* It is difficult to test and present accuracy/performance across all combinations of paramaters (read length, error rate, error profiles, genome diversity, etc.) when presenting benchmark results in a paper. this pipeline, each person can instead run the benchmarks they find interesting when assessing read mappers.  
-* With the help of Snakemake and Conda, anyone should be able to clone this repository and easily test read mappers using a configuration of their choice. In addition, we try to run benchmarks on a limited set of cases each night and present them here so that one can get an overview of how mappers perform on the most common cases.
+* It can be used to benchmark new read mappers (no need to spend time writing your own benchmarking scripts if you develop a read mapper).
+* It can be used to get an up-to-date overview of how given read mappers perform on a given type of reads/scenario. It is difficult to test and present accuracy/performance across all combinations of paramaters (read length, error rate, error profiles, genome diversity, etc.) when presenting benchmark results in a paper. With this pipeline, each person can instead run the benchmarks they find interesting when assessing read mappers.  
+* It has been developed with the goal of being easy to clone and run by anyone (Conda is used to avoid any manual installation/setup). It should be fairly straight-forward by anyone  to clone this repository and test read mappers using a configuration of their choice. 
+* The aim is also to have automatic benchmarks run frequently on larger data sets, so that one easily can get an overview of how mappers perform on the most common cases without having to run this pipeline.
+
+This pipeline is open source, and we are very happy for any contributions or suggestions for changes (see the Contribute section).
+
 
 ## How to use
-There are typically three ways to use this repository:
-
-1) Look at the [latest benchmarking results](...).
-2) Run benchmarks locally for a given set of parameters.
-3) Contribute by adding read-mapper to this repository or changing configurations/settings
-
-Below are more detailed guides for these:
 
 ### Latest benchmarking results
 You will find the latest results [here](). If you want these to include other parameters/settings, feel free to edit the configuration files and make a pull-request (see guide further down).
@@ -27,19 +24,10 @@ You will find the latest results [here](). If you want these to include other pa
 ### Contribute 
 
 #### 1) Add a new read-mapper
-Read-mappers that are not currently listed in config.yaml can be added. Follow these steps below. We assume you already have some experience with writing Snakemake rules, if not check out the Snakemake documentation first.
-
-1. Add the mapper to the `method` list in `config/config.yaml`
-2. Add the name of the mapper (this is what is shown in plots) to `method_names`
-3. Create a `.smk` file in rules for the mapper (e.g. `bwa.smk`)
-4. Implement two rules: `NAME_map_single_end` and `NAME_map_paired_end` (replace NAME with the mapper ID, e.g. `bwa`). The single-end rule should take `{data}/whole_genome_single_end/{config}/reads.fq.gz` as input. The paired-end rule should take this list of two fq-files as input: `["{data}/whole_genome_paired_end/{config}/reads" + n + ".fq.gz" for n in ("1", "2")]` 
-5. The rules can also take an index as input if that is needed, you will then need to implement a rule for creating the index (see the `bwa_index` rule for reference).
-6. As output, the rules should produce this bam-file: `{data}/whole_genome_single_end/{config}/NAME/{n_threads}/mapped.bam`
-7. The rule should use the `n_threads` wildcard as a parameter to specify number of threads. 
-8. Either use a Snakemake wrapper or specify a conda-environment for the rule. Nothing should be needed to be installed manually. Note that some Snakemake wrappers do not use the `n_threads` parameter correctly (e.g. the BWA MEM wrapper). If that is the case, you need to implement the run-command yourself and use a conda environment.
+See *Add a new read-mapper* under *Developer guide*.
 
 #### 2) Add plots/cases
-All plots are specified in `config/plots.yaml`. Feel free to edit this file to add plots you believe are useful, and make a pull request. The file contains documentation that should explain how to edit the file, but feel free to reach out with questions if anything is unclear. 
+All plots are specified in `config/plots.yaml`. For most plots, no code should be necessary to write, only configuration. Feel free to edit this file to add plots you believe are useful, and make a pull request. The file contains documentation that should explain how to edit the file, but feel free to reach out with questions if anything is unclear. Se developer guide for details.
 
 #### 3) General help/contribution
 This is a simple first attempt at a pipeline that tries to be flexible and allow benchmarking across what we think are the relevant parameters. However, we want this pipeline to be shaped by what the community believe is important. Feel free to open an issue to discuss things that can be changed or added, e.g. cases or benchmarks that are not currently supported.
@@ -49,7 +37,7 @@ This is a simple first attempt at a pipeline that tries to be flexible and allow
 
 ### Creating a plot
 
-This pipeline follows the Snakemake principles, meaning that the user defines what the final result should be, and then the pipeline tries to run the necessary jobs for creating that output. For instance, you can ask for a plot where the x-axis is something, the y-axis is something and the pipeline will try to run what is needed to generate that plot. "Something" needs to be a valid *parameter* or *result_type*. For instance, the x-axis could be `method` (i.e. read mapper) and the y-axis can be `memory_usage` and pipeline will then run all methods and capture the memory usage and present that.
+This pipeline follows the Snakemake principles, meaning that the user defines what the final result should be, and then the pipeline tries to run the necessary jobs for creating that output. For instance, you can ask for a plot where the x-axis is something, the y-axis is something and the pipeline will try to run what is needed to generate that plot. "Something" needs to be a valid *parameter* or *result_type*. For instance, the x-axis could be `method` (i.e. read mapper) and the y-axis can be `memory_usage` and the pipeline will then run all methods and capture the memory usage and present that.
 
 You can add a plot type by adding a configuration under `plot_types` in `config/plots.yaml`. Example:
 
@@ -80,7 +68,8 @@ We can now ask Snakemake to generate my_plot:
 snakemake reports/presets/my_plot.png
 ```
 
-Running the above will generate a plot with **default values** for all variables (method, read length etc). This is because no parameters were specified. The default values are specified in `config/config.yaml`. For instance, the default `parameter_group` for read length is `[75, 150, 300]`, specified with the `read_lengths_rough` name. The default individual is `hg002`. If you want to change any of the defaults, you can easily do that. Example: 
+Running the above will generate a plot with **default values** for all variables (method, read length etc). This is because no parameters were specified. The default values are specified in `config/config.yaml`. For instance, the default `parameter_set` for read length is `[75, 150, 300]`, specified with the `read_lengths_rough` name. The default individual is `hg002`. If you want to change any of the defaults, you can easily do that. 
+Example: 
 
 ```yaml
 plots:
@@ -93,19 +82,20 @@ plots:
 
 Now, if creating `my_plot` it will be run for hg003 and not hg002 which is the default. The minimum mapq for reads considered will be 30 (not 0 which is the default value).
 
+Se `result_types` and `parameter_types` in `config/config.yaml` for a list of valid paramters and results that can be used to generate plots. As long as your plot is defined in terms of these, you can generate any plot by only writing the configuration for the plot.
 
-### Add a new read-mapper
+### Adding a read mapper
+
 Read-mappers that are not currently listed in config.yaml can be added. Follow these steps below. We assume you already have some experience with writing Snakemake rules, if not check out the Snakemake documentation first.
 
 1. Add the mapper to the `method` list in `config/config.yaml`
 2. Add the name of the mapper (this is what is shown in plots) to `method_names`
 3. Create a `.smk` file in rules for the mapper (e.g. `bwa.smk`)
-4. Implement two rules: `NAME_map_single_end` and `NAME_map_paired_end` (replace NAME with the mapper ID, e.g. `bwa`). The single-end rule should take `{data}/whole_genome_single_end/{config}/reads.fq.gz` as input. The paired-end rule should take this list of two fq-files as input: `["{data}/whole_genome_paired_end/{config}/reads" + n + ".fq.gz" for n in ("1", "2")]` 
+4. Implement rules for running single-end and paired-end read mapping. This can e.g. be done using two rules: `NAME_map_single_end` and `NAME_map_paired_end` (replace NAME with the mapper ID, e.g. `bwa`). As input to the single-end rule, you can use the function `single_end_reads` and for the paired-enr-rule, you can use the function `paired_end_reads`. Se the rules in `rules/bowtie2.yml` for a good example of how to do this. 
 5. The rules can also take an index as input if that is needed, you will then need to implement a rule for creating the index (see the `bwa_index` rule for reference).
-6. As output, the rules should produce this bam-file: `{data}/whole_genome_single_end/{config}/NAME/{n_threads}/mapped.bam`
+6. As output, the rules should produce this bam-file: `{data}/whole_genome_single_end/[...]/NAME/{n_threads}/mapped.bam`. This path contains a lot of parameters, so we have implemented some Python code to generate the path (see the bowtie-rule for reference, and change bowtie to your mapper).
 7. The rule should use the `n_threads` wildcard as a parameter to specify number of threads. 
-8. Either use a Snakemake wrapper or specify a conda-environment for the rule. Nothing should be needed to be installed manually. Note that some Snakemake wrappers do not use the `n_threads` parameter correctly (e.g. the BWA MEM wrapper). If that is the case, you need to implement the run-command yourself and use a conda environment.
-
+8. Either use a Snakemake wrapper or specify a conda-environment for the rule. Nothing should be needed to be installed manually. Note that some Snakemake wrappers do not use the `n_threads` parameter correctly (e.g. the BWA MEM and bowtie wrappers). If that is the case, you need to implement the run-command yourself and use a conda environment.
 
 ### Add a new read type
 Reads are currently simulated using Mason in the rule `simulate_reads_for_chromosome_and_haplotype` but any tool that is able to take a fasta file (reference) and produce simulated reads and truth positions of those reads will work.

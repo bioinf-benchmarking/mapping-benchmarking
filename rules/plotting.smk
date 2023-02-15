@@ -111,15 +111,17 @@ rule make_plot:
         func = plotting_functions[plot_type]
         fig = func(df, **specification, template="simple_white", title=title)
 
-        # prettier facet titles
+        # prettier facet titles, names, etc
         fig.for_each_annotation(lambda a: a.update(text=pretty_name(a.text.split("=")[-1])))
+        fig.for_each_trace(lambda t: t.update(name=pretty_name(t.name)))
 
         #fig.update_annotations(font=dict(size=20))
         #fig.update_layout(font=dict(size=20))
         if "layout" in plot_config:
             fig.update_layout(**plot_config["layout"])
 
-        fig.update_traces(marker_size=20)
+        if plot_type != "bar":
+            fig.update_traces(marker_size=20)
         fig.show()
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)
