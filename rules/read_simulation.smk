@@ -31,7 +31,7 @@ rule make_chromosome_haplotype_sequence_for_simulation:
 
     output:
         coordinate_map="data/{genome_build}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
-        haplotype_reference="data/{genome_build}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta",
+        haplotype_reference=temp("data/{genome_build}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta"),
     shell:
         "graph_read_simulator prepare_simulation --chromosome {wildcards.chromosome} --haplotype {wildcards.haplotype} "
         "--vcf {input.vcf} --reference {input.reference} -o data/{wildcards.genome_build}/{wildcards.individual}/ "
@@ -111,9 +111,9 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end:
     input:
         haplotype_reference="{individual}/haplotype{haplotype}.fa"
     output:
-        reads1="{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}-1.fq.gz",
-        reads2="{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}-2.fq.gz",
-        truth1="{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}.haplotype_truth.sam",
+        reads1=temp("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}-1.fq.gz"),
+        reads2=temp("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}-2.fq.gz"),
+        truth1=temp("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}.haplotype_truth.sam"),
     conda:
         "../envs/mason.yml"
     params:
@@ -191,7 +191,7 @@ rule change_truth_alignments_to_reference_coordinates:
         truth_positions = "{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
         coordinate_map="{individual}/coordinate_map_haplotype{haplotype}.npz",
     output:
-        "{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.reference_coordinates.sam",
+        temp("{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.reference_coordinates.sam"),
         #"data/simulated_reads/{dataset}/simulated_reads_haplotype{haplotype,\d+}.reference_coordinates.sam"
     run:
         from shared_memory_wrapper import from_file
@@ -224,7 +224,7 @@ rule merge_truth_alignments_for_haplotypes:
         haplotype0 = "{config}/0.reference_coordinates.sam",
         haplotype1 = "{config}/1.reference_coordinates.sam",
     output:
-        "{config}/truth.sam"
+        temp("{config}/truth.sam")
     shell:
         "cat {input} | python scripts/assign_ids_to_sam.py  > {output} "
 
