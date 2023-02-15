@@ -6,9 +6,11 @@ plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 
 # Axis/titles/etc that will be replaced in plots
 pretty_names:
-  variant_calling_precision_snps: Precision on SNPs
-  variant_calling_recall_snps: Recall on SNPs
-  variant_calling_precision_indels: Precision on indels
+  variant_calling_precision: Precision
+  variant_calling_recall: Recall
+  variant_calling_f1score: F1 Score
+  one_minus_precision: 1-Precision
+  recall: Recall
 
 
 # Plots
@@ -86,9 +88,10 @@ plot_types:
     x: method
   variant_calling_accuracy:
     type: "scatter"
-    y: variant_calling_recall_snps
-    x: variant_calling_precision_snps
+    y: variant_calling_recall
+    x: variant_calling_precision
     color: method
+    facet_col: variant_calling_type
   accuracy_f1_score:
     type: bar
     y: f1_score

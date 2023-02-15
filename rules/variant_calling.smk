@@ -100,13 +100,13 @@ rule get_variant_calling_result:
     input:
         f"data/{parameters.until('n_threads')}/happy.summary.csv"
     output:
-        f"data/{parameters}/variant_calling_{{type, recall|precision|f1score}}_{{variant_type, snps|indels}}.txt"
+        f"data/{parameters}/variant_calling_{{type, recall|precision|f1score}}.txt"
     run:
         import pandas as pd
         data = pd.read_csv(input[0])
 
         index = 2
-        if wildcards.variant_type == "indels":
+        if wildcards.variant_calling_type == "indels":
             index = 0
 
         names = {"recall": "METRIC.Recall",

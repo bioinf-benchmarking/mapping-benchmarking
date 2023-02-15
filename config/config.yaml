@@ -18,12 +18,9 @@ result_types: [
   "recall",
   "one_minus_precision",
   "f1_score",
-  "variant_calling_precision_indels",
-  "variant_calling_recall_indels",
-  "variant_calling_f1score_indels",
-  "variant_calling_precision_snps",
-  "variant_calling_recall_snps",
-  "variant_calling_f1score_snps",
+  "variant_calling_precision",
+  "variant_calling_recall",
+  "variant_calling_f1score",
 ]
 
 # The list of all parameters that can be changed to produce a result,
@@ -40,7 +37,7 @@ parameter_types: [
   "n_threads",
   "min_mapq",
   "variant_filter",  # all, variants, nonvariants: Specifies type of reads to include (all, reads with genomic variants in them, reads with genomic variants)
-  #variant_calling_type
+  variant_calling_type
 ]
 
 
