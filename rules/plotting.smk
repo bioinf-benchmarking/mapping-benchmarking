@@ -118,7 +118,7 @@ rule make_plot:
             fig.update_layout(**plot_config["layout"])
 
         if plot_type != "bar":
-            fig.update_traces(marker_size=20)
+            fig.update_traces(marker_size=15)
         fig.show()
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)
@@ -178,6 +178,7 @@ rule report:
         timestamp = time.strftime("%Y-%m-%d %H:%M")
         # markdown
         out = "# Report, created  " + timestamp + "\n\n"
-        out += "\n\n".join("![](" + image + ")" for image in input)
-        with open(output.md,"w") as f:
+        files = ['/'.join(file.split("/")[1:]) for file in input]
+        out += "\n\n".join("![](" + image + ")" for image in files)
+        with open(output[0],"w") as f:
             f.write(out)
