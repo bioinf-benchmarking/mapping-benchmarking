@@ -1,5 +1,7 @@
 # This file contains all configuration for the plots (reports) that can be generated
 
+# List of quick and small plots used for testing
+test_plots: [f1_score, accuracy]
 # List of plots that will be generated every night
 nightly_plots: []
 plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]

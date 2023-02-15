@@ -162,3 +162,22 @@ rule plot_from_name:
     shell:
         "cp {input} {output}"
 
+
+def get_report_input(wildcards):
+    plots = config["test_plots"] if wildcards.type == "test" else config["nightly_plots"]
+    return ["reports/presets/" + name + ".png" for name in plots]
+
+
+rule report:
+    input: get_report_input
+    output:
+        "reports/{type, test|main}.md"
+
+    run:
+        import time
+        timestamp = time.strftime("%Y-%m-%d %H:%M")
+        # markdown
+        out = "# Report, created  " + timestamp + "\n\n"
+        out += "\n\n".join("![](" + image + ")" for image in input)
+        with open(output.md,"w") as f:
+            f.write(out)

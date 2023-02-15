@@ -6,6 +6,8 @@ rule store_alignments_as_np_data:
         #n_reads="data/simulated_reads/{dataset}.n_reads",
     output:
         "{path}/{n_reads,\d+}/{method}/mapped.npz"
+    conda:
+        "../envs/samtools.yml"
     shell:
         "samtools view {input.alignments} | numpy_alignments store sam {output} {wildcards.n_reads}"
 
@@ -67,4 +69,5 @@ rule get_memory_usage:
         f"data/{parameters}/memory_usage.txt"
     shell:
         "cat {input} | tail -n 1 | cut -f 3 > {output}"
+
 
