@@ -4,7 +4,7 @@ name: Test
 on:
   # small benchmark on push and pull request
   push:
-    branches: ["dev", "master"]
+    branches: ["dev_", "master_"]
 
 jobs:
   build:
@@ -30,5 +30,6 @@ jobs:
 
       - name: Save benchmarks results
         run: |
-          sudo chown -R actions_runner:actions_runner .
+          echo "done"
+          #sudo chown -R actions_runner:actions_runner .
 
