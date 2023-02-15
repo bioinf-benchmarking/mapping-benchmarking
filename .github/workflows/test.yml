@@ -1,5 +1,5 @@
 
-name: Benchmarks
+name: Test
 
 on:
   # small benchmark on push and pull request
@@ -19,6 +19,7 @@ jobs:
       - name: install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -r python_requirements.txt
 
       - name: Run test
         uses: snakemake/snakemake-github-action@v1

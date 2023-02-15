@@ -1,7 +1,4 @@
-from collections import defaultdict
-
 import plotly.express as px
-import plotly.graph_objects as go
 from hierarchical_results.hierarchical_results import HierarchicalResults, ParameterCombinations
 hr = HierarchicalResults(config["parameter_types"],config["result_types"], prefix="data/")
 
