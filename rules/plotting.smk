@@ -1,12 +1,14 @@
 from collections import defaultdict
 
 import plotly.express as px
+import plotly.graph_objects as go
 from hierarchical_results.hierarchical_results import HierarchicalResults, ParameterCombinations
 hr = HierarchicalResults(config["parameter_types"],config["result_types"], prefix="data/")
 
 plotting_functions = {
     "bar": px.bar,
-    "line": px.line
+    "line": px.line,
+    "scatter": px.scatter
 }
 
 
@@ -68,6 +70,8 @@ def parse_plot_specification(plot_type):
             specification[dimension] = config["plot_types"][plot_type][dimension]
         else:
             specification[dimension] = None
+
+    specification["labels"] = config["pretty_names"]
     return specification
 
 
@@ -76,8 +80,14 @@ rule make_plot:
     output:
         plot="reports/plots/{plot_type, \w+}/{path}/plot.png",
         plot_html="reports/plots/{plot_type, \w+}/{path}/plot.html",
-        data="reports/plots/{plot_type, \w+}/{path}/plot.csv",
+        data="reports/plots/{plot_type, \w+}/{path}/plot.csv"
     run:
+        def pretty_name(name):
+            if name not in config["pretty_names"]:
+                return name.capitalize()
+            return config["pretty_names"][name]
+
+
         parameter_combinations, result_names = get_parameter_combinations_and_result_names(wildcards)
         df = hr.get_results_dataframe(parameter_combinations, result_names)
         df.to_csv(output.data)
@@ -88,19 +98,28 @@ rule make_plot:
 
         plot_config = config["plot_types"][wildcards.plot_type]
         plot_type = plot_config["type"]
-        if plot_type in ("scatter", "scatter_and_line"):
-            specification = parse_plot_specification(wildcards.plot_type)
-            specification["labels"] = config["pretty_names"]
-            fig = px.scatter(df, **specification, template="simple_white")
-            fig.update_traces(marker_size=20)
-            if "line" in plot_type:
-                fig.add_traces(px.line(df, **specification).data)
-        else:
-            assert plot_type in plotting_functions, "Plot type %s not supported"
-            func = plotting_functions[plot_type]
-            fig = func(df, **parse_plot_specification(wildcards.plot_type), template="simple_white")
+        title = wildcards.plot_type.capitalize().replace("_", " ")
+        if "title" in plot_config:
+            title = plot_config["title"]
 
-        fig.update_layout(font=dict(size=20))
+        specification = parse_plot_specification(wildcards.plot_type)
+        markers = False
+        if plot_type != "scatter" and "markers" in plot_config and plot_config["markers"]:
+            specification["markers"] = True
+
+        assert plot_type in plotting_functions, "Plot type %s not supported"
+        func = plotting_functions[plot_type]
+        fig = func(df, **specification, template="simple_white", title=title)
+
+        # prettier facet titles
+        fig.for_each_annotation(lambda a: a.update(text=pretty_name(a.text.split("=")[-1])))
+
+        #fig.update_annotations(font=dict(size=20))
+        #fig.update_layout(font=dict(size=20))
+        if "layout" in plot_config:
+            fig.update_layout(**plot_config["layout"])
+
+        fig.update_traces(marker_size=20)
         fig.show()
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)
@@ -137,7 +156,7 @@ def get_plot_name(wildcards):
 
 # Wrapper around the make_plot rule that uses default parameters
 # so that less stuff needs to be specified
-rule make_plot_from_name:
+rule plot_from_name:
     input: get_plot_name
     output:
         "reports/presets/{name}.png"

@@ -11,6 +11,17 @@ pretty_names:
   variant_calling_f1score: F1 Score
   one_minus_precision: 1-Precision
   recall: Recall
+  runtime: Runtime (seconds)
+  n_threads: Number of threads
+  whole_genome_single_end: Single-end reads
+  whole_genome_paired_end: Paired-end reads
+  read_length: Read length (nt)
+  f1_score: F1 score
+  low_error: Low error
+  medium_error: Medium error
+  high_error: High error
+  bwa: BWA-MEM
+  minimap: Minimap2
 
 
 # Plots
@@ -19,10 +30,12 @@ plots:
     plot_type: accuracy_vs_read_length
     parameters:
       read_type: whole_genome_single_end
-  my_plot:
+  accuracy_vs_read_length:
     plot_type: accuracy_vs_read_length
   accuracy:
     plot_type: accuracy
+  accuracy_on_various_read_lengths:
+    plot_type: accuracy_on_various_read_lengths
   accuracy_f1_score:
     plot_type: accuracy_f1_score
   memory:
@@ -33,15 +46,13 @@ plots:
     plot_type: variant_calling_accuracy
   runtime_simple:
     plot_type: runtime_simple
-  runtime_complex:
-    plot_type: runtime_complex
+  runtime_with_varying_number_of_threads:
+    plot_type: runtime_with_varying_number_of_threads
 
-# plot_typoes define different type of plots
-# they only describe the structure of the plot, not what values are used for the variables
-# a plot tyope has:
-# type: line/bar
-# x_axis, y_axis, category_variable:
-#   each of these should be either a result_type or a parameter_type
+# The following defines different type of plots
+# This includes only the description of the structure of each plot, not what values are used for the variables
+# Each of x_axis, y_axis, category_variable, color, labels, facet_col, facet_row
+# should be either a result_type or a parameter_type if set
 
 plot_types:
   f1_score_bar:
@@ -49,13 +60,18 @@ plot_types:
     x: "method"
     y: "f1_score"
   accuracy:
-    type: "scatter_and_line"
+    type: line
+    markers: True
     x: "one_minus_precision"
     y: "recall"
     labels: "min_mapq"
     color: "method"
-  accuracy_facet:
-    type: "scatter_and_line"
+    facet_col: variant_filter
+    layout:
+      xaxis_type: log
+  accuracy_on_various_read_lengths:
+    type: line
+    markers: True
     x: "one_minus_precision"
     y: "recall"
     labels: "min_mapq"
@@ -72,11 +88,11 @@ plot_types:
     color: "method"
     facet_col: "variant_filter"
     facet_row: "error_profile"
-  runtime_simple:
+  runtime:
     type: "bar"
     y: "runtime"
     x: "method"
-  runtime_complex:
+  runtime_with_varying_number_of_threads:
     type: line
     y: runtime
     x: n_threads
