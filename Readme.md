@@ -3,7 +3,7 @@
 
 # Snakemake pipeline for benchmarking read mappers
 
-This is an attempt at a clean Snakemake pipeline for benchmarking read mappers. The idea behind this pipeline is:
+This is a Snakemake pipeline for benchmarking read mappers. The idea behind this pipeline is:
 
 * It can be used to benchmark new read mappers (no need to spend time writing your own benchmarking scripts if you develop a read mapper).
 * It can be used to get an up-to-date overview of how given read mappers perform on a given type of reads/scenario. It is difficult to test and present accuracy/performance across all combinations of paramaters (read length, error rate, error profiles, genome diversity, etc.) when presenting benchmark results in a paper. With this pipeline, each person can instead run the benchmarks they find interesting when assessing read mappers.  
