@@ -10,7 +10,10 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
+        with:
+          clean: false
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -21,7 +24,7 @@ jobs:
         with:
           directory: '.'
           snakefile: 'Snakefile'
-          args: '--cores 16 --use-conda reports/main.md'
+          args: '--cores 16 --use-conda --rerun-incomplete reports/test.md'
           stagein: | # 'cd benchmarks' # additional preliminary commands to run (can be multiline)
             apt-get update
             apt-get -y install gcc

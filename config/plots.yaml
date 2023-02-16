@@ -33,8 +33,8 @@ plots:
       read_type: whole_genome_single_end
   f1_score:
     plot_type: f1_score
-  accuracy_vs_read_length:
-    plot_type: accuracy_vs_read_length
+  accuracy_vs_read_length_and_error_profile:
+    plot_type: accuracy_vs_read_length_and_error_profile
   accuracy:
     plot_type: accuracy
   accuracy_on_various_read_lengths:
@@ -69,6 +69,12 @@ plots:
       dataset_size: big
       n_reads: "5000000"
 
+  accuracy_vs_read_length_and_error_profile_human_whole_genome:
+    plot_type: accuracy_vs_read_length_and_error_profile
+    parameters:
+      dataset_size: big
+      n_reads: "1000000"
+
 
 # The following defines different type of plots
 # This includes only the description of the structure of each plot, not what values are used for the variables
@@ -102,7 +108,7 @@ plot_types:
     type: "line"
     x: "read_length"
     y: "f1_score"
-  accuracy_vs_read_length:
+  accuracy_vs_read_length_and_error_profile:
     type: "line"
     x: "read_length"
     y: "f1_score"
