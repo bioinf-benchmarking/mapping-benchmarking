@@ -1,10 +1,9 @@
 
 name: Benchmarks
 
-on:
-  # small benchmark on push and pull request
-  push:
-    branches: ["dev", "master"]
+on: workflow_dispatch
+  #push:
+  #  branches: ["master"]
 
 jobs:
   build:

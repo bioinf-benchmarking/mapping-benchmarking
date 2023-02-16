@@ -47,8 +47,8 @@ plots:
     parameters:
       n_reads: "5000000"
     plot_type: variant_calling_accuracy
-  runtime_simple:
-    plot_type: runtime_simple
+  runtime:
+    plot_type: runtime
   runtime_with_varying_number_of_threads:
     plot_type: runtime_with_varying_number_of_threads
 

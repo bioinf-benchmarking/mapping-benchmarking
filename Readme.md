@@ -16,12 +16,25 @@ This pipeline is open source, and we are very happy for any contributions or sug
 ## How to use
 
 ### Latest benchmarking results
-You will find the latest results [here](). If you want these to include other parameters/settings, feel free to edit the configuration files and make a pull-request (see guide further down).
+You will find the latest results [here](https://github.com/ivargr/mapping-benchmarking/blob/benchmarks/reports/main.md). If you want these to include other parameters/settings, feel free to edit the configuration files and make a pull-request (see guide below).
 
 ### Run benchmarks locally
 1. Install Snakemake and Conda if you havn't already.
-2. Clone this repository: `git clone ...`
-3. Check that  
+2. Clone this repository
+3. Install Python requirements: `pip install -r python_requirements.txt` 
+4. Run:
+
+You can generate a test report to check that the pipeline is working. This takes about 10 minutes to finish:
+```bash
+snakemake --use-conda --cores 4 reports/test.md
+```
+
+You can generate a specific plot (defined in config/plots.yml)  like this:
+```bash
+snakemake --use-conda --cores 4 reports/presets/my_plot.png
+```
+
+Se guide below for more on how to configure types of runs.
 
 
 ### Contribute 
@@ -30,7 +43,8 @@ You will find the latest results [here](). If you want these to include other pa
 See *Add a new read-mapper* under *Developer guide*.
 
 #### 2) Add plots/cases
-All plots are specified in `config/plots.yaml`. For most plots, no code should be necessary to write, only configuration. Feel free to edit this file to add plots you believe are useful, and make a pull request. The file contains documentation that should explain how to edit the file, but feel free to reach out with questions if anything is unclear. Se developer guide for details.
+All plots are specified in `config/plots.yaml`. For any plots that rely on already implemented parameters and result types (as defined in `config/config.yaml`), no code is necesary, and the plots can be defined and built only by configuring them in `config/plot.yml`. 
+Feel free to edit that file to add plots you believe are useful, and make a pull request. See Developer guide for how this configuration works. 
 
 #### 3) General help/contribution
 This is a simple first attempt at a pipeline that tries to be flexible and allow benchmarking across what we think are the relevant parameters. However, we want this pipeline to be shaped by what the community believe is important. Feel free to open an issue to discuss things that can be changed or added, e.g. cases or benchmarks that are not currently supported.
@@ -47,12 +61,12 @@ You can add a plot type by adding a configuration under `plot_types` in `config/
 ```yaml
 plot_types:
   accuracy_vs_read_length:
-    type: "line"
-    x: "read_length"
-    y: "f1_score"
-    color: "method"
-    facet_col: "variant_filter"
-    facet_row: "error_profile"
+    type: line
+    x: read_length
+    y: f1_score
+    color: method
+    facet_col: variant_filter
+    facet_row: error_profile
 ```
 
 The above defines a plot type with the name `accuracy_vs_read_length`. We tell the pipeline to make a plot type where the x-axis is `read_length` and the y-axis is `f1_score`. The "color" is `method`, which means that we want one line for each available method (color is the term that **Plotly** uses). We want to repeat this plot for different "variant_filters" along the columns (specified by `facet_col`) and for different error profiles along the rows (specified by `facet_row`). Note that only `x` and `y` are mandatory, the rest can be ommited (in that case only a single plot is created).
@@ -70,8 +84,11 @@ We can now ask Snakemake to generate my_plot:
 ```bash
 snakemake reports/presets/my_plot.png
 ```
+.. which should create something like this:
 
-Running the above will generate a plot with **default values** for all variables (method, read length etc). This is because no parameters were specified. The default values are specified in `config/config.yaml`. For instance, the default `parameter_set` for read length is `[75, 150, 300]`, specified with the `read_lengths_rough` name. The default individual is `hg002`. If you want to change any of the defaults, you can easily do that. 
+![Plot example](reports/presets/example.png)
+
+Note that running the above will generate a plot with **default values** for all variables (method, read length etc). This is because no parameters were specified. The default values are specified in `config/config.yaml`. For instance, the default `parameter_set` for read length is `[75, 150, 300]`, specified with the `read_lengths_rough` name. The default individual is `hg002`. If you want to change any of the defaults, you can easily do that. 
 Example: 
 
 ```yaml

@@ -12,34 +12,6 @@ rule store_alignments_as_np_data:
         "samtools view {input.alignments} | numpy_alignments store sam {output} {wildcards.n_reads}"
 
 
-def get_result_files(wildcards):
-    methods = config["runs"]["mapping"]["tools"]
-    return [
-        f"{wildcards.dataset}/{method}/mapped.npz" for method in methods
-    ]
-
-
-rule compare_read_mapping_against_truth:
-    input:
-        get_result_files,
-        truth="{dataset}/truth.npz",
-    output:
-        "{dataset}/report.html"
-    params:
-        method_names=lambda wildcards: ','.join(config["runs"]["mapping"]["tools"]),
-        input_files=lambda wildcards: ",".join(get_result_files(wildcards))
-    shell:
-        """
-        numpy_alignments make_report -f {wildcards.dataset}/ --names="{params.method_names}" {input.truth} {params.input_files} purple,orange,blue
-        """
-
-
-rule make_mapping_report:
-    output:
-        "reports/mapping/report_{size}.html"
-
-
-
 rule get_accuracy_result:
     input:
         alignments=f"data/{parameters.until('n_threads')}/mapped.npz",

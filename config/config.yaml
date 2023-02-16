@@ -1,7 +1,7 @@
 use_conda: True
 
 # name of all methods
-methods: ["bwa", "bowtie2", "minimap2"]
+methods: ["bwa", "bowtie2", "minimap2", "strobealign"]
 
 # mapping from method IDs to names
 method_names:
@@ -61,7 +61,7 @@ default_parameter_values:
 parameter_sets:
   all_methods:
     parameter_type: "method"
-    values: ["bwa", "bowtie2", "minimap"]
+    values: ["bwa", "bowtie2", "minimap", "strobealign"]
   read_lengths_rough:
     parameter_type: "read_length"
     values: [75, 150, 300]

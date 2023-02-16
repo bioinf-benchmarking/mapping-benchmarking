@@ -2,13 +2,16 @@
 
 rule strobealign_map:
   input:
-    reads="data/simulated_reads/{dataset}/simulated_reads.fq.gz",
-    ref="data/reference_genomes/{dataset}.fa"
+    reads=get_input_reads,
+    ref=f"data/{parameters.until('dataset_size')}/reference.fa"
   output:
-      sam="data/mapping/strobealign/{dataset}.sam",
+      f"data/{parameters.until('n_threads')(method='strobealign')}/mapped.bam"
   conda:
       "../envs/strobealign.yml"
+  threads: lambda wildcards: int(wildcards.n_threads)
+  benchmark:
+      f"data/{parameters.until('n_threads')(method='strobealign')}/benchmark.csv"
   shell:
-      "strobealign {input.ref} {input.reads} > {output.sam}"
+      "strobealign -t {wildcards.n_threads} {input.ref} {input.reads} | samtools view -b -h - >  {output}"
 
 
