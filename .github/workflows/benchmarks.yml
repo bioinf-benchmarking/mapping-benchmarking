@@ -30,8 +30,8 @@ jobs:
 
       - name: Save benchmarks results
         run: |
-          git config --global user.email "github@action.com"
-          git config --global user.name "github action"
+          git config --local user.email "github@action.com"
+          git config --local user.name "github action"
           
           git checkout benchmarks
           git pull origin benchmarks
