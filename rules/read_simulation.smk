@@ -98,9 +98,9 @@ rule simulate_reads_for_chromosome_and_haplotype:
         min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
         max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
     threads:
-        6
+        2
     shell:
-        "mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output[0]} -oa {output[1]} --num-threads 6 {params.error_parameters} "
+        "mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output[0]} -oa {output[1]} --num-threads 2 {params.error_parameters} "
         "--illumina-read-length {wildcards.read_length} "
         "--fragment-mean-size {params.mean_fragment_size} "
         "--fragment-min-size {params.min_fragment_size} "
@@ -123,9 +123,9 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end:
         min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
         max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
     threads:
-        6
+        2
     shell:
-        "mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output.reads1} -or {output.reads2} -oa {output.truth1} --num-threads 6 {params.error_parameters} "
+        "mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output.reads1} -or {output.reads2} -oa {output.truth1} --num-threads 2 {params.error_parameters} "
         "--illumina-read-length {wildcards.read_length} "
         "--fragment-mean-size {params.mean_fragment_size} "
         "--fragment-min-size {params.min_fragment_size} "

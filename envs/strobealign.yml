@@ -3,3 +3,5 @@ channels:
 
 dependencies:
   - strobealign
+  - samtools
+
