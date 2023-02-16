@@ -8,6 +8,7 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: self-hosted
+    timeout-minutes: 3000
     steps:
       - uses: actions/checkout@v3
         with:
@@ -23,7 +24,7 @@ jobs:
         with:
           directory: '.'
           snakefile: 'Snakefile'
-          args: '--cores 16 --use-conda --rerun-incomplete reports/main.md'
+          args: '--cores 40 --use-conda --rerun-incomplete reports/main.md'
           stagein: | # 'cd benchmarks' # additional preliminary commands to run (can be multiline)
             apt-get update
             apt-get -y install gcc
