@@ -1,3 +1,6 @@
+[![Test]( https://github.com/ivargr/mapping-benchmarking/actions/workflows/test.yml/badge.svg)]()
+
+
 # Snakemake pipeline for benchmarking read mappers
 
 This is an attempt at a clean Snakemake pipeline for benchmarking read mappers. The idea behind this pipeline is:

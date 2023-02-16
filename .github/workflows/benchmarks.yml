@@ -32,12 +32,13 @@ jobs:
         run: |
           git config --local user.email "github@action.com"
           git config --local user.name "github action"
+          git config pull.rebase false
           
           git add -f reports/*.md
           git add -f reports/presets/*.png
           git commit -am 'Benchmark results'
           
-          git pull origin benchmarks
+          git pull -X ours origin benchmarks
 
       - name: Push results to benchmark branch
         uses: ad-m/github-push-action@master
