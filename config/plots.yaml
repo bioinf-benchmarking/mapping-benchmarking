@@ -3,7 +3,7 @@
 # List of quick and small plots used for testing
 test_plots: [f1_score, accuracy]
 # List of plots that will be generated every night
-nightly_plots: [accuracy]  # [accuracy_human_whole_genome, runtime_human_whole_genome]
+nightly_plots: [accuracy_human_whole_genome, runtime_human_whole_genome]
 plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 
 
@@ -56,12 +56,13 @@ plots:
     plot_type: accuracy
     parameters:
       dataset_size: big
+      n_reads: "10000000"
 
   runtime_human_whole_genome:
     plot_type: runtime_with_varying_number_of_threads
     parameters:
       dataset_size: big
-      n_reads: "5000000"
+      n_reads: "10000000"
 
   variant_calling_accuracy_human_whole_genome:
     plot_type: variant_calling_accuracy
