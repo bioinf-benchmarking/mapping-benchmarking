@@ -3,7 +3,7 @@
 # List of quick and small plots used for testing
 test_plots: [f1_score, accuracy]
 # List of plots that will be generated every night
-nightly_plots: [accuracy_human_whole_genome, runtime_human_whole_genome]
+nightly_plots: [accuracy_human_whole_genome, runtime_human_whole_genome, variant_calling_accuracy, accuracy_vs_read_length_and_error_profile_human_whole_genome]
 plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 
 
