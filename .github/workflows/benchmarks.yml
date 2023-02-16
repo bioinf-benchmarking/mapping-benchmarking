@@ -21,7 +21,7 @@ jobs:
         with:
           directory: '.'
           snakefile: 'Snakefile'
-          args: '-F --cores 16 --use-conda reports/dummy.md'
+          args: '-F --cores 16 --use-conda reports/test.md'
           stagein: | # 'cd benchmarks' # additional preliminary commands to run (can be multiline)
             apt-get update
             apt-get -y install gcc
@@ -32,8 +32,6 @@ jobs:
         run: |
           git config --local user.email "github@action.com"
           git config --local user.name "github action"
-          
-          #git checkout benchmarks
           
           git add -f reports/*.md
           git add -f reports/presets/*.png

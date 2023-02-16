@@ -176,7 +176,6 @@ rule report:
     run:
         import time
         timestamp = time.strftime("%Y-%m-%d %H:%M")
-        # markdown
         out = "# Report, created  " + timestamp + "\n\n"
         files = ['/'.join(file.split("/")[1:]) for file in input]
         out += "\n\n".join("![](" + image + ")" for image in files)
