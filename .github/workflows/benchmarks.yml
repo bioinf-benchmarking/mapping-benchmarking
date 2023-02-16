@@ -41,12 +41,12 @@ jobs:
           git add -f reports/presets/*.png
           git commit -am 'Benchmark results'
           
-          git pull -X ours origin benchmarks
+          #git pull -X ours origin benchmarks
 
       - name: Push results to benchmark branch
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tags: true
-          force: false
+          force: true
           branch: benchmarks
