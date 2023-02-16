@@ -1,5 +1,5 @@
-[![Test]( https://github.com/ivargr/mapping-benchmarking/actions/workflows/test.yml/badge.svg)]()
-
+[![Test]( https://github.com/ivargr/mapping-benchmarking/actions/workflows/test.yml/badge.svg)](https://github.com/ivargr/mapping-benchmarking/actions/workflows/test.yml)
+[![Benchmarks]( https://github.com/ivargr/mapping-benchmarking/actions/workflows/benchmarks.yml/badge.svg)](https://github.com/ivargr/mapping-benchmarking/blob/benchmarks/reports/main.md)
 
 # Snakemake pipeline for benchmarking read mappers
 

@@ -4,11 +4,11 @@ name: Test
 on:
   # small benchmark on push and pull request
   push:
-    branches: ["dev_", "master_"]
+    branches: ["dev", "master"]
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python
@@ -31,5 +31,4 @@ jobs:
       - name: Save benchmarks results
         run: |
           echo "done"
-          #sudo chown -R actions_runner:actions_runner .
 

@@ -21,7 +21,7 @@ jobs:
         with:
           directory: '.'
           snakefile: 'Snakefile'
-          args: '-F --cores 16 --use-conda reports/test.md'
+          args: '-F --cores 16 --use-conda reports/main.md'
           stagein: | # 'cd benchmarks' # additional preliminary commands to run (can be multiline)
             apt-get update
             apt-get -y install gcc
