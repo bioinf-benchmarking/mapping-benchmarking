@@ -1,5 +1,5 @@
 channels:
-  - conda
+  - bioconda
 
 dependencies:
   - strobealign
