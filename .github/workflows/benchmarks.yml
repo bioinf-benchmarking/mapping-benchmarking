@@ -33,7 +33,7 @@ jobs:
           git config --local user.email "github@action.com"
           git config --local user.name "github action"
           
-          git checkout benchmarks
+          #git checkout benchmarks
           
           git add -f reports/*.md
           git add -f reports/presets/*.png
