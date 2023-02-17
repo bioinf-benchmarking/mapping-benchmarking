@@ -5,3 +5,4 @@ kaleido
 graph_read_simulator>=0.0.14
 numpy_alignments
 hierarchical_results
+tabulate

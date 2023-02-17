@@ -1,4 +1,7 @@
+import itertools
+
 import plotly.express as px
+import tabulate
 from hierarchical_results.hierarchical_results import HierarchicalResults, ParameterCombinations
 hr = HierarchicalResults(config["parameter_types"],config["result_types"], prefix="data/")
 
@@ -77,7 +80,8 @@ rule make_plot:
     output:
         plot="reports/plots/{plot_type, \w+}/{path}/plot.png",
         plot_html="reports/plots/{plot_type, \w+}/{path}/plot.html",
-        data="reports/plots/{plot_type, \w+}/{path}/plot.csv"
+        data="reports/plots/{plot_type, \w+}/{path}/plot.csv",
+        table="reports/plots/{plot_type, \w+}/{path}/table.md"
     run:
         def pretty_name(name):
             if name not in config["pretty_names"]:
@@ -87,8 +91,12 @@ rule make_plot:
 
         parameter_combinations, result_names = get_parameter_combinations_and_result_names(wildcards)
         df = hr.get_results_dataframe(parameter_combinations, result_names)
-        df.to_csv(output.data)
-        print(df)
+        df.to_csv(output.data, index=False)
+
+        markdown_table = tabulate.tabulate(df, headers=df.columns, tablefmt="github")
+        print(markdown_table)
+        with open(output.table, "w") as f:
+            f.write(markdown_table + "\n")
 
         if wildcards.plot_type not in config["plot_types"]:
             print("Invalid plot type ", wildcards.plot_type, " not specified in config")
@@ -149,8 +157,9 @@ def get_plot_name(wildcards):
                 parameter = config["default_parameter_values"][parameter]
         plot_path.append(parameter)
 
-    file = "reports/plots/" + plot_config["plot_type"] + "/" + "/".join(plot_path) + "/plot.png"
-    return file
+    base_name = "reports/plots/" + plot_config["plot_type"] + "/" + "/".join(plot_path) + "/"
+    endings = ["plot.png", "table.md"]
+    return [base_name + ending for ending in endings]
 
 
 # Wrapper around the make_plot rule that uses default parameters
@@ -158,14 +167,17 @@ def get_plot_name(wildcards):
 rule plot_from_name:
     input: get_plot_name
     output:
-        "reports/presets/{name}.png"
+        png="reports/presets/{name}.png",
+        table="reports/presets/{name}.md",
     shell:
-        "cp {input} {output}"
+        "cp {input[0]} {output[0]} && "
+        "cp {input[1]} {output[1]}"
 
 
 def get_report_input(wildcards):
     plots = config["test_plots"] if wildcards.type == "test" else config["nightly_plots"]
-    return ["reports/presets/" + name + ".png" for name in plots]
+    return list(itertools.chain.from_iterable(zip(["reports/presets/" + name + ".png" for name in plots],
+               ["reports/presets/" + name + ".md" for name in plots])))
 
 
 rule report:
@@ -177,8 +189,13 @@ rule report:
         import time
         timestamp = time.strftime("%Y-%m-%d %H:%M")
         out = "# Report, created  " + timestamp + "\n\n"
+
+        # remove reports/
         files = ['/'.join(file.split("/")[1:]) for file in input]
-        out += "\n\n".join("![](" + image + ")" for image in files)
+
+        for image, table in zip(files[0::2], files[1::2]):
+            out += "![](" + image + ") \n [Data](" + table + ") \n\n"
+
         with open(output[0],"w") as f:
             f.write(out)
 
