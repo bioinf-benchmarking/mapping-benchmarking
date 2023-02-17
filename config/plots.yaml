@@ -45,7 +45,11 @@ plots:
     plot_type: memory_usage
   variant_calling_accuracy:
     parameters:
-      n_reads: "5000000"
+      n_reads: "1000000"
+    plot_type: variant_calling_accuracy
+  variant_calling_accuracy_test:
+    parameters:
+      n_reads: "100000"
     plot_type: variant_calling_accuracy
   runtime:
     plot_type: runtime
