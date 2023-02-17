@@ -77,6 +77,7 @@ rule make_truth_vcf_for_chromosome:
         """
 
 
+
 rule run_happy:
     input:
         variant_calls="data/{genome_build}/{individual}/{size}/{config}/variant_calls.vcf.gz",
@@ -97,6 +98,29 @@ rule run_happy:
         -f {input.truth_regions} \
         --no-decompose --engine=vcfeval 
         """
+
+
+"""
+rule run_happy2:
+    input:
+        truth="data/{genome_build}/{individual}/{size}/variant_calling_truth.vcf.gz",
+        query="data/{genome_build}/{individual}/{size}/{config}/variant_calls.vcf.gz",
+        truth_regions="data/{genome_build}/{individual}/truth_regions.bed",
+        genome="data/{genome_build}/reference.fa",
+        genome_index="data/{genome_build}/reference.fa.fai"
+    output:
+        multiext("data/{genome_build,\w+}/{individual,\w+}/{size,\w+}/{config}/happy",".runinfo.json",".vcf.gz",".summary.csv",
+            ".extended.csv",".metrics.json.gz",".roc.all.csv.gz",
+            ".roc.Locations.INDEL.csv.gz",".roc.Locations.INDEL.PASS.csv.gz",
+            ".roc.Locations.SNP.csv.gz",".roc.tsv")
+    params:
+        engine="vcfeval",
+        prefix=lambda wc, input, output: output[0].split('.')[0],
+        ## parameters such as -L to left-align variants
+        extra="--verbose"
+    threads: 2
+    wrapper: "v1.23.4/bio/hap.py/hap.py"
+"""
 
 rule get_variant_calling_result:
     input:
