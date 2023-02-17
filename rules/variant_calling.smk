@@ -91,6 +91,7 @@ rule run_happy:
         "../envs/happy.yml"
     shell:
         """
+        export HGREF={input.ref} \
         hap.py {input.truth_vcf} {input.variant_calls} \
         --no-leftshift \
         -r {input.ref} \
