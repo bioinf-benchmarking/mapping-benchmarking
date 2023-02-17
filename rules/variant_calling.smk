@@ -69,6 +69,8 @@ rule make_truth_vcf_for_chromosome:
         "data/{genome_build,\w+}/{individual}/{size}/variant_calling_truth.vcf.gz"
     params:
         chromosome=get_variant_calling_chromosome
+    conda:
+        "../envs/bcftools.yml"
     shell:
         """
         bcftools view --regions {params.chromosome} -O z {input.variants} > {output}
