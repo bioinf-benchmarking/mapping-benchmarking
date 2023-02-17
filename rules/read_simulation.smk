@@ -84,6 +84,17 @@ def get_mason_error_parameters(wildcards):
             " --illumina-prob-insert " + str(profile["insertion_prob"]) + \
             " --illumina-prob-mismatch-scale " + str(profile["mismatch_scale"])
 
+def get_art_error_parameters(wildcards):
+    profile = config["illumina_error_profiles"][wildcards.error_profile]
+    return \
+            " --delRate " + str(profile["deletion_prob"]) + \
+            " --delRate2 " + str(profile["deletion_prob"]) + \
+            " --insRate " + str(profile["insertion_prob"]) + \
+            " --insRate2 " + str(profile["insertion_prob"]) + \
+            " -qs " + str(1 / profile["mismatch_scale"]) + \
+            " -qs2 " + str(1 / profile["mismatch_scale"])
+
+"""
 rule simulate_reads_for_chromosome_and_haplotype:
     input:
         haplotype_reference="{individual}/haplotype{haplotype}.fa"
@@ -105,8 +116,83 @@ rule simulate_reads_for_chromosome_and_haplotype:
         "--fragment-mean-size {params.mean_fragment_size} "
         "--fragment-min-size {params.min_fragment_size} "
         "--fragment-max-size {params.max_fragment_size} "
+"""
 
 
+def get_genome_size(wildcards, input, output):
+    with open(input.haplotype_reference_fai) as f:
+        size = sum((int(l.strip().split()[1]) for l in f))
+    print("Genome size:", size)
+    return size
+
+
+def get_coverage(wildcards, input, output):
+    genome_size = get_genome_size(wildcards, input, output)
+    coverage = int(wildcards.n_reads) * int(wildcards.read_length) / genome_size
+    print("Coverage: ", coverage)
+    return coverage / 2
+
+
+rule simulate_reads_for_chromosome_and_haplotype_art:
+    input:
+        haplotype_reference="{individual}/haplotype{haplotype}.fa",
+        haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
+    output:
+        multiext("{individual}/whole_genome_single_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", ".fq", ".sam")
+    conda:
+        "../envs/art.yml"
+    params:
+        error_parameters=get_art_error_parameters,
+        coverage=get_coverage,
+        mean_fragment_size=lambda wildcards: int(wildcards.read_length) * 3,
+        min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
+        max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
+        output_base_name=lambda wildcards, input, output: output[0].split(".")[0]
+    threads:
+        2
+    shell:
+        "art_illumina -ss MSv3 -sam -i {input.haplotype_reference} -f {params.coverage} -o {params.output_base_name} -l {wildcards.read_length} {params.error_parameters} "
+
+
+rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
+    input:
+        haplotype_reference="{individual}/haplotype{haplotype}.fa",
+        haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
+    output:
+        multiext("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", "-1.fq", "-2.fq", "-.sam")
+    conda:
+        "../envs/art.yml"
+    params:
+        error_parameters=get_art_error_parameters,
+        coverage=get_coverage,
+        mean_fragment_size=lambda wildcards: int(wildcards.read_length) * 3,
+        min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
+        max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
+        std_fragment_size= lambda wildcards: int(wildcards.read_length) // 10 ,
+        output_base_name=lambda wildcards, input, output: output[0].split(".")[0][0:-1]
+    threads:
+        2
+    shell:
+        "art_illumina -ss MSv3 -p -sam -i {input.haplotype_reference} -f {params.coverage} -o {params.output_base_name} "
+        "-l {wildcards.read_length} -m {params.mean_fragment_size} -s {params.std_fragment_size} {params.error_parameters} "
+
+
+# hack to get paired end rule to give same as single end
+rule fix_sam_file_name:
+    input:
+        "{name}-.sam"
+    output:
+        "{name}.sam"
+    shell: "cp {input} {output}"
+
+
+rule gz:
+    input: "{file}.fq"
+    output: "{file}.fq.gz"
+    shell: "gzip -c {input} > {output}"
+
+
+"""
 rule simulate_reads_for_chromosome_and_haplotype_paired_end:
     input:
         haplotype_reference="{individual}/haplotype{haplotype}.fa"
@@ -130,6 +216,7 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end:
         "--fragment-mean-size {params.mean_fragment_size} "
         "--fragment-min-size {params.min_fragment_size} "
         "--fragment-max-size {params.max_fragment_size} "
+"""
 
 rule merge_paired_end_reads:
     input:
@@ -160,7 +247,7 @@ rule deinterleave_fastq:
 # finds out whether each truth alignment covers a variant and adds that information
 rule add_variant_info_to_truth_sam:
     input:
-        truth_positions="{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.haplotype_truth.sam",
+        truth_positions="{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.sam",
         coordinate_map="{individual}/coordinate_map_haplotype{haplotype}.npz",
     output:
         "{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
