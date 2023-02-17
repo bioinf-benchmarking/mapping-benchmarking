@@ -135,10 +135,10 @@ def get_coverage(wildcards, input, output):
 
 rule simulate_reads_for_chromosome_and_haplotype_art:
     input:
-        haplotype_reference=f"{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa",
+        haplotype_reference=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa",
         #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
     output:
-        multiext(f"{parameters.until('n_reads')(read_type='whole_genome_single_end')}/{{haplotype,\d+}}", ".fq", ".sam")
+        multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_single_end')}/{{haplotype,\d+}}", ".fq", ".sam")
     conda:
         "../envs/art.yml"
     params:
