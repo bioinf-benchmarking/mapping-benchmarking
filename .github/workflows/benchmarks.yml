@@ -27,7 +27,7 @@ jobs:
           args: '--cores 40 --use-conda --rerun-incomplete reports/main.md'
           stagein: | # 'cd benchmarks' # additional preliminary commands to run (can be multiline)
             apt-get update
-            apt-get -y install gcc-10
+            apt-get -y install gcc
             gcc --version
             python -m pip install --upgrade pip setuptools wheel
             pip install -r python_requirements.txt
