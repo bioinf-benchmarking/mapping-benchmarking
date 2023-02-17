@@ -127,7 +127,7 @@ def get_genome_size(wildcards, input, output):
 
 
 def get_coverage(wildcards, input, output):
-    genome_size = get_genome_size(wildcards, input, output)
+    genome_size = config["genomes"][wildcards.genome_build][wildcards.individual][wildcards.dataset_size]["genome_size"]  # get_genome_size(wildcards, input, output)
     coverage = int(wildcards.n_reads) * int(wildcards.read_length) / genome_size
     print("Coverage: ", coverage)
     return coverage / 2
@@ -135,10 +135,10 @@ def get_coverage(wildcards, input, output):
 
 rule simulate_reads_for_chromosome_and_haplotype_art:
     input:
-        haplotype_reference="{individual}/haplotype{haplotype}.fa",
-        haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
+        haplotype_reference=f"{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa",
+        #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
     output:
-        multiext("{individual}/whole_genome_single_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", ".fq", ".sam")
+        multiext(f"{parameters.until('n_reads')(read_type='whole_genome_single_end')}/{{haplotype,\d+}}", ".fq", ".sam")
     conda:
         "../envs/art.yml"
     params:
@@ -156,10 +156,12 @@ rule simulate_reads_for_chromosome_and_haplotype_art:
 
 rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
     input:
-        haplotype_reference="{individual}/haplotype{haplotype}.fa",
-        haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
+        haplotype_reference=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa",
+        #haplotype_reference="{individual}/haplotype{haplotype}.fa",
+        #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
     output:
-        multiext("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", "-1.fq", "-2.fq", "-.sam")
+        multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype,\d+}}", "-1.fq", "-2.fq", "-.sam")
+        #multiext("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", "-1.fq", "-2.fq", "-.sam")
     conda:
         "../envs/art.yml"
     params:
