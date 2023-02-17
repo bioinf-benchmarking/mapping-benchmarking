@@ -12,7 +12,7 @@ rule strobealign_map:
   benchmark:
       f"data/{parameters.until('n_threads')(method='strobealign')}/benchmark.csv"
   shell:
-      "mkdir -p dirname {output} && "
+      "mkdir -p $(dirname {output}) && "
       "strobealign -t {wildcards.n_threads} {input.ref} {input.reads} | "
       "samtools view -b -h - | "
       # add read group (needed for variant calling)
