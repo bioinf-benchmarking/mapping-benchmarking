@@ -44,5 +44,7 @@ rule add_read_group_to_strobealign:
         f"data/{parameters.until('n_threads')(method='strobealign')}/without_readgroup.bam"
     output:
         f"data/{parameters.until('n_threads')(method='strobealign')}/mapped.bam"
+    conda:
+        "../envs/samtools.yml"
     shell:
         "samtools addreplacerg -r 'ID:sample\\tSM:sample' -O bam -o {output} {input}"
