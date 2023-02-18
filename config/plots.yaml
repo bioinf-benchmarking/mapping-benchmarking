@@ -15,7 +15,7 @@ pretty_names:
   variant_calling_f1score: F1 Score
   one_minus_precision: 1-Precision
   recall: Recall
-  runtime: Runtime (seconds)
+  runtime: Runtime useconds)
   n_threads: Number of threads
   whole_genome_single_end: Single-end reads
   whole_genome_paired_end: Paired-end reads
@@ -67,7 +67,7 @@ plots:
     plot_type: runtime_with_varying_number_of_threads
     parameters:
       dataset_size: big
-      n_reads: "1000000"
+      n_reads: "200000"
 
   variant_calling_accuracy_human_whole_genome:
     plot_type: variant_calling_accuracy
@@ -131,6 +131,7 @@ plot_types:
     x: n_threads
     color: method
     facet_col: read_type
+    facet_row: read_length
   memory_usage:
     type: bar
     y: memory_usage
