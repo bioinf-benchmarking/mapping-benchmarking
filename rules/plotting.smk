@@ -195,7 +195,7 @@ rule report:
         files = ['/'.join(file.split("/")[1:]) for file in input]
 
         for image, table in zip(files[0::2], files[1::2]):
-            out += "![](" + image + ") \n [Data](" + table + ") \n\n"
+            out += "![](" + image + ") \n\n [Link to plot data](" + table + ") \n\n"
 
         with open(output[0],"w") as f:
             f.write(out)
