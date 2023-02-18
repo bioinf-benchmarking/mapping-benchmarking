@@ -1,10 +1,14 @@
 # This file contains all configuration for the plots (reports) that can be generated
 
 # List of quick and small plots used for testing
-test_plots: [f1_score, accuracy]
+test_plots: [f1_score, accuracy_for_various_mapq_thresholds, memory]
 # List of plots that will be generated every night
 #nightly_plots: [accuracy_on_various_read_lengths, variant_calling_accuracy]
-nightly_plots: [accuracy_human_whole_genome, runtime_human_whole_genome, variant_calling_accuracy, accuracy_vs_read_length_and_error_profile_human_whole_genome]
+nightly_plots: [accuracy_for_various_mapq_thresholds_human_whole_genome,
+                runtime_human_whole_genome,
+                variant_calling_accuracy,
+                accuracy_vs_read_length_and_error_profile_human_whole_genome,
+                memory_human_whole_genome]
 
 # Dimensions that can be used when defining plot_types
 plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
@@ -61,7 +65,7 @@ plots:
     parameters:
       n_reads: "100000"
 
-  accuracy_human_whole_genome:
+  accuracy_for_various_mapq_thresholds_human_whole_genome:
     plot_type: accuracy
     parameters:
       dataset_size: big
@@ -72,6 +76,12 @@ plots:
     parameters:
       dataset_size: big
       n_reads: "200000"
+
+    memory_human_whole_genome:
+      plot_type: memory
+      parameters:
+        dataset_size: big
+        n_reads: "200000"
 
   variant_calling_accuracy_human_whole_genome:
     plot_type: variant_calling_accuracy
@@ -152,20 +162,3 @@ plot_types:
     y: f1_score
     x: method
     facet_col: read_type
-
-
-# A plot type can then be used to generate a plot with specified values specified by path:
-# reports/plots/accuracy/... config matching read config but can contain variable groups ...
-# example:
-# reports/plots/accuracy/hg38/hg002/small/whole_genome_single_end/low_error/150/1000/all_methods/4/0/snps/plot.png
-# all_methods is here a variable group. An accuracy plot will then be generated with methods specified by all_methods
-# example with read length as a group:
-# reports/plots/accuracy_vs_read_length/hg38/hg002/small/whole_genome_single_end/low_error/read_lengths_rough/1000/all_methods/4/0/snps/plot.png
-#
-# In the last example, the engine knows that accuracy_vs_read_length will require that read_length is a parameter_group with parameter_type read_length
-# since the x_axis is read_length. Similarily, since category_variable is "method", it will ned a method parameter_group
-# it will then generate a plot with those methods as category variable and the read lengths as x_axis
-#
-# Configuration for "genomes" (individuals) that reads can be sequenced from
-# Genomes are based on a reference genome
-# each reference genome can have multiple individuals
