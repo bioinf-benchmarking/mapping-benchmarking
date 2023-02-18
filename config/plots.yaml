@@ -38,7 +38,7 @@ plots:
     plot_type: f1_score
   accuracy_vs_read_length_and_error_profile:
     plot_type: accuracy_vs_read_length_and_error_profile
-  accuracy:
+  accuracy_for_various_mapq_thresholds:
     plot_type: accuracy
   accuracy_on_various_read_lengths:
     plot_type: accuracy_on_various_read_lengths
@@ -104,6 +104,7 @@ plot_types:
     labels: "min_mapq"
     color: "method"
     facet_col: variant_filter
+    facet_row: read_type
     layout:
       xaxis_type: log
   accuracy_on_various_read_lengths:

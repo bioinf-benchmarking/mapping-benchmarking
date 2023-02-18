@@ -189,6 +189,7 @@ rule report:
         import time
         timestamp = time.strftime("%Y-%m-%d %H:%M")
         out = "# Report, created  " + timestamp + "\n\n"
+        out += "Note: This pipeline is under development, and the results may be wrong or inaccurate.\n\n"
 
         # remove reports/
         files = ['/'.join(file.split("/")[1:]) for file in input]
