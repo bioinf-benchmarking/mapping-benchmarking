@@ -5,6 +5,8 @@ test_plots: [f1_score, accuracy]
 # List of plots that will be generated every night
 #nightly_plots: [accuracy_on_various_read_lengths, variant_calling_accuracy]
 nightly_plots: [accuracy_human_whole_genome, runtime_human_whole_genome, variant_calling_accuracy, accuracy_vs_read_length_and_error_profile_human_whole_genome]
+
+# Dimensions that can be used when defining plot_types
 plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 
 
@@ -15,7 +17,7 @@ pretty_names:
   variant_calling_f1score: F1 Score
   one_minus_precision: 1-Precision
   recall: Recall
-  runtime: Runtime useconds)
+  runtime: Runtime (sec)
   n_threads: Number of threads
   whole_genome_single_end: Single-end reads
   whole_genome_paired_end: Paired-end reads
@@ -56,6 +58,8 @@ plots:
     plot_type: runtime
   runtime_with_varying_number_of_threads:
     plot_type: runtime_with_varying_number_of_threads
+    parameters:
+      n_reads: "100000"
 
   accuracy_human_whole_genome:
     plot_type: accuracy
