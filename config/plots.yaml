@@ -78,7 +78,7 @@ plots:
       n_reads: "200000"
 
   memory_human_whole_genome:
-    plot_type: memory
+    plot_type: memory_usage
     parameters:
       dataset_size: big
       n_reads: "200000"
