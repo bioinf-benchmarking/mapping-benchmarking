@@ -1,5 +1,8 @@
 channels:
+  # multiple channels to get samtools to work
   - bioconda
+  - conda-forge
+  - defaults
 
 dependencies:
   - samtools=1.16
