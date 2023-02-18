@@ -77,11 +77,11 @@ plots:
       dataset_size: big
       n_reads: "200000"
 
-    memory_human_whole_genome:
-      plot_type: memory
-      parameters:
-        dataset_size: big
-        n_reads: "200000"
+  memory_human_whole_genome:
+    plot_type: memory
+    parameters:
+      dataset_size: big
+      n_reads: "200000"
 
   variant_calling_accuracy_human_whole_genome:
     plot_type: variant_calling_accuracy
