@@ -55,6 +55,9 @@ parameter_sets:
   all_methods:
     parameter_type: "method"
     values: ["bwa", "bowtie2", "minimap"]
+  including_strobealign:
+    parameter_type: "method"
+    values: ["bwa", "bowtie2", "minimap", "strobealign"]
   read_lengths_rough:
     parameter_type: "read_length"
     values: [75, 150, 250]
