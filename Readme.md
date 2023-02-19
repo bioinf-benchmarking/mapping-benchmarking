@@ -5,12 +5,12 @@
 
 This is a Snakemake pipeline for benchmarking read mappers. The idea behind this pipeline is:
 
-* It can be used to benchmark new read mappers (no need to spend time writing your own benchmarking scripts if you develop a read mapper).
-* It can be used to get an up-to-date overview of how given read mappers perform on a given type of reads/scenario. It is difficult to test and present accuracy/performance across all combinations of paramaters (read length, error rate, error profiles, genome diversity, etc.) when presenting benchmark results in a paper. With this pipeline, each person can instead run the benchmarks they find interesting when assessing read mappers.  
+* It can be used to benchmark new read mappers (no need to spend time writing your own benchmarking scripts if you develop a read mapper). Adding a read mapper should be fairly easy.
+* It can be used to get an up-to-date overview of how given read mappers perform on a given type of reads/scenario. This way, we can more easily be up-to-date on how mappers perform, and we can test the specific scenarios we are interested in at any given time. 
 * It has been developed with the goal of being easy to clone and run by anyone (Conda is used to avoid any manual installation/setup). It should be fairly straight-forward by anyone  to clone this repository and test read mappers using a configuration of their choice. 
-* The aim is also to have automatic benchmarks run frequently on larger data sets, so that one easily can get an overview of how mappers perform on the most common cases without having to run this pipeline.
+* The aim is also to have automatic benchmarks run frequently on larger data sets, so that one easily can get an overview of how mappers perform on the most common cases without having to run this pipeline. Currently, this runs every night using the latest configurations defined in `config/plots.yml`.
 
-This pipeline is open source, and we are very happy for any contributions or suggestions for changes (see the Contribute section).
+This pipeline is open source, and anyone can contribute (see the Contribute section).
 
 
 ## How to use
