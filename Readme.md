@@ -108,14 +108,13 @@ Se `result_types` and `parameter_types` in `config/config.yaml` for a list of va
 
 Read-mappers that are not currently listed in config.yaml can be added. Follow these steps below. We assume you already have some experience with writing Snakemake rules, if not check out the Snakemake documentation first.
 
-1. Add the mapper to the `method` list in `config/config.yaml`
-2. Add the name of the mapper (this is what is shown in plots) to `method_names`
-3. Create a `.smk` file in rules for the mapper (e.g. `bwa.smk`)
-4. Implement rules for running single-end and paired-end read mapping. This can e.g. be done using two rules: `NAME_map_single_end` and `NAME_map_paired_end` (replace NAME with the mapper ID, e.g. `bwa`). As input to the single-end rule, you can use the function `single_end_reads` and for the paired-enr-rule, you can use the function `paired_end_reads`. Se the rules in `rules/bowtie2.yml` for a good example of how to do this. 
-5. The rules can also take an index as input if that is needed, you will then need to implement a rule for creating the index (see the `bwa_index` rule for reference).
-6. As output, the rules should produce this bam-file: `{data}/whole_genome_single_end/[...]/NAME/{n_threads}/mapped.bam`. This path contains a lot of parameters, so we have implemented some Python code to generate the path (see the bowtie-rule for reference, and change bowtie to your mapper).
-7. The rule should use the `n_threads` wildcard as a parameter to specify number of threads. 
-8. Either use a Snakemake wrapper or specify a conda-environment for the rule. Nothing should be needed to be installed manually. Note that some Snakemake wrappers do not use the `n_threads` parameter correctly (e.g. the BWA MEM and bowtie wrappers). If that is the case, you need to implement the run-command yourself and use a conda environment.
+1. Add the mapper to the `method` and `all_methods` lists in `config/config.yaml`
+2. Create a `.smk` file in rules for the mapper (e.g. `bwa.smk`)
+3. Implement rules for running single-end and paired-end read mapping. This can e.g. be done using two rules: `NAME_map_single_end` and `NAME_map_paired_end` (replace NAME with the mapper ID, e.g. `bwa`). As input to the single-end rule, you can use the function `single_end_reads` and for the paired-enr-rule, you can use the function `paired_end_reads`. Se the rules in `rules/bowtie2.yml` for a good example of how to do this. 
+4. The rules can also take an index as input if that is needed, you will then need to implement a rule for creating the index (see the `bwa_index` rule for reference).
+5. As output, the rules should produce this bam-file: `{data}/whole_genome_single_end/[...]/NAME/{n_threads}/mapped.bam`. This path contains a lot of parameters, so we have implemented some Python code to generate the path (see the bowtie-rule for reference, and change bowtie to your mapper).
+6. The rule should use the `n_threads` wildcard as a parameter to specify number of threads. 
+7. Either use a Snakemake wrapper or specify a conda-environment for the rule. Nothing should be needed to be installed manually. Note that some Snakemake wrappers do not use the `n_threads` parameter correctly (e.g. the BWA MEM and bowtie wrappers). If that is the case, you need to implement the run-command yourself and use a conda environment.
 
 ### Add a new read type
 Reads are currently simulated using ART in the rule `simulate_reads_for_chromosome_and_haplotype` but any tool that is able to take a fasta file (reference) and produce simulated reads and truth positions of those reads will work. There are also rules using Mason instead of ART, but from our experience ART is much faster.

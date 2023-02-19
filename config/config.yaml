@@ -3,13 +3,6 @@ use_conda: True
 # name of all methods
 methods: ["bwa", "bowtie2", "minimap2"]
 
-# mapping from method IDs to names
-method_names:
-  bwa: "BWA MEM"
-  #strobealign: "Strobealign"
-  #minimap2: "Minimap2"
-
-
 # things that can be measured and represented as a
 # number for each method. These types can be specified on axis/facets for plot_types.
 result_types: [
@@ -61,7 +54,7 @@ default_parameter_values:
 parameter_sets:
   all_methods:
     parameter_type: "method"
-    values: ["bwa", "bowtie2", "minimap", "strobealign"]
+    values: ["bwa", "bowtie2", "minimap"]
   read_lengths_rough:
     parameter_type: "read_length"
     values: [75, 150, 250]
