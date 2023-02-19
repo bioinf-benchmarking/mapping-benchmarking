@@ -1,7 +1,7 @@
 use_conda: True
 
 # name of all methods
-methods: ["bwa", "bowtie2", "minimap2", "strobealign"]
+methods: ["bwa", "bowtie2", "minimap2"]
 
 # mapping from method IDs to names
 method_names:
