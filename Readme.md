@@ -118,7 +118,7 @@ Read-mappers that are not currently listed in config.yaml can be added. Follow t
 8. Either use a Snakemake wrapper or specify a conda-environment for the rule. Nothing should be needed to be installed manually. Note that some Snakemake wrappers do not use the `n_threads` parameter correctly (e.g. the BWA MEM and bowtie wrappers). If that is the case, you need to implement the run-command yourself and use a conda environment.
 
 ### Add a new read type
-Reads are currently simulated using Mason in the rule `simulate_reads_for_chromosome_and_haplotype` but any tool that is able to take a fasta file (reference) and produce simulated reads and truth positions of those reads will work.
+Reads are currently simulated using ART in the rule `simulate_reads_for_chromosome_and_haplotype` but any tool that is able to take a fasta file (reference) and produce simulated reads and truth positions of those reads will work. There are also rules using Mason instead of ART, but from our experience ART is much faster.
 
 The idea behind read simulation is currently that two haploid references are created and that reads are simulated independently on those. The truth positions are then "translated" to the real reference genome coordinates. This is a bit complicated, and not how read simulation is normally done, but this lets us simulate from a diploid genome and do benchmarking of variant calling and genotyping since we can have heterozygous variants. All the conversion of coordinates is taken care of as long as the read simulation rule outputs the correct files.
 

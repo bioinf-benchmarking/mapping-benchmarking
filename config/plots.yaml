@@ -109,10 +109,10 @@ plot_types:
   accuracy:
     type: line
     markers: True
-    x: "one_minus_precision"
-    y: "recall"
-    labels: "min_mapq"
-    color: "method"
+    x: one_minus_precision
+    y: recall
+    labels: min_mapq
+    color: method
     facet_col: variant_filter
     facet_row: read_type
     layout:
