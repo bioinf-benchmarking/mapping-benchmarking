@@ -1,6 +1,6 @@
 
 # seperate rule so that indexing time is not included in benchmark
-# index depends on read length and thus the reads
+# index depends on read length
 rule strobealign_index:
     input:
         ref=f"data/{parameters.until('dataset_size')}/reference.fa"
@@ -13,7 +13,20 @@ rule strobealign_index:
 
 
 def strobealign_r(read_length):
-    return 50 * round(int(read_length) / 50)
+    if int(read_length) <= 90:
+        return 50
+    elif int(read_length) <= 110:
+        return 100
+    elif int(read_length) <= 135:
+        return 125
+    elif int(read_length) <= 175:
+        return 150
+    elif int(read_length) <= 275:
+        return 250
+    elif int(read_length) <= 375:
+        return 300
+    else:
+        return 400
 
 
 rule strobealign_map:

@@ -42,8 +42,12 @@ plots:
     plot_type: f1_score
   accuracy_vs_read_length_and_error_profile:
     plot_type: accuracy_vs_read_length_and_error_profile
+    parameters:
+      method: including_strobealign
   accuracy_for_various_mapq_thresholds:
     plot_type: accuracy
+    parameters:
+      method: all_methods
   accuracy_on_various_read_lengths:
     plot_type: accuracy_on_various_read_lengths
   accuracy_f1_score:
@@ -75,7 +79,7 @@ plots:
     plot_type: runtime_with_varying_number_of_threads
     parameters:
       dataset_size: big
-      n_reads: "2000000"
+      n_reads: "10000000"
       method: including_strobealign
 
   memory_human_whole_genome:
