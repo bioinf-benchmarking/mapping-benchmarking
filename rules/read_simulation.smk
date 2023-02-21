@@ -129,7 +129,6 @@ def get_genome_size(wildcards, input, output):
 def get_coverage(wildcards, input, output):
     genome_size = config["genomes"][wildcards.genome_build][wildcards.individual][wildcards.dataset_size]["genome_size"]  # get_genome_size(wildcards, input, output)
     coverage = int(wildcards.n_reads) * int(wildcards.read_length) / genome_size
-    print("Coverage: ", coverage)
     return coverage / 2
 
 

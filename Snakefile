@@ -20,10 +20,7 @@ def single_end_reads(wildcards=None):
 
 
 def get_input_reads(wildcards):
-    if "paired_end" in wildcards.read_type:
-        return paired_end_reads()
-    else:
-        return single_end_reads()
+    return paired_end_reads() if "paired_end" in wildcards.read_type else single_end_reads()
 
 
 class Parameters:
