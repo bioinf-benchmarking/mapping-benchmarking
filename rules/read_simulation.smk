@@ -181,9 +181,9 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
 # hack to get paired end rule to give same as single end
 rule fix_sam_file_name:
     input:
-        "{name}-.sam"
+        "{dir}/{haplotype,\d+}-.sam"
     output:
-        "{name}.sam"
+        "{dir}/{haplotype,\d+}.sam"
     shell: "cp {input} {output}"
 
 
