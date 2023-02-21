@@ -12,6 +12,7 @@ result_types: [
   "one_minus_precision",
   "f1_score",
   "variant_calling_precision",
+  "variant_calling_one_minus_precision",
   "variant_calling_recall",
   "variant_calling_f1score",
 ]

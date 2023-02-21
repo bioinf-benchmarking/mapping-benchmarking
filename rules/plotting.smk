@@ -125,8 +125,8 @@ rule make_plot:
         if "layout" in plot_config:
             fig.update_layout(**plot_config["layout"])
 
-        if plot_type != "bar":
-            fig.update_traces(marker_size=15)
+        #if plot_type != "bar":
+        #    fig.update_traces(marker_size=15)
         fig.show()
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)

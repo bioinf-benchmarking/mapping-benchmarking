@@ -4,6 +4,12 @@ configfile: "config/plots.yaml"
 workflow.use_conda = True
 
 
+wildcard_constraints:
+    n_threads="\d+",
+    min_mapq="\d+",
+    variant_filter="all|variants|nonvariants"
+
+
 def paired_end_reads(wildcards=None):
     return [f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/reads" + n + ".fq.gz" for n in
             ("1", "2")]
@@ -30,14 +36,16 @@ class Parameters:
         self.parameters = parameters
 
     def __str__(self):
-        return "{" + "}/{".join(self.parameters) + "}"
+        splitter = "}/{"
+        out = "{" + splitter.join(self.parameters) + "}"
+        return out
 
     def __getitem__(self, item):
         return Parameters(self.parameters[item])
 
     def until(self, parameter):
         """ Gives all parameters until and including the given parameter"""
-        assert parameter in self.parameters
+        assert parameter in self.parameters, "Parameter %s not in %s" % (parameter, self.parameters)
         return self[0:self.parameters.index(parameter)+1]
 
     def __call__(self, **filters):
@@ -54,6 +62,7 @@ class Parameters:
 
 
 parameters = Parameters(config["parameter_types"])
+print(str(parameters))
 
 include: "rules/bwa.smk"
 include: "rules/bowtie2.smk"

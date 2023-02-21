@@ -2,7 +2,7 @@
 # but is done on reads mapped to/from the whole genome to not introduce any bias
 
 def get_variant_calling_chromosome(wildcards):
-    chromosomes = config["genomes"][wildcards.genome_build][wildcards.individual][wildcards.size]["chromosomes"].split(",")
+    chromosomes = config["genomes"][wildcards.genome_build][wildcards.individual][wildcards.dataset_size]["chromosomes"].split(",")
     return chromosomes[0]
 
 
@@ -25,6 +25,19 @@ rule sambamba_sort:
         "v1.21.4/bio/sambamba/sort"
 
 
+rule filter_bam_on_mapq:
+    input:
+        f"data/{parameters.until('n_threads')}/mapped.bam"
+    output:
+        f"data/{parameters.until('min_mapq')}/mapped.bam"
+    conda:
+        "../envs/samtools.yml"
+    shell:
+        """
+        samtools view -b -q {wildcards.min_mapq} {input} > {output} 
+        """
+
+
 rule index_bam:
     input:
         "{file}.bam"
@@ -38,13 +51,13 @@ rule index_bam:
 
 rule call_variants:
     input:
-        sorted_bam = "data/{genome_build}/{individual}/{size}/whole_genome_{pairing}_end/{config}/mapped.sorted.bam",
-        bamindex = "data/{genome_build}/{individual}/{size}/whole_genome_{pairing}_end/{config}/mapped.sorted.bam.bai",
-        reference = "data/{genome_build}/{individual}/{size}/reference.fa",
-        reference_index = "data/{genome_build}/{individual}/{size}/reference.fa.fai",
-        reference_dict = "data/{genome_build}/{individual}/{size}/reference.dict",
+        sorted_bam = f"data/{parameters.until('min_mapq')}/mapped.sorted.bam",
+        bamindex = f"data/{parameters.until('min_mapq')}/mapped.sorted.bam.bai",
+        reference = f"data/{parameters.until('dataset_size')}/reference.fa",
+        reference_index = f"data/{parameters.until('dataset_size')}/reference.fa.fai",
+        reference_dict = f"data/{parameters.until('dataset_size')}/reference.dict",
     output:
-        "{data}/{genome_build}/{individual}/{size}/whole_genome_{pairing}_end/{config}/variant_calls.vcf.gz"
+        f"data/{parameters.until('min_mapq')}/variant_calls.vcf.gz"
     params:
         chromosome=get_variant_calling_chromosome
     threads:
@@ -58,7 +71,6 @@ rule call_variants:
         "--native-pair-hmm-threads 1 "
         "--output {output} "
         "--intervals {params.chromosome} "
-        "--minimum-mapping-quality 20 "
 
 
 rule make_truth_vcf_for_chromosome:
@@ -66,7 +78,7 @@ rule make_truth_vcf_for_chromosome:
         variants="data/{genome_build}/{individual}/variants.vcf.gz",
         index="data/{genome_build}/{individual}/variants.vcf.gz.tbi",
     output:
-        "data/{genome_build,\w+}/{individual}/{size}/variant_calling_truth.vcf.gz"
+        "data/{genome_build,\w+}/{individual}/{dataset_size}/variant_calling_truth.vcf.gz"
     params:
         chromosome=get_variant_calling_chromosome
     conda:
@@ -80,13 +92,15 @@ rule make_truth_vcf_for_chromosome:
 
 rule run_happy:
     input:
-        variant_calls="data/{genome_build}/{individual}/{size}/{config}/variant_calls.vcf.gz",
-        truth_vcf="data/{genome_build}/{individual}/{size}/variant_calling_truth.vcf.gz",
-        truth_regions="data/{genome_build}/{individual}/truth_regions.bed",
-        ref="data/{genome_build}/reference.fa"
+        variant_calls=f"data/{parameters.until('min_mapq')}/variant_calls.vcf.gz",
+        truth_vcf=f"data/{parameters.until('dataset_size')}/variant_calling_truth.vcf.gz",
+        truth_regions=f"data/{parameters.until('individual')}/truth_regions.bed",
+        ref=f"data/{parameters.until('genome_build')}/reference.fa"
     output:
-        "data/{genome_build,\w+}/{individual,\w+}/{size,\w+}/{config}/happy.extended.csv",
-        "data/{genome_build,\w+}/{individual,\w+}/{size,\w+}/{config}/happy.summary.csv",
+        f"data/{parameters.until('min_mapq')}/happy.extended.csv",
+        f"data/{parameters.until('min_mapq')}/happy.summary.csv",
+    params:
+        output_base_name=lambda wildcards, input, output: output[0].split(".")[0]
     conda:
         "../envs/happy.yml"
     shell:
@@ -95,7 +109,7 @@ rule run_happy:
         hap.py {input.truth_vcf} {input.variant_calls} \
         --no-leftshift \
         -r {input.ref} \
-        -o data/{wildcards.genome_build}/{wildcards.individual}/{wildcards.size}/{wildcards.config}/happy \
+        -o {params.output_base_name} \
         -f {input.truth_regions} \
         --no-decompose --engine=vcfeval 
         """
@@ -125,9 +139,9 @@ rule run_happy2:
 
 rule get_variant_calling_result:
     input:
-        f"data/{parameters.until('n_threads')}/happy.summary.csv"
+        f"data/{parameters.until('min_mapq')}/happy.summary.csv"
     output:
-        f"data/{parameters}/variant_calling_{{type, recall|precision|f1score}}.txt"
+        f"data/{parameters}/variant_calling_{{type, recall|one_minus_precision|f1score}}.txt"
     run:
         import pandas as pd
         data = pd.read_csv(input[0])
@@ -137,10 +151,13 @@ rule get_variant_calling_result:
             index = 0
 
         names = {"recall": "METRIC.Recall",
-                 "precision": "METRIC.Precision",
+                 "one_minus_precision": "METRIC.Precision",
                  "f1score": "METRIC.F1_Score"}
 
         result = data.iloc[index][names[wildcards.type]]
         with open(output[0], "w") as f:
+            if wildcards.type == "one_mnus_precision":
+                result = 1 - result
+
             f.write(str(result) + "\n")
 

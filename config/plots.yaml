@@ -4,11 +4,14 @@
 test_plots: [f1_score, accuracy_for_various_mapq_thresholds, memory]
 # List of plots that will be generated every night
 #nightly_plots: [accuracy_on_various_read_lengths, variant_calling_accuracy]
-nightly_plots: [accuracy_for_various_mapq_thresholds_human_whole_genome,
-                runtime_human_whole_genome,
-                variant_calling_accuracy,
-                accuracy_vs_read_length_and_error_profile_human_whole_genome,
-                memory_human_whole_genome]
+nightly_plots: [
+  variant_calling_accuracy_vs_mapq_threshold,
+  accuracy_for_various_mapq_thresholds_human_whole_genome,
+  runtime_human_whole_genome,
+  variant_calling_accuracy,
+  accuracy_vs_read_length_and_error_profile_human_whole_genome,
+  memory_human_whole_genome
+]
 
 # Dimensions that can be used when defining plot_types
 plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
@@ -99,6 +102,19 @@ plots:
     parameters:
       dataset_size: big
       n_reads: "250000"
+      
+  variant_calling_accuracy_vs_mapq_threshold_quick:
+    plot_type: variant_calling_accuracy_vs_mapq_threshold
+    parameters:
+      datset_size: small
+      n_reads: "200000"
+      
+  variant_calling_accuracy_vs_mapq_threshold:
+    plot_type: variant_calling_accuracy_vs_mapq_threshold
+    parameters:
+      datset_size: medium
+      n_reads: "15000000"
+      n_threads: 8
 
 
 # The following defines different type of plots
@@ -167,3 +183,10 @@ plot_types:
     y: f1_score
     x: method
     facet_col: read_type
+  variant_calling_accuracy_vs_mapq_threshold:
+    type: line
+    markers: true
+    y: variant_calling_recall
+    x: variant_calling_one_minus_precision
+    labels: min_mapq
+    color: method
