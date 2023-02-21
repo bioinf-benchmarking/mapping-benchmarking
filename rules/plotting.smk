@@ -146,7 +146,7 @@ def get_plot_name(wildcards):
     plot_path = []
     for parameter in config["parameter_types"]:
         if "parameters" in plot_config and parameter in plot_config["parameters"]:
-            parameter = plot_config["parameters"][parameter]
+            parameter = str(plot_config["parameters"][parameter])
         else:
             # not specified, use default value
             if parameter in variables:

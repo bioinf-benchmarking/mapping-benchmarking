@@ -55,7 +55,7 @@ class Parameters:
         out = []
         for parameter in self.parameters:
             if parameter in filters:
-                out.append(filters[parameter])
+                out.append(str(filters[parameter]))
             else:
                 out.append("{" + parameter + "}")
         return "/".join(out)

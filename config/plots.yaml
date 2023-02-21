@@ -108,6 +108,7 @@ plots:
     parameters:
       datset_size: small
       n_reads: "200000"
+      n_threads: 2
       
   variant_calling_accuracy_vs_mapq_threshold:
     plot_type: variant_calling_accuracy_vs_mapq_threshold
