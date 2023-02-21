@@ -134,10 +134,18 @@ rule make_plot:
 
 def get_plot_name(wildcards):
     name = wildcards.name
-    assert name in config["plots"], "Plot name %s not defined in plots.yaml" % name
-    plot_config = config["plots"][name]
-    assert plot_config["plot_type"] in config["plot_types"], "Plot specifies a plot type %s that is not in config.plot_types" % plot_config["plot_type"]
-    plot_type_config = config["plot_types"][plot_config["plot_type"]]
+
+    if name in config["plots"]:
+        #assert name in config["plots"], "Plot name %s not defined in plots.yaml" % name
+        plot_config = config["plots"][name]
+        assert plot_config["plot_type"] in config["plot_types"], "Plot specifies a plot type %s that is not in config.plot_types" % plot_config["plot_type"]
+        plot_type_config = config["plot_types"][plot_config["plot_type"]]
+    else:
+        # allow direct use of a plot type without having it defined as a plot
+        plot_config = config["plots"]["generic"]
+        print(plot_config)
+        plot_config["plot_type"] = name
+        plot_type_config = config["plot_types"][name]
 
     # Parameters that can vary for this plot:
     variables = [plot_type_config[dimension] for dimension in config["plotting_dimensions"] if dimension in plot_type_config]

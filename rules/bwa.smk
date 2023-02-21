@@ -22,6 +22,6 @@ rule bwa_map:
     conda: "../envs/bwa.yml"
     shell:
         """
-        bwa mem -t {wildcards.n_threads} -R "@RG\\tID:sample\\tSM:sample" {input.idx[0]} {input.reads} | samtools view -b -h - > {output}
+        bwa mem -t {wildcards.n_threads} -R "@RG\\tID:sample\\tSM:sample" {input.idx[0]} {input.reads} | samtools view -o {output} -
         """
 

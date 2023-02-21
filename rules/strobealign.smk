@@ -29,7 +29,7 @@ rule strobealign_map:
   shell:
       "mkdir -p $(dirname {output}) && "
       "strobealign -t {wildcards.n_threads} --use-index {input.ref} {input.reads} | "
-      "samtools view -b - > {output} "
+      "samtools view -o {output} -"
 
 
 
