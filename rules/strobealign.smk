@@ -1,53 +1,35 @@
 
 # seperate rule so that indexing time is not included in benchmark
-# index depends on read length
+# index depends on reads, but output file name is not deterministic, so create a checkpoint file that
+# depends on the reads
 rule strobealign_index:
     input:
-        ref=f"data/{parameters.until('dataset_size')}/reference.fa"
+        ref=f"data/{parameters.until('dataset_size')}/reference.fa",
+        reads=get_input_reads
     output:
-        f"data/{parameters.until('dataset_size')}/reference.fa.r{{r}}.sti"
+        touch(f"data/{parameters.until('n_reads')}/strobealign-index-created")
     conda:
         "../envs/strobealign.yml"
     shell:
-        "strobealign --create-index -r {wildcards.r} {input.ref}"
-
-
-def strobealign_r(read_length):
-    if int(read_length) <= 90:
-        return 50
-    elif int(read_length) <= 110:
-        return 100
-    elif int(read_length) <= 135:
-        return 125
-    elif int(read_length) <= 175:
-        return 150
-    elif int(read_length) <= 275:
-        return 250
-    elif int(read_length) <= 375:
-        return 300
-    else:
-        return 400
+        "strobealign --create-index {input.ref} {input.reads}"
 
 
 rule strobealign_map:
   input:
     reads=get_input_reads,
     ref=f"data/{parameters.until('dataset_size')}/reference.fa",
-    index=lambda wildcards: f"data/{parameters.until('dataset_size')}/reference.fa.r{strobealign_r(wildcards.read_length)}.sti"
+    checkpoint_index_is_created=f"data/{parameters.until('n_reads')}/strobealign-index-created"
   output:
       f"data/{parameters.until('n_threads')(method='strobealign')}/without_readgroup.bam"
   conda:
       "../envs/strobealign.yml"
   threads: lambda wildcards: int(wildcards.n_threads)
-  params:
-      # strobealign rounds r to nearest 50, so we need to do the same to know what the index neede will be
-      r=lambda wildcards: strobealign_r(wildcards.read_length)
   benchmark:
       f"data/{parameters.until('n_threads')(method='strobealign')}/benchmark.csv"
   shell:
       "mkdir -p $(dirname {output}) && "
-      "strobealign -t {wildcards.n_threads} -r {params.r} --use-index {input.ref} {input.reads} | "
-      "samtools view -b -h - > {output} "
+      "strobealign -t {wildcards.n_threads} --use-index {input.ref} {input.reads} | "
+      "samtools view -b - > {output} "
 
 
 
