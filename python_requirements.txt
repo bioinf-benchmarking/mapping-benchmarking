@@ -3,6 +3,6 @@ pandas
 plotly
 kaleido
 graph_read_simulator>=0.0.15
-numpy_alignments
+numpy_alignments>=0.0.5
 hierarchical_results
 tabulate
