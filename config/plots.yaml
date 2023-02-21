@@ -5,10 +5,11 @@ test_plots: [f1_score, accuracy_for_various_mapq_thresholds, memory]
 # List of plots that will be generated every night
 #nightly_plots: [accuracy_on_various_read_lengths, variant_calling_accuracy]
 nightly_plots: [
-  variant_calling_accuracy_vs_mapq_threshold,
+  f1_score_vs_read_length,
   accuracy_for_various_mapq_thresholds_human_whole_genome,
   runtime_human_whole_genome,
-  variant_calling_accuracy,
+  variant_calling_accuracy_vs_mapq_threshold,
+  #variant_calling_accuracy,
   accuracy_vs_read_length_and_error_profile_human_whole_genome,
   memory_human_whole_genome
 ]
@@ -20,6 +21,7 @@ plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 # Axis/titles/etc that will be replaced in plots
 pretty_names:
   variant_calling_precision: Precision
+  variant_calling_one_minus_precision: 1-Precision
   variant_calling_recall: Recall
   variant_calling_f1score: F1 Score
   one_minus_precision: 1-Precision
@@ -51,6 +53,7 @@ plots:
     parameters:
       method: including_strobealign
   accuracy_for_various_mapq_thresholds:
+    description: "Accuracy for various mapq thresholds. Divided into reads depending on whether they contain genomic variants or not."
     plot_type: accuracy
     parameters:
       method: all_methods
@@ -116,6 +119,7 @@ plots:
       n_threads: 2
       
   variant_calling_accuracy_vs_mapq_threshold:
+    description: "Run on a small genome (chr17-21). Shows precision/recall for various MAPQ thresholds."
     plot_type: variant_calling_accuracy_vs_mapq_threshold
     parameters:
       datset_size: medium
@@ -123,6 +127,7 @@ plots:
       n_threads: 8
   
   f1_score_vs_read_length:
+    description: "Accuracy vs. read length for paired/single end reads. Showing for reads containing and not containing genomic variants."
     plot_type: f1_score_vs_read_length
     parameters:
       read_length: read_lengths_fine
