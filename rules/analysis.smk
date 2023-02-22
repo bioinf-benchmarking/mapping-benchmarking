@@ -21,7 +21,7 @@ rule get_accuracy_result:
     output:
         f"data/{parameters}/{{type, recall|one_minus_precision|f1_score}}.txt"
     params:
-        allowed_bp_mismatch=lambda wildcards: int(wildcards.read_length) // 5
+        allowed_bp_mismatch=50 #lambda wildcards: int(wildcards.read_length) // 5
     shell:
         "numpy_alignments get_correct_rates --report-type {wildcards.type} -m {wildcards.min_mapq} --allowed-bp-mismatch {params.allowed_bp_mismatch} {input.truth} {input.alignments} {wildcards.variant_filter} > {output}"
 
