@@ -111,6 +111,8 @@ rule make_plot:
         markers = False
         if plot_type != "scatter" and "markers" in plot_config and plot_config["markers"]:
             specification["markers"] = True
+            assert "labels" in plot_config, "When markers: True, you need to define labels in the plot config"
+            specification["markers"] = plot_config["labels"]
 
         assert plot_type in plotting_functions, "Plot type %s not supported"
         func = plotting_functions[plot_type]
