@@ -1,0 +1,11 @@
+channels:
+  # multiple channels to get samtools to work
+  - bioconda
+  - conda-forge
+  - defaults
+
+dependencies:
+  - samtools
+  - python=3.8
+  - pip:
+      - numpy_alignments>=0.0.5

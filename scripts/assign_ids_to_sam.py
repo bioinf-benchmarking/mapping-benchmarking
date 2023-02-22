@@ -27,3 +27,6 @@ for line in sys.stdin:
         read_id += 1
 
     i += 1
+
+
+logging.info("In total %d reads" % i)

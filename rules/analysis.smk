@@ -7,9 +7,9 @@ rule store_alignments_as_np_data:
     output:
         "{path}/{n_reads,\d+}/{method}/mapped.npz"
     conda:
-        "../envs/samtools.yml"
+        "../envs/numpy_alignments.yml"
     shell:
-        "samtools view {input.alignments} | numpy_alignments store sam {output} {wildcards.n_reads}"
+        "which python && which python3 && samtools view {input.alignments} | numpy_alignments store sam {output} {wildcards.n_reads}"
 
 
 rule get_accuracy_result:
