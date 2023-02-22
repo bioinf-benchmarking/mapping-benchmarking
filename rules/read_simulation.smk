@@ -138,7 +138,7 @@ def get_coverage(wildcards, input, output):
 rule simulate_reads_for_chromosome_and_haplotype_art:
     input:
         haplotype_reference=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa",
-        fai=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa.fai",
+        #fai=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa.fai",
         #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
     output:
         multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_single_end')}/{{haplotype,\d+}}", ".fq", ".sam")
@@ -160,7 +160,7 @@ rule simulate_reads_for_chromosome_and_haplotype_art:
 rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
     input:
         haplotype_reference=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa",
-        fai=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa.fai",
+        #fai=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa.fai",
         #haplotype_reference="{individual}/haplotype{haplotype}.fa",
         #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
     output:
