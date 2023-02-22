@@ -112,7 +112,7 @@ rule make_plot:
         if plot_type != "scatter" and "markers" in plot_config and plot_config["markers"]:
             specification["markers"] = True
             assert "labels" in plot_config, "When markers: True, you need to define labels in the plot config"
-            specification["markers"] = plot_config["labels"]
+            specification["text"] = plot_config["labels"]
 
         assert plot_type in plotting_functions, "Plot type %s not supported"
         func = plotting_functions[plot_type]
@@ -121,6 +121,8 @@ rule make_plot:
         # prettier facet titles, names, etc
         fig.for_each_annotation(lambda a: a.update(text=pretty_name(a.text.split("=")[-1])))
         fig.for_each_trace(lambda t: t.update(name=pretty_name(t.name)))
+        if "text" in specification:
+            fig.update_traces(textposition="bottom right")
 
         #fig.update_annotations(font=dict(size=20))
         #fig.update_layout(font=dict(size=20))
