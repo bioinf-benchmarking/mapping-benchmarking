@@ -3,13 +3,15 @@
 rule store_alignments_as_np_data:
     input:
         alignments="{path}/{n_reads}/{method}/mapped.bam",
-        #n_reads="data/simulated_reads/{dataset}.n_reads",
+        n_reads="{path}/{n_reads}/n_reads.txt",
     output:
         "{path}/{n_reads,\d+}/{method}/mapped.npz"
+    params:
+        n_reads=lambda wildcards, input, output: open(input.n_reads).read().strip()
     conda:
         "../envs/numpy_alignments.yml"
     shell:
-        "which python && which python3 && samtools view {input.alignments} | numpy_alignments store sam {output} {wildcards.n_reads}"
+        "samtools view {input.alignments} | numpy_alignments store sam {output} {params.n_reads}"
 
 
 rule get_accuracy_result:

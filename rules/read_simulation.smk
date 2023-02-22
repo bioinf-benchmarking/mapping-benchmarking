@@ -294,15 +294,26 @@ rule merge_truth_alignments_for_haplotypes:
         "cat {input} | python scripts/assign_ids_to_sam.py  > {output} "
 
 
+rule count_reads:
+    input:
+        f"data/{parameters.until('n_reads')}/truth.sam"
+    output:
+        f"data/{parameters.until('n_reads')}/n_reads.txt"
+    shell:
+        "wc -l {input} | cut -f 1 -d ' ' > {output}"
+
+
 rule store_truth_alignments:
     input:
         reads="{data}/{n_reads}/reads.fq.gz",  # not necessary
         sam="{data}/{n_reads}/truth.sam",
-        #coordinate_map="data/simulated_reads/{dataset}/"
+        n_reads="{data}/{n_reads}/n_reads.txt",
+    params:
+        n_reads=lambda wildcards, input, output: open(input.n_reads).read().strip()
     output:
         "{data}/{n_reads,\d+}/truth.npz",
     shell:
         """
-        cat {input.sam} | numpy_alignments store sam {output} {wildcards.n_reads}
+        cat {input.sam} | numpy_alignments store sam {output} {params.n_reads}
         """
 
