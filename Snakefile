@@ -1,4 +1,3 @@
-
 configfile: "config/config.yaml"
 configfile: "config/plots.yaml"
 workflow.use_conda = True
@@ -59,7 +58,6 @@ class Parameters:
 
 
 parameters = Parameters(config["parameter_types"])
-print(str(parameters))
 
 include: "rules/bwa.smk"
 include: "rules/bowtie2.smk"
@@ -71,18 +69,7 @@ include: "rules/analysis.smk"
 include: "rules/reports.smk"
 include: "rules/variant_calling.smk"
 include: "rules/plotting.smk"
-
-
-rule test:
-    input:
-        "data/hg38/hg002/small/whole_genome_single_end/medium_error/150/200/bwa/4/0/all/snps/f1_score.txt" 
-    output:
-        touch("test.txt")
-    run:
-        score = float(open(input[0]).read().strip())
-        assert score >= 0.90
-        print("Tests passed")
-
+include: "rules/tests.smk"
 
 
 
