@@ -136,12 +136,12 @@ plots:
       n_threads: 8
 
   f1_score_vs_read_length:
-  description: "Accuracy vs. read length for paired/single end reads. Divided into reads containing and not containing genomic variants."
-  plot_type: f1_score_vs_read_length
-  parameters:
-    read_length: read_lengths_fine
-    n_threads: 4
-    n_reads: 40000
+    description: "Accuracy vs. read length for paired/single end reads. Divided into reads containing and not containing genomic variants."
+    plot_type: f1_score_vs_read_length
+    parameters:
+      read_length: read_lengths_fine
+      n_threads: 4
+      n_reads: 40000
 
   accuracy_for_various_mapq_thresholds_yeast:
     plot_type: accuracy
