@@ -1,7 +1,7 @@
 # This file contains all configuration for the plots (reports) that can be generated
 
 # List of quick and small plots used for testing
-test_plots: [f1_score, accuracy_for_various_mapq_thresholds, memory]
+test_plots: [f1_score, accuracy_for_various_mapq_thresholds_yeast, memory]
 # List of plots that will be generated every night
 #nightly_plots: [accuracy_on_various_read_lengths, variant_calling_accuracy]
 nightly_plots: [
@@ -114,7 +114,7 @@ plots:
   variant_calling_accuracy_vs_mapq_threshold_quick:
     plot_type: variant_calling_accuracy_vs_mapq_threshold
     parameters:
-      datset_size: small
+      dataset_size: small
       n_reads: "200000"
       n_threads: 2
       
@@ -122,17 +122,32 @@ plots:
     description: "Run on a small genome (chr17-21). Shows precision/recall for various MAPQ thresholds."
     plot_type: variant_calling_accuracy_vs_mapq_threshold
     parameters:
-      datset_size: medium
+      dataset_size: medium
       n_reads: "15000000"
       n_threads: 8
-  
-  f1_score_vs_read_length:
-    description: "Accuracy vs. read length for paired/single end reads. Showing for reads containing and not containing genomic variants."
-    plot_type: f1_score_vs_read_length
+
+  variant_calling_accuracy_vs_mapq_threshold_yeast:
+    plot_type: variant_calling_accuracy_vs_mapq_threshold
     parameters:
-      read_length: read_lengths_fine
-      n_threads: 4
-      n_reads: 40000
+      genome_build: sacCer3
+      individual: simulated
+      dataset_size: medium
+      n_reads: "200000"
+      n_threads: 8
+
+  f1_score_vs_read_length:
+  description: "Accuracy vs. read length for paired/single end reads. Divided into reads containing and not containing genomic variants."
+  plot_type: f1_score_vs_read_length
+  parameters:
+    read_length: read_lengths_fine
+    n_threads: 4
+    n_reads: 40000
+
+  accuracy_for_various_mapq_thresholds_yeast:
+    plot_type: accuracy
+    parameters:
+      genome_build: sacCer3
+      individual: simulated
 
 # The following defines different type of plots
 # This includes only the description of the structure of each plot, not what values are used for the variables

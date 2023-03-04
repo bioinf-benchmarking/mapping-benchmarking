@@ -6,9 +6,14 @@ import sys
 read_id = 0
 is_paired_end = False
 i = 0
+header_done = False
 for line in sys.stdin:
     if line.startswith("@"):
+        if not header_done:
+            print(line.strip())
         continue
+    else:
+        header_done = True
 
     line = line.strip().split("\t")
     if line[6] != "*":

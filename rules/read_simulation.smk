@@ -1,12 +1,27 @@
 
+def get_truth_vcf_command(wildcards, input, output):
+    individual_config = config["genomes"][wildcards.genome_build][wildcards.individual]
+    if individual_config["simulated"]:
+        tmp_output = output.vcf.split(".gz")[0]
+        parameters = ' '.join(config["mason_variator_parameters"].split("\n"))
+        return f"mason_variator -ir {input.reference} -ov {tmp_output} {parameters} && cat {tmp_output} | python scripts/assign_random_genotypes_to_vcf.py | gzip -c > {output.vcf}"
+    else:
+        url = individual_config["vcf_url"]
+        return f"wget -O {output} {url}"
 
-rule download_truth_vcf:
+
+rule get_truth_vcf:
+    input:
+        reference="data/{genome_build}/reference.fa"
     output:
-        "data/{genome_build}/{individual}/variants.vcf.gz"
+        vcf="data/{genome_build}/{individual}/variants.vcf.gz"
     params:
-        url=lambda wildcards: config["genomes"][wildcards.genome_build][wildcards.individual]["vcf_url"]
+        command=get_truth_vcf_command
+        #url=lambda wildcards: config["genomes"][wildcards.genome_build][wildcards.individual]["vcf_url"]
+    conda:
+        "../envs/mason.yml"
     shell:
-        "wget -O {output} {params.url}"
+        "{params.command}"
 
 
 rule download_truth_regions:
@@ -258,7 +273,8 @@ rule add_variant_info_to_truth_sam:
         truth_positions="{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.sam",
         coordinate_map="{individual}/coordinate_map_haplotype{haplotype}.npz",
     output:
-        "{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
+        sam="{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.haplotype_truth.with_variant_info.sam",
+        txt="{individual}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.n_variants.txt",
     script: "../scripts/add_variant_info_to_truth_sam.py"
 
 
@@ -288,32 +304,40 @@ rule merge_truth_alignments_for_haplotypes:
     input:
         haplotype0 = "{config}/0.reference_coordinates.sam",
         haplotype1 = "{config}/1.reference_coordinates.sam",
+        haplotype0_n_variants = "{config}/0.n_variants.txt",
+        haplotype1_n_variants= "{config}/1.n_variants.txt",
     output:
-        "{config}/truth.sam"
+        bam="{config}/truth.bam",
+        n_variants="{config}/n_variants.txt"
+    conda:
+        "../envs/samtools.yml"
     shell:
-        "cat {input} | python scripts/assign_ids_to_sam.py  > {output} "
+        "cat {input.haplotype0} {input.haplotype1} | python scripts/assign_ids_to_sam.py  | samtools view -o {output.bam} - && "
+        "cat {input.haplotype0_n_variants} {input.haplotype1_n_variants} > {output.n_variants}"
 
 
 rule count_reads:
     input:
-        f"data/{parameters.until('n_reads')}/truth.sam"
+        f"data/{parameters.until('n_reads')}/truth.bam"
     output:
         f"data/{parameters.until('n_reads')}/n_reads.txt"
+    conda:
+        "../envs/samtools.yml"
     shell:
-        "wc -l {input} | cut -f 1 -d ' ' > {output}"
+        "samtools view {input} | wc -l | cut -f 1 -d ' ' > {output}"
 
 
 rule store_truth_alignments:
     input:
         reads="{data}/{n_reads}/reads.fq.gz",  # not necessary
-        sam="{data}/{n_reads}/truth.sam",
+        bam="{data}/{n_reads}/truth.bam",
+        n_variants="{data}/{n_reads}/n_variants.txt",
         n_reads="{data}/{n_reads}/n_reads.txt",
     params:
         n_reads=lambda wildcards, input, output: open(input.n_reads).read().strip()
     output:
         "{data}/{n_reads,\d+}/truth.npz",
     shell:
-        """
-        cat {input.sam} | numpy_alignments store sam {output} {params.n_reads}
-        """
+        #"cat {input.sam} | numpy_alignments store sam {output} {params.n_reads}"
+        "numpy_alignments store bam -i {input.bam} -n {input.n_variants} {output} {params.n_reads}"
 

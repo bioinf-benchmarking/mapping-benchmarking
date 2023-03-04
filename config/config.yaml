@@ -119,6 +119,7 @@ default_parameter_sets:
 genomes:
   hg38:  # UCSC id of reference genome
     hg002:  # a descriptive name [a-zA-z0-9]
+      simulated: False
       # url to the genomic variants and truth regions for this individual
       vcf_url: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv4.2.1/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz"
       truth_regions: "https://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/release/AshkenazimTrio/HG002_NA24385_son/NISTv4.2.1/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark_noinconsistent.bed"
@@ -137,6 +138,18 @@ genomes:
     hg003:
       # not implemented
 
+  # yeast
+  sacCer3:
+    simulated:
+      simulated: True
+      small:
+        chromosomes: "chrIV,chrXV"
+        genome_size: 2623224
+      medium:
+        chromosomes: "chrI,chrII,chrIII,chrIV,chrV"
+        genome_size: 3468829
+
+
 
 # Error profiles. The names (e.g. low_error) are used as parameters
 illumina_error_profiles:
@@ -154,3 +167,15 @@ illumina_error_profiles:
     deletion_prob: 0.0005
     insertion_prob: 0.0005
     mismatch_scale: 3.0
+
+
+mason_variator_parameters:
+   "--snp-rate 0.001
+   --small-indel-rate 0.0001
+   --min-small-indel-size 1
+   --max-small-indel-size 6
+   --sv-indel-rate 0
+   --sv-inversion-rate 0
+   --sv-translocation-rate 0
+   --sv-duplication-rate 0
+   "

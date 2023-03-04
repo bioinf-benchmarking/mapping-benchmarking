@@ -11,7 +11,8 @@ rule store_alignments_as_np_data:
     conda:
         "../envs/numpy_alignments.yml"
     shell:
-        "samtools view {input.alignments} | numpy_alignments store sam {output} {params.n_reads}"
+        #"samtools view {input.alignments} | numpy_alignments store sam {output} {params.n_reads}"
+        "numpy_alignments store bam -i {input.alignments} {output} {params.n_reads}"
 
 
 rule get_accuracy_result:
