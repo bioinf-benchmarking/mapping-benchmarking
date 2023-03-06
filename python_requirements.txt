@@ -4,7 +4,7 @@ plotly
 kaleido
 obgraph>=0.0.34
 bionumpy>=0.2.18
-graph_read_simulator>=0.0.17
+graph_read_simulator>=0.0.18
 numpy_alignments>=0.0.6
 hierarchical_results
 tabulate
