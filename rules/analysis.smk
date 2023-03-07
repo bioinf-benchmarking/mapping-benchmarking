@@ -12,7 +12,7 @@ rule store_alignments_as_np_data:
         "../envs/numpy_alignments.yml"
     shell:
         #"samtools view {input.alignments} | numpy_alignments store sam {output} {params.n_reads}"
-        "numpy_alignments store -i {input.alignments} bam {output} {params.n_reads}"
+        "which python && numpy_alignments store -i {input.alignments} bam {output} {params.n_reads}"
 
 
 rule get_accuracy_result:
