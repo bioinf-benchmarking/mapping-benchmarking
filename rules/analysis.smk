@@ -8,8 +8,8 @@ rule store_alignments_as_np_data:
         "{path}/{n_reads,\d+}/{method}/mapped.npz"
     params:
         n_reads=lambda wildcards, input, output: open(input.n_reads).read().strip()
-    conda:
-        "../envs/numpy_alignments.yml"
+    #conda:
+    #    "../envs/numpy_alignments.yml"
     shell:
         #"samtools view {input.alignments} | numpy_alignments store sam {output} {params.n_reads}"
         "which python && numpy_alignments store -i {input.alignments} bam {output} {params.n_reads}"
