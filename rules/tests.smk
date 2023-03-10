@@ -1,6 +1,6 @@
 
 
-rule test_accuracy_calculation_is_correct:
+rule test_accuracy:
     input:
         "data/hg38/hg002/small/whole_genome_single_end/medium_error/150/200/bwa/4/0/all/snps/f1_score.txt"
     output:
@@ -12,9 +12,10 @@ rule test_accuracy_calculation_is_correct:
 
 
 
-rule div_tests:
+rule test:
     input:
-        "snakemake data/sacCer3/simulated/small/whole_genome_single_end/medium_error/150/10000/bwa/4/mapped.npz",
-        "snakemake data/sacCer3/simulated/small/chip_seq/medium_error/1000/1.fq.gz"
+        "data/sacCer3/simulated/small/whole_genome_single_end/medium_error/150/10000/bwa/4/mapped.npz",
+        "data/sacCer3/simulated/small/whole_genome_single_end/medium_error/150/10000/bwa/4/0/all/snps/f1_score.txt",
+        "data/sacCer3/simulated/small/chip_seq/medium_error/1000/1.fq.gz"
     output:
         touch("test2.txt")

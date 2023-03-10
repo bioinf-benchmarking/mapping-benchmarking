@@ -53,11 +53,18 @@ parameter_types_whole_genome_sequencing: [
 ]
 
 parameter_types_chip_seq: [
+  read_type,
   error_profile,
   read_length,
   n_peaks,
+  method,
+  n_threads
 ]
 
+
+result_types_chip_seq: [
+  accuracy
+]
 
 default_parameter_values:
   genome_build: "hg38"
@@ -72,6 +79,7 @@ default_parameter_values:
   min_mapq: "0"
   variant_filter: "all"
   variant_calling_type: "snps"
+  n_peaks: "100"
 
 
 

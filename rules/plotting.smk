@@ -3,7 +3,13 @@ import itertools
 import plotly.express as px
 import tabulate
 from hierarchical_results.hierarchical_results import HierarchicalResults, ParameterCombinations
-hr = HierarchicalResults(config["parameter_types"],config["result_types"], prefix="data/")
+#hr = HierarchicalResults(parameters_wgs, config["result_types"], prefix="data/")
+
+def get_hierarchical_results(wildcards):
+    if "chip_seq" in '/'.join(wildcards):
+        return HierarchicalResults(parameters_chip_seq, config["result_types_chip_seq"], prefix="data/")
+    else:
+        return HierarchicalResults(parameters_wgs,config["result_types"], prefix="data/")
 
 plotting_functions = {
     "bar": px.bar,
@@ -12,14 +18,11 @@ plotting_functions = {
 }
 
 
-def get_parameter_from_config_path(parameter, path):
-    print(parameter, path)
-    assert parameter in config["parameter_types"]
-    return path.split("/")[config["parameter_types"].index(parameter)]
+def get_parameter_from_config_path(parameter, path, parameter_types):
+    return path.split("/")[parameter_types.index(parameter)]
 
 
 def permute_files(files, parameter, values):
-    print("Permuting files %s with parameter %s and values %s" % (files, parameter, values))
     new_files = []
     for file in files:
         splitted = file.split("/")
@@ -30,6 +33,7 @@ def permute_files(files, parameter, values):
 
 
 def get_parameter_combinations_and_result_names(wildcards):
+    hr = get_hierarchical_results(wildcards)
     parameter_combinations = ParameterCombinations.from_path(hr.get_names(), wildcards.path)
 
     type = wildcards.plot_type
@@ -43,7 +47,7 @@ def get_parameter_combinations_and_result_names(wildcards):
 
     for dimension in dimensions:
         if dimension in config["parameter_types"]:
-            parameter_group = get_parameter_from_config_path(dimension, wildcards.path)
+            parameter_group = get_parameter_from_config_path(dimension, wildcards.path, config["parameter_types"])
             assert parameter_group in config["parameter_sets"], "Parameter group %s invalid" % parameter_group
             values = config["parameter_sets"][parameter_group]["values"]
             parameter_name = config["parameter_sets"][parameter_group]["parameter_type"]
@@ -58,6 +62,7 @@ def get_parameter_combinations_and_result_names(wildcards):
 
 def get_plot_input_files(wildcards):
     parameter_combinations, result_names = get_parameter_combinations_and_result_names(wildcards)
+    hr = get_hierarchical_results(wildcards)
     files = hr.get_result_file_names(parameter_combinations, result_names)
     files = [f for f in files]
     return files
@@ -89,6 +94,7 @@ rule make_plot:
             return config["pretty_names"][name]
 
 
+        hr = get_hierarchical_results(wildcards)
         parameter_combinations, result_names = get_parameter_combinations_and_result_names(wildcards)
         df = hr.get_results_dataframe(parameter_combinations, result_names)
         df.to_csv(output.data, index=False)
