@@ -3,3 +3,14 @@
 data/
 .snakemake
 *.npz
+*.fq
+*.bam
+*.bed
+*.gz
+reports
+*.fastq
+__pycache__
+logs
+*.vcf
+*.txt
+*.sam

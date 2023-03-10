@@ -11,3 +11,10 @@ rule test_accuracy_calculation_is_correct:
         print("Tests passed")
 
 
+
+rule div_tests:
+    input:
+        "snakemake data/sacCer3/simulated/small/whole_genome_single_end/medium_error/150/10000/bwa/4/mapped.npz",
+        "snakemake data/sacCer3/simulated/small/chip_seq/medium_error/1000/1.fq.gz"
+    output:
+        touch("test2.txt")

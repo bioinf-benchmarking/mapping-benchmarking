@@ -2,17 +2,11 @@
 
 rule store_alignments_as_np_data:
     input:
-        alignments="{path}/{n_reads}/{method}/mapped.bam",
-        n_reads="{path}/{n_reads}/n_reads.txt",
+        alignments="{path}/mapped.bam",
     output:
-        "{path}/{n_reads,\d+}/{method}/mapped.npz"
-    params:
-        n_reads=lambda wildcards, input, output: open(input.n_reads).read().strip()
-    #conda:
-    #    "../envs/numpy_alignments.yml"
+        "{path}/mapped.npz"
     shell:
-        #"samtools view {input.alignments} | numpy_alignments store sam {output} {params.n_reads}"
-        "which python && numpy_alignments store -i {input.alignments} bam {output} {params.n_reads}"
+        "numpy_alignments store -i {input.alignments} bam {output} -1"
 
 
 rule get_accuracy_result:

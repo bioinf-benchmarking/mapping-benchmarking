@@ -295,9 +295,9 @@ rule merge_simulated_reads_for_haplotypes:
         haplotype0="{config}/0.fq.gz",
         haplotype1="{config}/1.fq.gz",
     output:
-        "{config}/reads.fq.gz"
+        "{config}/reads.fq"
     shell:
-        "zcat {input} | python scripts/assign_ids_to_fq.py | gzip > {output} "
+        "zcat {input} | python scripts/assign_ids_to_fq.py > {output} "
 
 
 rule merge_truth_alignments_for_haplotypes:

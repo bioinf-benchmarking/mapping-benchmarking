@@ -34,6 +34,30 @@ parameter_types: [
   variant_calling_type
 ]
 
+parameter_types_reference_genome: [
+  genome_build,
+  individual,
+  dataset_size
+]
+
+parameter_types_whole_genome_sequencing: [
+  read_type,
+  error_profile,
+  read_length,
+  n_reads,
+  method,
+  n_threads,
+  min_mapq,
+  variant_filter,
+  variant_calling_type
+]
+
+parameter_types_chip_seq: [
+  error_profile,
+  read_length,
+  n_peaks,
+]
+
 
 default_parameter_values:
   genome_build: "hg38"

@@ -6,20 +6,24 @@ workflow.use_conda = True
 wildcard_constraints:
     n_threads="\d+",
     min_mapq="\d+",
-    variant_filter="all|variants|nonvariants"
+    variant_filter="all|variants|nonvariants",
+    genome_build="\w+",
+    individual="\w+",
+    dataset_size="small|medium|big",
+
 
 
 def paired_end_reads(wildcards=None):
-    return [f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/reads" + n + ".fq.gz" for n in
+    return [f"data/{reference_genome}/{{config}}/reads" + n + ".fq.gz" for n in
             ("1", "2")]
 
 
 def single_end_reads(wildcards=None):
-    return f"data/{parameters.until('n_reads')(read_type='whole_genome_single_end')}/reads.fq.gz"
+    return f"data/{reference_genome}/{{config}}/reads.fq.gz"
 
 
 def get_input_reads(wildcards):
-    return paired_end_reads() if "paired_end" in wildcards.read_type else single_end_reads()
+    return paired_end_reads() if "paired_end" in ''.join(wildcards) else single_end_reads()
 
 
 class Parameters:
@@ -28,16 +32,17 @@ class Parameters:
     Makes it possible to use {{parameters}} in a rule instead of manually
     specifying all parameters
     """
-    def __init__(self, parameters):
+    def __init__(self, parameters, prefix=""):
         self.parameters = parameters
+        self.prefix = prefix
 
     def __str__(self):
         splitter = "}/{"
         out = "{" + splitter.join(self.parameters) + "}"
-        return out
+        return self.prefix + out
 
     def __getitem__(self, item):
-        return Parameters(self.parameters[item])
+        return Parameters(self.parameters[item], prefix=self.prefix)
 
     def until(self, parameter):
         """ Gives all parameters until and including the given parameter"""
@@ -54,10 +59,15 @@ class Parameters:
                 out.append(str(filters[parameter]))
             else:
                 out.append("{" + parameter + "}")
-        return "/".join(out)
+        return self.prefix + "/".join(out)
 
 
 parameters = Parameters(config["parameter_types"])
+reference_genome = Parameters(config["parameter_types_reference_genome"])
+wgs = Parameters(config["parameter_types_whole_genome_sequencing"])
+chip_seq = Parameters(config["parameter_types_chip_seq"], prefix="chip_seq/")
+
+print(f"data/{reference_genome}/{chip_seq}/{{haplotype,0|1}}.fq")
 
 include: "rules/bwa.smk"
 include: "rules/bowtie2.smk"
@@ -65,6 +75,7 @@ include: "rules/strobealign.smk"
 include: "rules/minimap2.smk"
 include: "rules/reference_genome.smk"
 include: "rules/read_simulation.smk"
+include: "rules/chip_seq_simulation.smk"
 include: "rules/analysis.smk"
 include: "rules/reports.smk"
 include: "rules/variant_calling.smk"
