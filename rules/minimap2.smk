@@ -14,17 +14,19 @@ rule minimap_index:
 
 rule minimap_single_end:
     input:
-        target = "{data}/reference.mmi",
-        query = "{data}/whole_genome_single_end/{config}/reads.fq.gz",
+        target = f"data/{reference_genome}/reference.mmi",
+        query = get_input_reads  # "{data}/whole_genome_single_end/{config}/reads.fq.gz",
     output:
-        "{data}/whole_genome_single_end/{config}/minimap/{n_threads}/mapped.bam",
+        #"{data}/whole_genome_single_end/{config}/minimap/{n_threads}/mapped.bam",
+        f"data/{reference_genome}/{{config}}/minimap/{{n_threads}}/mapped.bam"
     params:
         extra = r"-ax sr -R '@RG\tID:sample\tSM:sample' -a",  # optional
         sorting = "none",  # optional: Enable sorting. Possible values: 'none', 'queryname' or 'coordinate'
         sort_extra = "",  # optional: extra arguments for samtools/picard
 
     benchmark:
-        "{data}/whole_genome_single_end/{config}/minimap/{n_threads}/benchmark.csv",
+        #"{data}/whole_genome_single_end/{config}/minimap/{n_threads}/benchmark.csv",
+        f"data/{reference_genome}/{{config}}/minimap/{{n_threads}}/benchmark.csv"
     threads: lambda wildcards: int(wildcards.n_threads)
     conda:
         "../envs/minimap2.yml"
@@ -37,6 +39,7 @@ rule minimap_single_end:
     #    "v1.21.2/bio/minimap2/aligner"
 
 
+"""
 rule minimap_paired_end:
     input:
         target = "{data}/reference.mmi",
@@ -54,8 +57,7 @@ rule minimap_paired_end:
         "../envs/minimap2.yml"
     shell:
         # hack with removing column 16, gatk does not handle the tp:A:P field
-        """
-        minimap2 -t {wildcards.n_threads} --MD -ax sr -R '@RG\\tID:sample\\tSM:sample' -a {input} | cut --complement -f 17 | samtools view -b -h - > {output}
-        """
+        "minimap2 -t {wildcards.n_threads} --MD -ax sr -R '@RG\\tID:sample\\tSM:sample' -a {input} | cut --complement -f 17 | samtools view -b -h - > {output}"
     #wrapper:
     #    "v1.21.2/bio/minimap2/aligner"
+"""

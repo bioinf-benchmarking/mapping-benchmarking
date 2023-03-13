@@ -9,11 +9,22 @@ rule download_reference:
 
 rule convert_reference_genome_to_fasta:
     input:
-        "data/{sample}/reference.2bit"
+        "data/{genome_build}/reference.2bit"
     output:
-        "data/{sample,\w+}/reference.fa"
+        "data/{genome_build}/reference.fa"
     wrapper:
         "v1.21.2/bio/ucsc/twoBitToFa"
+
+
+rule get_reference_genome_chromosome:
+    input:
+        "data/{genome_build}/reference.fa"
+    output:
+        "data/{genome_build}/reference_genome_by_chromosome/{chromosome}.fa.gz"
+    conda:
+        "../envs/samtools.yml"
+    shell:
+        "samtools faidx {input} {wildcards.chromosome} | gzip -c > {output}"
 
 
 rule samtools_index:

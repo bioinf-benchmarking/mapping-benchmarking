@@ -15,6 +15,7 @@ result_types: [
   "variant_calling_one_minus_precision",
   "variant_calling_recall",
   "variant_calling_f1score",
+  "peak_calling_accuracy"
 ]
 
 # The list of all parameters that can be changed to produce a result,
@@ -56,6 +57,8 @@ parameter_types_chip_seq: [
   read_type,
   error_profile,
   read_length,
+  spot,  # chips term: Ratio of reads that are in peaks
+  peak_read_coverage,
   n_peaks,
   method,
   n_threads
@@ -63,7 +66,7 @@ parameter_types_chip_seq: [
 
 
 result_types_chip_seq: [
-  accuracy
+  peak_calling_accuracy
 ]
 
 default_parameter_values:
@@ -80,6 +83,8 @@ default_parameter_values:
   variant_filter: "all"
   variant_calling_type: "snps"
   n_peaks: "100"
+  spot: "0.2"
+  peak_read_coverage: "20"
 
 
 
@@ -97,6 +102,9 @@ parameter_sets:
   read_lengths_fine:
     parameter_type: "read_length"
     values: [75, 100, 125, 150, 175, 200, 225, 250]
+  read_lengths_chip_seq:
+    parameter_type: "read_length"
+    values: [36, 75, 125]
   typical_n_threads:
     parameter_type: "n_threads"
     values: [1, 4, 8, 16]
@@ -130,6 +138,12 @@ parameter_sets:
   variant_calling_types:
     parameter_type: variant_calling_type
     values: [snps, indels]
+  n_peaks_rough:
+    parameter_type: n_peaks
+    values: [50, 100]
+  spot_values:
+    parameter_type: spot
+    values: [0.1, 0.2, 0.5]
 
 
 # Default parameter groups. Will be used for plotting if not overridden
@@ -146,6 +160,8 @@ default_parameter_sets:
   min_mapq: mapqs
   variant_filter: variant_filters
   variant_calling_type: variant_calling_types
+  n_peaks: n_peaks_rough
+  spot: spot_values
 
 
 genomes:

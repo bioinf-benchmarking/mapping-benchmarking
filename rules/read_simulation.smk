@@ -156,7 +156,7 @@ rule simulate_reads_for_chromosome_and_haplotype_art:
         #fai=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa.fai",
         #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
     output:
-        multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_single_end')}/{{haplotype,\d+}}", ".fq", ".sam")
+        multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_single_end')}/{{haplotype,\d+}}", ".fq.gz", ".sam")
     conda:
         "../envs/art.yml"
     params:
@@ -165,11 +165,13 @@ rule simulate_reads_for_chromosome_and_haplotype_art:
         mean_fragment_size=lambda wildcards: int(wildcards.read_length) * 3,
         min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
         max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
-        output_base_name=lambda wildcards, input, output: output[0].split(".")[0]
+        output_base_name=lambda wildcards, input, output: output[0].split(".")[0],
+        reads_base= lambda wildcards,input,output: output[0].replace(".gz","")
     threads:
         2
     shell:
         "art_illumina -ss MSv3 -sam -i {input.haplotype_reference} -f {params.coverage} -o {params.output_base_name} -l {wildcards.read_length} {params.error_parameters} "
+        "&& gzip {params.reads_base}"
 
 
 rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
@@ -179,7 +181,7 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
         #haplotype_reference="{individual}/haplotype{haplotype}.fa",
         #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
     output:
-        multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype,\d+}}", "-1.fq", "-2.fq", "-.sam")
+        multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype,\d+}}", "-1.fq.gz", "-2.fq.gz", "-.sam")
         #multiext("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", "-1.fq", "-2.fq", "-.sam")
     conda:
         "../envs/art.yml"
@@ -190,12 +192,15 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
         min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
         max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
         std_fragment_size= lambda wildcards: int(wildcards.read_length) // 10 ,
-        output_base_name=lambda wildcards, input, output: output[0].split(".")[0][0:-1]
+        output_base_name=lambda wildcards, input, output: output[0].split(".")[0][0:-1],
+        reads1_base=lambda wildcards, input, output: output[0].replace(".gz", ""),
+        reads2_base= lambda wildcards,input,output: output[1].replace(".gz", "")
     threads:
         2
     shell:
         "art_illumina -ss MSv3 -p -sam -i {input.haplotype_reference} -f {params.coverage} -o {params.output_base_name} "
-        "-l {wildcards.read_length} -m {params.mean_fragment_size} -s {params.std_fragment_size} {params.error_parameters} "
+        "-l {wildcards.read_length} -m {params.mean_fragment_size} -s {params.std_fragment_size} {params.error_parameters} && "
+        "gzip {params.reads1_base} && gzip {params.reads2_base}"
 
 
 # hack to get paired end rule to give same as single end
@@ -209,10 +214,10 @@ rule fix_sam_file_name:
     shell: "cp {input} {output}"
 
 
-rule gz:
-    input: "{file}.fq"
-    output: "{file}.fq.gz"
-    shell: "gzip -c {input} > {output}"
+#rule gz:
+#    input: "{file}.fq"
+#    output: "{file}.fq.gz"
+#    shell: "gzip -c {input} > {output}"
 
 
 """
@@ -243,10 +248,10 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end:
 
 rule merge_paired_end_reads:
     input:
-        r1=f"data/{reference_genome}/{wgs(read_type='whole_genome_paired_end')}/{{haplotype}}-1.fq.gz",
-        r2=f"data/{reference_genome}/{wgs(read_type='whole_genome_paired_end')}/{{haplotype}}-2 .fq.gz"
+        r1=f"data/{reference_genome}/{wgs.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype}}-1.fq.gz",
+        r2=f"data/{reference_genome}/{wgs.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype}}-2.fq.gz"
     output:
-        merged=f"data/{reference_genome}/{wgs(read_type='whole_genome_paired_end')}/{{haplotype}}.fq.gz"
+        merged=f"data/{reference_genome}/{wgs.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype}}.fq.gz"
     params:
         compress_lvl=9,
     threads: 4
@@ -295,9 +300,9 @@ rule merge_simulated_reads_for_haplotypes:
         haplotype0="{config}/0.fq.gz",
         haplotype1="{config}/1.fq.gz",
     output:
-        "{config}/reads.fq"
+        "{config}/reads.fq.gz"
     shell:
-        "zcat {input} | python scripts/assign_ids_to_fq.py > {output} "
+        "zcat {input} | python scripts/assign_ids_to_fq.py | gzip -c > {output} "
 
 
 rule merge_truth_alignments_for_haplotypes:

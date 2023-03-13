@@ -1,7 +1,7 @@
 # This file contains all configuration for the plots (reports) that can be generated
 
 # List of quick and small plots used for testing
-test_plots: [f1_score, accuracy_for_various_mapq_thresholds_yeast, memory]
+test_plots: [peak_calling_accuracy_vs_read_length_yeast, f1_score, accuracy_for_various_mapq_thresholds_yeast, memory]
 # List of plots that will be generated every night
 #nightly_plots: [accuracy_on_various_read_lengths, variant_calling_accuracy]
 nightly_plots: [
@@ -11,7 +11,8 @@ nightly_plots: [
   variant_calling_accuracy_vs_mapq_threshold,
   #variant_calling_accuracy,
   accuracy_vs_read_length_and_error_profile_human_whole_genome,
-  memory_human_whole_genome
+  memory_human_whole_genome,
+  peak_calling_accuracy_human
 ]
 
 # Dimensions that can be used when defining plot_types
@@ -149,6 +150,30 @@ plots:
       genome_build: sacCer3
       individual: simulated
 
+  peak_calling_accuracy:
+    plot_type: peak_calling_accuracy
+    parameters:
+      read_type: chip_seq
+
+  peak_calling_accuracy_vs_read_length_human:
+    plot_type: peak_calling_accuracy_vs_read_length
+    parameters:
+      read_type: chip_seq
+      read_length: read_lengths_chip_seq
+      genome_build: hg38
+      individual: hg002
+      n_peaks: 500
+
+  peak_calling_accuracy_vs_read_length_yeast:
+    plot_type: peak_calling_accuracy_vs_read_length
+    parameters:
+      read_type: chip_seq
+      read_length: read_lengths_chip_seq
+      genome_build: sacCer3
+      individual: simulated
+      n_peaks: 50
+
+
 # The following defines different type of plots
 # This includes only the description of the structure of each plot, not what values are used for the variables
 # Each of x_axis, y_axis, category_variable, color, labels, facet_col, facet_row
@@ -229,3 +254,14 @@ plot_types:
     color: method
     facet_col: variant_filter
     facet_row: read_type
+  peak_calling_accuracy:
+    parameter_set: parameters_chip_seq
+    type: bar
+    x: method
+    y: peak_calling_accuracy
+  peak_calling_accuracy_vs_read_length:
+    parameter_set: parameters_chip_seq
+    type: line
+    color: method
+    y: peak_calling_accuracy
+    x: read_length

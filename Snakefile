@@ -10,7 +10,8 @@ wildcard_constraints:
     genome_build="\w+",
     individual="\w+",
     dataset_size="small|medium|big",
-    haplotype="0|1"
+    haplotype="0|1",
+    peak_read_coverage="\d+"
 
 
 
@@ -63,7 +64,7 @@ class Parameters:
         return self.prefix + "/".join(out)
 
 parameters_wgs = config["parameter_types_reference_genome"] + config["parameter_types_whole_genome_sequencing"]
-parameters_chip_seq = config["parameter_types_reference_genome"] + config["parameter_types_whole_genome_sequencing"]
+parameters_chip_seq = config["parameter_types_reference_genome"] + config["parameter_types_chip_seq"]
 
 parameters = Parameters(config["parameter_types"])
 reference_genome = Parameters(config["parameter_types_reference_genome"])

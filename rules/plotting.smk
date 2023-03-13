@@ -33,8 +33,14 @@ def permute_files(files, parameter, values):
 
 
 def get_parameter_combinations_and_result_names(wildcards):
+    print("WIldcards", str(wildcards))
     hr = get_hierarchical_results(wildcards)
+    print("HR names.", hr.get_names())
     parameter_combinations = ParameterCombinations.from_path(hr.get_names(), wildcards.path)
+
+    print(hr.get_names())
+    parameter_types = hr.get_names() # config["parameter_types"]
+    print("Parameter types: ", parameter_types)
 
     type = wildcards.plot_type
 
@@ -47,7 +53,7 @@ def get_parameter_combinations_and_result_names(wildcards):
 
     for dimension in dimensions:
         if dimension in config["parameter_types"]:
-            parameter_group = get_parameter_from_config_path(dimension, wildcards.path, config["parameter_types"])
+            parameter_group = get_parameter_from_config_path(dimension, wildcards.path, parameter_types)
             assert parameter_group in config["parameter_sets"], "Parameter group %s invalid" % parameter_group
             values = config["parameter_sets"][parameter_group]["values"]
             parameter_name = config["parameter_sets"][parameter_group]["parameter_type"]
@@ -144,6 +150,7 @@ rule make_plot:
 
 def get_plot_name(wildcards):
     name = wildcards.name
+    print("Get plot name")
 
     if name in config["plots"]:
         #assert name in config["plots"], "Plot name %s not defined in plots.yaml" % name
@@ -157,12 +164,17 @@ def get_plot_name(wildcards):
         plot_config["plot_type"] = name
         plot_type_config = config["plot_types"][name]
 
+    parameter_types = parameters_wgs
+    if "parameter_set" in plot_type_config:
+        parameter_types = eval(plot_type_config["parameter_set"])
+
+    print("Parameter set is", str(parameter_types))
+
     # Parameters that can vary for this plot:
     variables = [plot_type_config[dimension] for dimension in config["plotting_dimensions"] if dimension in plot_type_config]
-    print(variables)
 
     plot_path = []
-    for parameter in config["parameter_types"]:
+    for parameter in parameter_types:
         if "parameters" in plot_config and parameter in plot_config["parameters"]:
             parameter = str(plot_config["parameters"][parameter])
         else:
@@ -177,8 +189,9 @@ def get_plot_name(wildcards):
 
     base_name = "reports/plots/" + plot_config["plot_type"] + "/" + "/".join(plot_path) + "/"
     endings = ["plot.png", "table.md"]
-    return [base_name + ending for ending in endings]
-
+    out = [base_name + ending for ending in endings]
+    print("Plot name: ", out[0])
+    return out
 
 # Wrapper around the make_plot rule that uses default parameters
 # so that less stuff needs to be specified
