@@ -67,13 +67,13 @@ parameters_wgs = config["parameter_types_reference_genome"] + config["parameter_
 parameters_chip_seq = config["parameter_types_reference_genome"] + config["parameter_types_chip_seq"]
 
 parameters = Parameters(config["parameter_types"])
+
+print("Parameters: ", type(parameters))
 reference_genome = Parameters(config["parameter_types_reference_genome"])
 wgs = Parameters(config["parameter_types_whole_genome_sequencing"])
 chip_seq = Parameters(config["parameter_types_chip_seq"])
 
-print(f"data/{reference_genome}/{chip_seq}/{{haplotype,0|1}}.fq")
 
-include: "rules/bwa.smk"
 include: "rules/bowtie2.smk"
 include: "rules/strobealign.smk"
 include: "rules/minimap2.smk"
@@ -86,6 +86,7 @@ include: "rules/reports.smk"
 include: "rules/variant_calling.smk"
 include: "rules/plotting.smk"
 include: "rules/tests.smk"
+include: "rules/bwa.smk"
 
 
 

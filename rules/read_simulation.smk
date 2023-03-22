@@ -1,3 +1,5 @@
+from mapping_benchmarking.parameter_config import WholeGenomeSingleEnd, ReferenceGenome, WholeGenomePairedEnd, Reads
+
 
 def get_truth_vcf_command(wildcards, input, output):
     individual_config = config["genomes"][wildcards.genome_build][wildcards.individual]
@@ -152,11 +154,9 @@ def get_coverage(wildcards, input, output):
 
 rule simulate_reads_for_chromosome_and_haplotype_art:
     input:
-        haplotype_reference=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa",
-        #fai=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa.fai",
-        #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
+        haplotype_reference=ReferenceGenome.path(file_ending="") + "/haplotype{haplotype}.fa",
     output:
-        multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_single_end')}/{{haplotype,\d+}}", ".fq.gz", ".sam")
+        multiext(WholeGenomeSingleEnd.path(file_ending="") + "/{haplotype}", ".fq.gz", ".sam")
     conda:
         "../envs/art.yml"
     params:
@@ -176,13 +176,9 @@ rule simulate_reads_for_chromosome_and_haplotype_art:
 
 rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
     input:
-        haplotype_reference=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa",
-        #fai=f"data/{parameters.until('dataset_size')}/haplotype{{haplotype}}.fa.fai",
-        #haplotype_reference="{individual}/haplotype{haplotype}.fa",
-        #haplotype_reference_fai="{individual}/haplotype{haplotype}.fa.fai",
+        haplotype_reference=ReferenceGenome.path(file_ending="") + "/haplotype{haplotype}.fa",
     output:
-        multiext(f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype,\d+}}", "-1.fq.gz", "-2.fq.gz", "-.sam")
-        #multiext("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", "-1.fq", "-2.fq", "-.sam")
+        multiext(WholeGenomePairedEnd.path() + "/{haplotype}", "-1.fq.gz", "-2.fq.gz", "-.sam")
     conda:
         "../envs/art.yml"
     params:
@@ -206,11 +202,10 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
 # hack to get paired end rule to give same as single end
 rule fix_sam_file_name:
     input:
-        f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype}}-.sam"
-        #"{dir}/{haplotype,\d+}-.sam"
+        WholeGenomePairedEnd.path() + "/{haplotype}-.sam"
     output:
-        f"data/{parameters.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype,\d+}}.sam"
-        #"{dir}/{haplotype,\d+}.sam"
+        WholeGenomePairedEnd.path() + "/{haplotype}.sam"
+
     shell: "cp {input} {output}"
 
 
@@ -248,10 +243,10 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end:
 
 rule merge_paired_end_reads:
     input:
-        r1=f"data/{reference_genome}/{wgs.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype}}-1.fq.gz",
-        r2=f"data/{reference_genome}/{wgs.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype}}-2.fq.gz"
+        r1 = WholeGenomePairedEnd.path() + "/{haplotype}-1.fq.gz",
+        r2 = WholeGenomePairedEnd.path() + "/{haplotype}-2.fq.gz",
     output:
-        merged=f"data/{reference_genome}/{wgs.until('n_reads')(read_type='whole_genome_paired_end')}/{{haplotype}}.fq.gz"
+        merged = WholeGenomePairedEnd.path() + "/{haplotype}.fq.gz",
     params:
         compress_lvl=9,
     threads: 4
@@ -275,11 +270,14 @@ rule deinterleave_fastq:
 # finds out whether each truth alignment covers a variant and adds that information
 rule add_variant_info_to_truth_sam:
     input:
-        truth_positions="{path}/whole_genome_{pair}_end/{config}/{haplotype}.sam",
-        coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
+        truth_positions=Reads.path() + "/whole_genome_{pair}_end/{config}/{haplotype}.sam",
+        coordinate_map=ReferenceGenome.path() + "/coordinate_map_haplotype{haplotype}.npz",
+        #coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
     output:
-        sam="{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
-        txt="{path}/whole_genome_{pair}_end/{config}/{haplotype}.n_variants.txt",
+        #sam="{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
+        sam = Reads.path() + "/{haplotype}.haplotype_truth.with_variant_info.sam",
+        txt = Reads.path() + "/{haplotype}.n_variants.txt",
+        #txt="{path}/whole_genome_{pair}_end/{config}/{haplotype}.n_variants.txt",
     script: "../scripts/add_variant_info_to_truth_sam.py"
 
 

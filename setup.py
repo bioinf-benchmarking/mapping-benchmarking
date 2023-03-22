@@ -5,7 +5,7 @@
 from setuptools import setup, find_packages
 
 
-requirements = [ ]
+requirements = ['snakehelp', 'numpy', 'pandas']
 
 test_requirements = ['pytest>=3', "hypothesis"]
 

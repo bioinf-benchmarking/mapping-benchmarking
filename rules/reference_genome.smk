@@ -1,4 +1,4 @@
-
+from mapping_benchmarking.parameter_config import ReferenceGenome
 
 rule download_reference:
     output:
@@ -59,16 +59,15 @@ rule get_single_chromosome_reference:
 
 rule get_dataset_reference:
     input:
-        ref = "data/{reference}/reference.fa",
-        index = "data/{reference}/reference.fa.fai",
-        #ref=lambda wildcards: "data/reference_genomes/raw/" + config["variant_sources"][config["individuals"][wildcards.individual]["variant_source"]]["genome"]  + ".fa",
-        #index=lambda wildcards: "data/reference_genomes/raw/" + config["variant_sources"][config["individuals"][wildcards.individual]["variant_source"]]["genome"]  + ".fa.fai",
+        ref = "data/{genome_build}/reference.fa",
+        index = "data/{genome_build}/reference.fa.fai",
     output:
-        "data/{reference}/{individual}/{size}/reference.fa"
+        ReferenceGenome.path()
+        #"data/{reference}/{individual}/{size}/reference.fa"
     conda:
         "../envs/samtools.yml"
     params:
-        regions=lambda wildcards: config["genomes"][wildcards.reference][wildcards.individual][wildcards.size]["chromosomes"].replace(",", " ")
+        regions=lambda wildcards: config["genomes"][wildcards.genome_build][wildcards.individual][wildcards.dataset_size]["chromosomes"].replace(",", " ")
     shell:
         "samtools faidx {input.ref} {params.regions} > {output}"
 
