@@ -81,8 +81,8 @@ rule simulate_peak_reads:
         out_base_name = lambda wildcards, input, output: ".".join(output.reads.split(".")[:-1]),
         frac = peak_frac,
         n_reads=chip_seq_n_reads
-    conda:
-        "../envs/chips.yml"
+    #conda:
+    #    "../envs/chips.yml"
     shell:
         "chips simreads --spot {wildcards.spot} --numcopies 1000 --frac "
         "{params.frac} --seed 1 -t bed -c 5 -p {input.peaks} -f {input.reference} "
