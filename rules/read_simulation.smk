@@ -270,13 +270,13 @@ rule deinterleave_fastq:
 # finds out whether each truth alignment covers a variant and adds that information
 rule add_variant_info_to_truth_sam:
     input:
-        truth_positions=Reads.path() + "/whole_genome_{pair}_end/{config}/{haplotype}.sam",
-        coordinate_map=ReferenceGenome.path() + "/coordinate_map_haplotype{haplotype}.npz",
+        truth_positions=Reads.path(file_ending="") + "/{haplotype}.sam",
+        coordinate_map=ReferenceGenome.path(file_ending="") + "/coordinate_map_haplotype{haplotype}.npz",
         #coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
     output:
         #sam="{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
-        sam = Reads.path() + "/{haplotype}.haplotype_truth.with_variant_info.sam",
-        txt = Reads.path() + "/{haplotype}.n_variants.txt",
+        sam = Reads.path(file_ending="") + "/{haplotype}.haplotype_truth.with_variant_info.sam",
+        txt = Reads.path(file_ending="") + "/{haplotype}.n_variants.txt",
         #txt="{path}/whole_genome_{pair}_end/{config}/{haplotype}.n_variants.txt",
     script: "../scripts/add_variant_info_to_truth_sam.py"
 
@@ -284,11 +284,13 @@ rule add_variant_info_to_truth_sam:
 
 rule change_truth_alignments_to_reference_coordinates:
     input:
-        truth_positions = "{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
-        coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
+        truth_positions=Reads.path(file_ending="") + "/{haplotype}.haplotype_truth.with_variant_info.sam",
+        #truth_positions = "{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
+        #coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
+        coordinate_map=ReferenceGenome.path(file_ending="") + "/coordinate_map_haplotype{haplotype}.npz",
     output:
-        "{path}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.reference_coordinates.sam"
-        #"data/simulated_reads/{dataset}/simulated_reads_haplotype{haplotype,\d+}.reference_coordinates.sam"
+        #"{path}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.reference_coordinates.sam"
+        truth_positions=Reads.path(file_ending="") + "/{haplotype}.reference_coordinates.sam",
     script: "../scripts/change_truth_alignments_to_reference_coordinates.py"
 
 
@@ -319,28 +321,12 @@ rule merge_truth_alignments_for_haplotypes:
         "cat {input.haplotype0_n_variants} {input.haplotype1_n_variants} > {output.n_variants}"
 
 
-rule count_reads:
-    input:
-        f"data/{parameters.until('n_reads')}/truth.bam"
-    output:
-        f"data/{parameters.until('n_reads')}/n_reads.txt"
-    conda:
-        "../envs/samtools.yml"
-    shell:
-        "samtools view {input} | wc -l | cut -f 1 -d ' ' > {output}"
-
-
 rule store_truth_alignments:
     input:
-        reads="{data}/{n_reads}/reads.fq.gz",  # not necessary
-        bam="{data}/{n_reads}/truth.bam",
-        n_variants="{data}/{n_reads}/n_variants.txt",
-        #n_reads="{data}/{n_reads}/n_reads.txt",
-    #params:
-    #n_reads=lambda wildcards, input, output: open(input.n_reads).read().strip()
+        bam="{data}/truth.bam",
+        n_variants="{data}/n_variants.txt",
     output:
-        "{data}/{n_reads,\d+}/truth.npz",
+        "{data}/truth.npz",
     shell:
-        #"cat {input.sam} | numpy_alignments store sam {output} {params.n_reads}"
         "numpy_alignments store bam -i {input.bam} -n {input.n_variants} {output} -1"
 

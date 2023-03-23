@@ -1,24 +1,27 @@
-
+from mapping_benchmarking.parameter_config import MappedReads, Reads, AccuracyResult
 
 rule store_alignments_as_np_data:
     input:
-        alignments="{path}/mapped.bam",
+        alignments=MappedReads.path(file_ending=".bam"),
     output:
-        "{path}/mapped.npz"
+        MappedReads.path(file_ending=".npz")
     shell:
         "numpy_alignments store -i {input.alignments} bam {output} -1"
 
 
 rule get_accuracy_result:
     input:
-        alignments=f"data/{parameters.until('n_threads')}/mapped.npz",
-        truth=f"data/{parameters.until('n_reads')}/truth.npz"
+        #alignments=f"data/{parameters.until('n_threads')}/mapped.npz",
+        alignments=MappedReads.path(file_ending=".npz"),
+        #truth=f"data/{parameters.until('n_reads')}/truth.npz"
+        truth=Reads.path(file_ending="/truth.npz")
     output:
-        f"data/{parameters}/{{type, recall|one_minus_precision|f1_score}}.txt"
+        #f"data/{parameters}/{{type, recall|one_minus_precision|f1_score}}.txt"
+        AccuracyResult.path()
     params:
         allowed_bp_mismatch=50 #lambda wildcards: int(wildcards.read_length) // 5
     shell:
-        "numpy_alignments get_correct_rates --report-type {wildcards.type} -m {wildcards.min_mapq} --allowed-bp-mismatch {params.allowed_bp_mismatch} {input.truth} {input.alignments} {wildcards.variant_filter} > {output}"
+        "numpy_alignments get_correct_rates --report-type {wildcards.accuracy_type} -m {wildcards.min_mapq} --allowed-bp-mismatch {params.allowed_bp_mismatch} {input.truth} {input.alignments} {wildcards.variant_filter} > {output}"
 
 
 rule get_runtime:
