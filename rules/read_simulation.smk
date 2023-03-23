@@ -178,7 +178,7 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
     input:
         haplotype_reference=ReferenceGenome.path(file_ending="") + "/haplotype{haplotype}.fa",
     output:
-        multiext(WholeGenomePairedEnd.path() + "/{haplotype}", "-1.fq.gz", "-2.fq.gz", "-.sam")
+        multiext(WholeGenomePairedEnd.path(file_ending="") + "/{haplotype}", "-1.fq.gz", "-2.fq.gz", "-.sam")
     conda:
         "../envs/art.yml"
     params:

@@ -1,9 +1,10 @@
-from mapping_benchmarking.parameter_config import MappedReads, ReferenceGenome, Reads, SingleEndReads, PairedEndReads
+from mapping_benchmarking.parameter_config import MappedReads, ReferenceGenome, Reads, SingleEndReads, PairedEndReads, \
+    GenericReads
 
 
 def input_reads(wildcards):
-    return SingleEndReads.path() if not "paired_end" in wildcards.read_config else PairedEndReads.path(file=[
-        "reads1.fq.gz", "reads2.fq.gz"]),
+    file = "reads.fq.gz" if not "paired_end" in wildcards.read_config else ["reads1.fq.gz", "reads2.fq.gz"]
+    return GenericReads.path(file=file)
 
 
 rule bwa_index:
