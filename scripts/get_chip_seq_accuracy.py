@@ -23,5 +23,5 @@ for peak in peaks:
 
 accuracy = n_found / len(truth)
 print("accuracy", accuracy)
-with open(snakemake.output.peaks, "w") as f:
+with open(snakemake.output.result, "w") as f:
     f.write(str(accuracy) + "\n")

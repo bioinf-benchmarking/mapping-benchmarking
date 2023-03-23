@@ -26,5 +26,5 @@ rule get_accuracy:
     output:
         #peaks=f"data/{reference_genome}/{chip_seq}/peak_calling_accuracy.txt",
         #peaks = CalledPeaks.path() + "/peak_calling_accuracy.txt"
-        peaks = PeakCallingAccuracyResult.path(accuracy_type="accuracy")
+        result = PeakCallingAccuracyResult.path(accuracy_type="accuracy")
     script: "../scripts/get_chip_seq_accuracy.py"
