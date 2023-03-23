@@ -1,4 +1,5 @@
-from mapping_benchmarking.parameter_config import MappedReads, Reads, AccuracyResult
+from mapping_benchmarking.parameter_config import MappedReads, Reads, AccuracyResult, PeakCallingAccuracyResult
+
 
 rule store_alignments_as_np_data:
     input:

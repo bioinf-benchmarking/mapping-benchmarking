@@ -14,7 +14,7 @@ rule test_accuracy:
 
 rule test_peak_calling_accuracy:
     input:
-        "data/sacCer3/simulated/small/chip_seq/medium_error/75/0.3/40/50/bwa/4/peak_calling_accuracy.txt"
+        "data/sacCer3/simulated/small/chip_seq/medium_error/75/0.3/40/50/bwa/4/accuracy.txt"
     output:
         touch("test_peak_calling_accuracy.txt")
     run:
