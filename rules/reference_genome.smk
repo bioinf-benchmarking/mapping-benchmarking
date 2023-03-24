@@ -1,4 +1,4 @@
-from mapping_benchmarking.parameter_config import ReferenceGenome
+from mapping_benchmarking.config import ReferenceGenome
 
 rule download_reference:
     output:

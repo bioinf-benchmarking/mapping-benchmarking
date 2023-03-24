@@ -1,11 +1,11 @@
-from mapping_benchmarking.parameter_config import MappedReads, Reads, AccuracyResult, PeakCallingAccuracyResult
+from mapping_benchmarking.config import WholeGenomeMappedReads, MappingAccuracy, GenericReads, GenericMappedReads
 
 
 rule store_alignments_as_np_data:
     input:
-        alignments=MappedReads.path(file_ending=".bam"),
+        alignments=GenericMappedReads.path(file_ending=".bam"),
     output:
-        MappedReads.path(file_ending=".npz")
+        GenericMappedReads.path(file_ending=".npz")
     shell:
         "numpy_alignments store -i {input.alignments} bam {output} -1"
 
@@ -13,14 +13,15 @@ rule store_alignments_as_np_data:
 rule get_accuracy_result:
     input:
         #alignments=f"data/{parameters.until('n_threads')}/mapped.npz",
-        alignments=MappedReads.path(file_ending=".npz"),
+        alignments=WholeGenomeMappedReads.path(file_ending=".npz"),
         #truth=f"data/{parameters.until('n_reads')}/truth.npz"
-        truth=Reads.path(file_ending="/truth.npz")
+        truth=WholeGenomeReads.path(file_ending="/truth.npz")
     output:
         #f"data/{parameters}/{{type, recall|one_minus_precision|f1_score}}.txt"
-        AccuracyResult.path()
+        MappingAccuracy.path()
     params:
-        allowed_bp_mismatch=50 #lambda wildcards: int(wildcards.read_length) // 5
+        allowed_bp_mismatch=50, #lambda wildcards: int(wildcards.read_length) // 5
+
     shell:
         "numpy_alignments get_correct_rates --report-type {wildcards.accuracy_type} -m {wildcards.min_mapq} --allowed-bp-mismatch {params.allowed_bp_mismatch} {input.truth} {input.alignments} {wildcards.variant_filter} > {output}"
 

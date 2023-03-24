@@ -1,6 +1,5 @@
 import numpy as np
-
-from mapping_benchmarking.parameter_config import ReferenceGenome, ChipSeq, SimulatedChipSeqPeaks
+from mapping_benchmarking.config import ReferenceGenome, ChipSeq, SimulatedChipSeqPeaks
 
 peak_size = 200
 

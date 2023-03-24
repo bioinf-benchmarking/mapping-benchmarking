@@ -1,5 +1,4 @@
-from mapping_benchmarking.parameter_config import MappedReads, ReferenceGenome, Reads, SingleEndReads, PairedEndReads, \
-    GenericReads
+from mapping_benchmarking.config import WholeGenomeMappedReads, ReferenceGenome, GenericReads, GenericMappedReads
 
 
 def input_reads(wildcards):
@@ -23,9 +22,9 @@ rule bwa_map:
         reads = input_reads,
         idx = ReferenceGenome.path(file_ending=[".fa", ".fa.amb",".fa.ann",".fa.bwt",".fa.pac",".fa.sa"])
     output:
-        reads=MappedReads.as_output(method='bwa')
+        reads=GenericMappedReads.as_output(method='bwa')
     benchmark:
-        MappedReads.as_output(method='bwa', file_ending=".benchmark.csv")
+        GenericMappedReads.as_output(method='bwa', file_ending=".benchmark.csv")
     threads: lambda wildcards: int(wildcards.n_threads)
     conda: "../envs/bwa.yml"
     shell:

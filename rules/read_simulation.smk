@@ -1,4 +1,4 @@
-from mapping_benchmarking.parameter_config import WholeGenomeSingleEnd, ReferenceGenome, WholeGenomePairedEnd, Reads
+from mapping_benchmarking.config import ReferenceGenome, WholeGenomeReads
 
 
 def get_truth_vcf_command(wildcards, input, output):
@@ -156,7 +156,7 @@ rule simulate_reads_for_chromosome_and_haplotype_art:
     input:
         haplotype_reference=ReferenceGenome.path(file_ending="") + "/haplotype{haplotype}.fa",
     output:
-        multiext(WholeGenomeSingleEnd.path(file_ending="") + "/{haplotype}", ".fq.gz", ".sam")
+        multiext(WholeGenomeReads.path(read_type="single_end", file_ending="") + "/{haplotype}", ".fq.gz", ".sam")
     conda:
         "../envs/art.yml"
     params:
@@ -178,7 +178,7 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
     input:
         haplotype_reference=ReferenceGenome.path(file_ending="") + "/haplotype{haplotype}.fa",
     output:
-        multiext(WholeGenomePairedEnd.path(file_ending="") + "/{haplotype}", "-1.fq.gz", "-2.fq.gz", "-.sam")
+        multiext(WholeGenomeReads.path(read_type="paired_end", file_ending="") + "/{haplotype}", "-1.fq.gz", "-2.fq.gz", "-.sam")
     conda:
         "../envs/art.yml"
     params:
@@ -202,9 +202,9 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end_art:
 # hack to get paired end rule to give same as single end
 rule fix_sam_file_name:
     input:
-        WholeGenomePairedEnd.path() + "/{haplotype}-.sam"
+        WholeGenomeReads.path(read_type="paired_end") + "/{haplotype}-.sam"
     output:
-        WholeGenomePairedEnd.path() + "/{haplotype}.sam"
+        WholeGenomeReads.path(read_type="paired_end") + "/{haplotype}.sam"
 
     shell: "cp {input} {output}"
 
@@ -243,10 +243,10 @@ rule simulate_reads_for_chromosome_and_haplotype_paired_end:
 
 rule merge_paired_end_reads:
     input:
-        r1 = WholeGenomePairedEnd.path() + "/{haplotype}-1.fq.gz",
-        r2 = WholeGenomePairedEnd.path() + "/{haplotype}-2.fq.gz",
+        r1 = WholeGenomeReads.path(read_type="paired_end") + "/{haplotype}-1.fq.gz",
+        r2 = WholeGenomeReads.path(read_type="paired_end") + "/{haplotype}-2.fq.gz",
     output:
-        merged = WholeGenomePairedEnd.path() + "/{haplotype}.fq.gz",
+        merged = WholeGenomeReads.path(read_type="paired_end") + "/{haplotype}.fq.gz",
     params:
         compress_lvl=9,
     threads: 4
@@ -270,13 +270,13 @@ rule deinterleave_fastq:
 # finds out whether each truth alignment covers a variant and adds that information
 rule add_variant_info_to_truth_sam:
     input:
-        truth_positions=Reads.path(file_ending="") + "/{haplotype}.sam",
+        truth_positions=WholeGenomeReads.path(file_ending="") + "/{haplotype}.sam",
         coordinate_map=ReferenceGenome.path(file_ending="") + "/coordinate_map_haplotype{haplotype}.npz",
         #coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
     output:
         #sam="{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
-        sam = Reads.path(file_ending="") + "/{haplotype}.haplotype_truth.with_variant_info.sam",
-        txt = Reads.path(file_ending="") + "/{haplotype}.n_variants.txt",
+        sam = WholeGenomeReads.path(file_ending="") + "/{haplotype}.haplotype_truth.with_variant_info.sam",
+        txt = WholeGenomeReads.path(file_ending="") + "/{haplotype}.n_variants.txt",
         #txt="{path}/whole_genome_{pair}_end/{config}/{haplotype}.n_variants.txt",
     script: "../scripts/add_variant_info_to_truth_sam.py"
 
@@ -284,13 +284,13 @@ rule add_variant_info_to_truth_sam:
 
 rule change_truth_alignments_to_reference_coordinates:
     input:
-        truth_positions=Reads.path(file_ending="") + "/{haplotype}.haplotype_truth.with_variant_info.sam",
+        truth_positions=WholeGenomeReads.path(file_ending="") + "/{haplotype}.haplotype_truth.with_variant_info.sam",
         #truth_positions = "{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
         #coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
         coordinate_map=ReferenceGenome.path(file_ending="") + "/coordinate_map_haplotype{haplotype}.npz",
     output:
         #"{path}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.reference_coordinates.sam"
-        truth_positions=Reads.path(file_ending="") + "/{haplotype}.reference_coordinates.sam",
+        truth_positions=WholeGenomeReads.path(file_ending="") + "/{haplotype}.reference_coordinates.sam",
     script: "../scripts/change_truth_alignments_to_reference_coordinates.py"
 
 

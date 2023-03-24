@@ -1,9 +1,11 @@
 import itertools
-
+from snakehelp.plotting import PlotType, Plot
 import plotly.express as px
 import tabulate
 from hierarchical_results.hierarchical_results import HierarchicalResults, ParameterCombinations
 #hr = HierarchicalResults(parameters_wgs, config["result_types"], prefix="data/")
+from mapping_benchmarking.config import *
+
 
 def get_hierarchical_results(wildcards):
     if "chip_seq" in '/'.join(wildcards):
@@ -20,16 +22,6 @@ plotting_functions = {
 
 def get_parameter_from_config_path(parameter, path, parameter_types):
     return path.split("/")[parameter_types.index(parameter)]
-
-
-def permute_files(files, parameter, values):
-    new_files = []
-    for file in files:
-        splitted = file.split("/")
-        for value in values:
-            splitted[config["parameter_types"].index(parameter)] = str(value)
-            new_files.append("/".join(splitted))
-    return new_files
 
 
 def get_parameter_combinations_and_result_names(wildcards):
@@ -86,6 +78,82 @@ def parse_plot_specification(plot_type):
     return specification
 
 
+result_to_classes_mapping = {
+    "mapping_f1_score": MappingF1Score
+}
+
+
+def get_plot_type_parameters(plot_type, plot_type_object):
+    """
+    Returns a dict with parameters for the plot type.
+    Uses default range values if a parameter is not specified in the config.
+    """
+    plot_type_config = config["plot_types"][plot_type]
+
+    # parse those specified in yaml config
+    if "parameters" in plot_type_config:
+        parameters = plot_type_config["parameters"]
+    else:
+        parameters = {}
+
+    # set defaults for those not specified
+    for required_parameter in plot_type_object.parameter_types():
+        if required_parameter not in parameters:
+            parameters[required_parameter] = config["default_parameter_sets"][required_parameter]
+
+    print(parameters)
+    return parameters
+
+
+def get_plot(plot_name):
+    plot_config = config["plots"][plot_name]
+    plot_type_config = config["plot_types"][plot_config["plot_type"]]
+
+    parsed_config = {}
+    for name, val in plot_type_config.items():
+        if val in result_to_classes_mapping:
+            val = result_to_classes_mapping[val]
+        parsed_config[name] = val
+
+    # replace literal values with classes
+
+    print("Parsed config")
+    print(parsed_config)
+    plot_type = PlotType.from_yaml_dict(parsed_config)
+
+    out_base_name = f"plots/{plot_name}"
+
+    parameters = get_plot_type_parameters(plot_config["plot_type"],plot_type)
+    plot = plot_type.plot(out_base_name,**parameters)
+    return plot
+
+
+def get_plot_input_files2(wildcards):
+    plot_name = wildcards.plot_name
+    plot = get_plot(plot_name)
+    files = plot.file_names()
+    return files
+
+
+rule make_plot2:
+    input: get_plot_input_files2
+    output:
+        plot="plots/{plot_name}.png",
+        csv="plots/{plot_name}.csv",
+        md="plots/{plot_name}.md",
+    run:
+        plot = get_plot(wildcards.plot_name)
+        df = plot._parameter_combinations.get_results_dataframe()
+        plot.plot()
+
+        df.to_csv(output.csv, index=False)
+
+        markdown_table = tabulate.tabulate(df,headers=df.columns,tablefmt="github")
+        print(markdown_table)
+        with open(output.md, "w") as f:
+            f.write(markdown_table + "\n")
+
+"""
 rule make_plot:
     input: get_plot_input_files
     output:
@@ -93,7 +161,7 @@ rule make_plot:
         plot_html="reports/plots/{plot_type, \w+}/{path}/plot.html",
         data="reports/plots/{plot_type, \w+}/{path}/plot.csv",
         table="reports/plots/{plot_type, \w+}/{path}/table.md"
-    run:
+    run
         def pretty_name(name):
             if name not in config["pretty_names"]:
                 return name.capitalize()
@@ -146,7 +214,7 @@ rule make_plot:
         fig.show()
         fig.write_image(output.plot)
         fig.write_html(output.plot_html)
-
+"""
 
 def get_plot_name(wildcards):
     name = wildcards.name

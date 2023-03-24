@@ -183,7 +183,7 @@ plot_types:
   f1_score:
     type: bar
     x: "method"
-    y: "f1_score"
+    y: mapping_f1_score
   accuracy:
     type: line
     markers: True

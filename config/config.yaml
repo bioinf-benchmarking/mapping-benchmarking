@@ -73,7 +73,7 @@ default_parameter_values:
   genome_build: "hg38"
   individual: "hg002"
   dataset_size: "small"
-  read_type: "whole_genome_paired_end"
+  read_type: "paired_end"
   error_profile: "medium_error"
   read_length: "150"
   n_reads: "10000"
@@ -87,81 +87,22 @@ default_parameter_values:
   peak_read_coverage: "20"
 
 
-
-# groups of parameters, to be used when creating a plot
-parameter_sets:
-  all_methods:
-    parameter_type: "method"
-    values: ["bwa", "bowtie2", "minimap", "strobealign"]
-  including_strobealign:
-    parameter_type: "method"
-    values: ["bwa", "bowtie2", "minimap", "strobealign"]
-  read_lengths_rough:
-    parameter_type: "read_length"
-    values: [75, 150, 250]
-  read_lengths_fine:
-    parameter_type: "read_length"
-    values: [75, 100, 125, 150, 175, 200, 225, 250]
-  read_lengths_chip_seq:
-    parameter_type: "read_length"
-    values: [36, 75, 125]
-  typical_n_threads:
-    parameter_type: "n_threads"
-    values: [1, 4, 8, 16]
-  mapqs:
-    parameter_type: "min_mapq"
-    values: [0, 10, 20, 30, 40]
-  variant_types:
-    parameter_type: "variant_filter"
-    values: ["all", "variants", "nonvariants"]
-  error_profiles:
-    parameter_type: "error_profile"
-    values: ["low_error", "medium_error", "high_error"]
-  all_genome_builds:
-    parameter_type: "genome_build"
-    values: ["hg38"]
-  all_individuals:
-    parameter_type: "individual"
-    values: ["hg002", "hg003"]
-  dataset_sizes:
-    parameter_type: "dataset_size"
-    values: ["small", "medium", "big"]
-  read_types:
-    parameter_type: "read_type"
-    values: ["whole_genome_single_end", "whole_genome_paired_end"]
-  n_reads_rough:
-    parameter_type: n_reads
-    values: [1000, 10000, 100000, 1000000, 10000000]
-  variant_filters:
-    parameter_type: variant_filter
-    values: [all, nonvariants, variants]
-  variant_calling_types:
-    parameter_type: variant_calling_type
-    values: [snps, indels]
-  n_peaks_rough:
-    parameter_type: n_peaks
-    values: [50, 100]
-  spot_values:
-    parameter_type: spot
-    values: [0.1, 0.2, 0.5]
-
-
 # Default parameter groups. Will be used for plotting if not overridden
 default_parameter_sets:
-  genome_build: all_genome_builds
-  individual: all_individuals
-  dataset_size: dataset_sizes
-  read_type: read_types
-  error_profile: error_profiles
-  read_length: read_lengths_rough
-  n_reads: n_reads_rough
-  method: all_methods
-  n_threads: typical_n_threads
-  min_mapq: mapqs
-  variant_filter: variant_filters
-  variant_calling_type: variant_calling_types
-  n_peaks: n_peaks_rough
-  spot: spot_values
+  genome_build: ["hg38", "sacCer3"]
+  individual: ["hg002"]
+  dataset_size: ["small", "medium", "big"]
+  read_type: ["single_end", "paired_end"]
+  error_profile: ["low_error", "medium_error", "high_error"]
+  read_length: [75, 150, 250]
+  n_reads: [1000, 10000, 100000, 1000000, 10000000]
+  method: ["bwa"]  # ["bwa", "bowtie2", "minimap", "strobealign"]
+  n_threads: [1, 4, 8, 16]
+  min_mapq: [0, 10, 20, 30, 40]
+  variant_filter: ["all", "variants", "nonvariants"]
+  variant_calling_type: ["snps", "indels"]
+  n_peaks: [50, 100, 500]
+  spot: [0.2, 0.4, 0.6]
 
 
 genomes:

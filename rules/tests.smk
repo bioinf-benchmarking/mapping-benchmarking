@@ -1,8 +1,10 @@
+from mapping_benchmarking.config import MappingF1Score
 
 
 rule test_accuracy:
     input:
-        "data/hg38/hg002/small/whole_genome_single_end/medium_error/150/200/bwa/4/0/all/snps/f1_score.txt"
+        #"data/hg38/hg002/small/whole_genome_single_end/medium_error/150/200/bwa/4/0/all/f1_score.txt"
+        MappingF1Score.from_flat_params(genome_build="hg38",genome="hg002",read_type="single_end",read_length=150,n_reads=200,method="bwa").file_path()
     output:
         touch("test_accuracy.txt")
     run:
@@ -13,7 +15,7 @@ rule test_accuracy:
 
 rule test_accuracy_paired_end:
     input:
-        "data/hg38/hg002/small/whole_genome_paired_end/medium_error/150/200/bwa/4/0/all/snps/f1_score.txt"
+        MappingF1Score.from_flat_params(genome_build="hg38", genome="hg002", read_type="paired_end", read_length=150, n_reads=200, method="bwa").file_path()
     output:
         touch("test_accuracy_paired_end.txt")
     run:
@@ -25,7 +27,8 @@ rule test_accuracy_paired_end:
 
 rule test_peak_calling_accuracy:
     input:
-        "data/sacCer3/simulated/small/chip_seq/medium_error/75/0.3/40/50/bwa/4/accuracy.txt"
+        PeakCallingAccuracy.from_flat_params(genome_build="sacCer3", individual="simulated").file_path()
+        #"data/sacCer3/simulated/small/chip_seq/medium_error/75/0.3/40/50/bwa/4/accuracy.txt"
     output:
         touch("test_peak_calling_accuracy.txt")
     run:
@@ -35,9 +38,7 @@ rule test_peak_calling_accuracy:
 
 rule test:
     input:
-        #"test_accuracy.txt",
+        "test_accuracy.txt",
         "test_peak_calling_accuracy.txt",
-        "data/sacCer3/simulated/small/whole_genome_single_end/medium_error/150/10000/bwa/4.npz",
-        "data/sacCer3/simulated/small/whole_genome_single_end/medium_error/150/10000/bwa/4/0/all/snps/f1_score.txt",
     output:
         touch("test.txt")

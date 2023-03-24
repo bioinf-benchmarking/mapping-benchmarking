@@ -1,4 +1,4 @@
-from mapping_benchmarking.parameter_config import CalledPeaks, SimulatedChipSeqPeaks, PeakCallingAccuracyResult
+from mapping_benchmarking.config import CalledPeaks, SimulatedChipSeqPeaks, PeakCallingAccuracy
 
 rule macs2_callpeaks:
     input:
@@ -26,5 +26,5 @@ rule get_accuracy:
     output:
         #peaks=f"data/{reference_genome}/{chip_seq}/peak_calling_accuracy.txt",
         #peaks = CalledPeaks.path() + "/peak_calling_accuracy.txt"
-        result = PeakCallingAccuracyResult.path(accuracy_type="accuracy")
+        result = PeakCallingAccuracy.path()
     script: "../scripts/get_chip_seq_accuracy.py"
