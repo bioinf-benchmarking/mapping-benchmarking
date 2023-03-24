@@ -28,9 +28,11 @@ rule get_accuracy_result:
 
 rule get_runtime:
     input:
-        f"data/{parameters.until('n_threads')}/benchmark.csv"
+        WholeGenomeMappedReads.as_output(file_ending=".benchmark.csv")
+        #f"data/{parameters.until('n_threads')}/benchmark.csv"
     output:
-        f"data/{parameters}/runtime.txt"
+        Runtime.path()
+        #f"data/{parameters}/runtime.txt"
     shell:
         "cat {input} | tail -n 1 | cut -f 1 > {output}"
 
@@ -38,9 +40,11 @@ rule get_runtime:
 
 rule get_memory_usage:
     input:
-        f"data/{parameters.until('n_threads')}/benchmark.csv"
+        WholeGenomeMappedReads.as_output(file_ending=".benchmark.csv")
+        #f"data/{parameters.until('n_threads')}/benchmark.csv"
     output:
-        f"data/{parameters}/memory_usage.txt"
+        MemoryUsage.path()
+        #f"data/{parameters}/memory_usage.txt"
     shell:
         "cat {input} | tail -n 1 | cut -f 3 > {output}"
 

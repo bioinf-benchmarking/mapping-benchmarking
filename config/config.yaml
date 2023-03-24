@@ -96,7 +96,7 @@ default_parameter_sets:
   error_profile: ["low_error", "medium_error", "high_error"]
   read_length: [75, 150, 250]
   n_reads: [1000, 10000, 100000, 1000000, 10000000]
-  method: ["bwa"]  # ["bwa", "bowtie2", "minimap", "strobealign"]
+  method: ["bwa", "minimap", "strobealign", "bowtie2"]  # ["bwa", "bowtie2", "minimap", "strobealign"]
   n_threads: [1, 4, 8, 16]
   min_mapq: [0, 10, 20, 30, 40]
   variant_filter: ["all", "variants", "nonvariants"]

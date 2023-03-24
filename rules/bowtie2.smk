@@ -1,3 +1,5 @@
+from mapping_benchmarking.config import *
+
 
 rule bowtie2_index:
     input:
@@ -22,23 +24,25 @@ rule bowtie2_index:
 
 rule bowtie2_map:
     input:
-        reads = single_end_reads,
-        idx=multiext(
-            f"data/{reference_genome}/reference",
+        reads = get_input_reads,
+        idx = ReferenceGenome.path(file_ending=[
             ".fa",
             ".fa.1.bt2l",
             ".fa.2.bt2l",
             ".fa.3.bt2l",
             ".fa.4.bt2l",
             ".fa.rev.1.bt2l",
-            ".fa.rev.2.bt2l",
-        ),
+            ".fa.rev.2.bt2l"
+            ]
+        )
     output:
+        reads=GenericMappedReads.as_output(method="bowtie2")
         #f"data/{parameters.until('n_threads')(method='bowtie2', read_type='whole_genome_single_end')}/mapped.bam"
-        f"data/{reference_genome}/{{config}}/bowtie2/{{n_threads}}/mapped.bam"
+        #f"data/{reference_genome}/{{config}}/bowtie2/{{n_threads}}/mapped.bam"
     benchmark:
         #f"data/{parameters.until('n_threads')(method='bowtie2', read_type='whole_genome_single_end')}/benchmark.csv"
-        f"data/{reference_genome}/{{config}}/bowtie2/{{n_threads}}/benchmark.csv"
+        GenericMappedReads.as_output(method='bowtie2', file_ending=".benchmark.csv")
+        #f"data/{reference_genome}/{{config}}/bowtie2/{{n_threads}}/benchmark.csv"
     threads: lambda wildcards: int(wildcards.n_threads)
     conda: "../envs/bowtie2.yml"
     params:

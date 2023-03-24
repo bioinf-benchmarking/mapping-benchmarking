@@ -1,4 +1,20 @@
-from mapping_benchmarking.config import MappingF1Score
+from mapping_benchmarking.config import MappingF1Score, WholeGenomeMappedReads, Runtime
+
+
+rule test_that_mappers_work:
+    input:
+        WholeGenomeMappedReads.from_flat_params(method="bowtie2", n_reads=1000).file_path(),
+        WholeGenomeMappedReads.from_flat_params(method="minimap", n_reads=1000).file_path(),
+        WholeGenomeMappedReads.from_flat_params(method="strobealign", n_reads=1000).file_path(),
+    output:
+        touch("test_mappers.txt")
+
+
+rule test_runtime:
+    input:
+        Runtime.from_flat_params(method="bwa", n_reads=1000).file_path()
+    output:
+        touch("test_runtime.txt")
 
 
 rule test_accuracy:

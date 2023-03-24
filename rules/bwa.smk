@@ -1,9 +1,4 @@
-from mapping_benchmarking.config import WholeGenomeMappedReads, ReferenceGenome, GenericReads, GenericMappedReads
-
-
-def input_reads(wildcards):
-    file = "reads.fq.gz" if not "paired_end" in wildcards.read_config else ["reads1.fq.gz", "reads2.fq.gz"]
-    return GenericReads.path(file=file)
+from mapping_benchmarking.config import *
 
 
 rule bwa_index:
@@ -19,7 +14,7 @@ rule bwa_index:
 
 rule bwa_map:
     input:
-        reads = input_reads,
+        reads = get_input_reads,
         idx = ReferenceGenome.path(file_ending=[".fa", ".fa.amb",".fa.ann",".fa.bwt",".fa.pac",".fa.sa"])
     output:
         reads=GenericMappedReads.as_output(method='bwa')

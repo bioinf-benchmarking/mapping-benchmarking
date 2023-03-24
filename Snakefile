@@ -1,6 +1,7 @@
 configfile: "config/config.yaml"
 configfile: "config/plots.yaml"
 workflow.use_conda = True
+from mapping_benchmarking.config import *
 
 
 wildcard_constraints:
@@ -15,17 +16,21 @@ wildcard_constraints:
 
 
 
-def paired_end_reads(wildcards=None):
-    return [f"data/{reference_genome}/{{config}}/reads" + n + ".fq.gz" for n in
-            ("1", "2")]
+#def paired_end_reads(wildcards=None):
+#   return [f"data/{reference_genome}/{{config}}/reads" + n + ".fq.gz" for n in
+#            ("1", "2")]
 
 
-def single_end_reads(wildcards=None):
-    return f"data/{reference_genome}/{{config}}/reads.fq.gz"
+#def single_end_reads(wildcards=None):
+#    return f"data/{reference_genome}/{{config}}/reads.fq.gz"
 
+
+#def get_input_reads(wildcards):
+#    return paired_end_reads() if "paired_end" in ''.join(wildcards) else single_end_reads()
 
 def get_input_reads(wildcards):
-    return paired_end_reads() if "paired_end" in ''.join(wildcards) else single_end_reads()
+    file = "reads.fq.gz" if not "paired_end" in wildcards.read_config else ["reads1.fq.gz", "reads2.fq.gz"]
+    return GenericReads.path(file=file)
 
 
 class Parameters:
@@ -83,7 +88,7 @@ include: "rules/chip_seq_simulation.smk"
 include: "rules/chip_seq.smk"
 include: "rules/analysis.smk"
 include: "rules/reports.smk"
-include: "rules/variant_calling.smk"
+#include: "rules/variant_calling.smk"
 include: "rules/plotting.smk"
 include: "rules/tests.smk"
 include: "rules/bwa.smk"

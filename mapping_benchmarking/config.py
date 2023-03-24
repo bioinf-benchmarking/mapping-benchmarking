@@ -129,6 +129,16 @@ class MappingF1Score:
 
 
 @result
+class Runtime:
+    filtered_mapped_reads: FilteredWholeGenomeMappedReads
+
+
+@result
+class MemoryUsage:
+    filtered_mapped_reads: FilteredWholeGenomeMappedReads
+
+
+@result
 class PeakCallingAccuracy:
     called_peaks: CalledPeaks
 

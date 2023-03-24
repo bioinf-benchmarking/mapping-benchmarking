@@ -49,6 +49,7 @@ jobs:
           git config --local user.name "github action"
           git config pull.rebase false
           
+          git add -f plots/*.md
           git add -f reports/*.md
           git add -f reports/presets/*.png
           git add -f reports/presets/*.md
