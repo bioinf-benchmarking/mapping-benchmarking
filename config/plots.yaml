@@ -2,6 +2,7 @@
 
 # List of quick and small plots used for testing
 test_plots: [peak_calling_accuracy_vs_read_length_yeast, f1_score, accuracy_for_various_mapq_thresholds_yeast, memory]
+
 # List of plots that will be generated every night
 #nightly_plots: [accuracy_on_various_read_lengths, variant_calling_accuracy]
 nightly_plots: [
@@ -9,14 +10,10 @@ nightly_plots: [
   accuracy_for_various_mapq_thresholds_human_whole_genome,
   runtime_human_whole_genome,
   variant_calling_accuracy_vs_mapq_threshold,
-  #variant_calling_accuracy,
   accuracy_vs_read_length_and_error_profile_human_whole_genome,
   memory_human_whole_genome,
   peak_calling_accuracy_human
 ]
-
-# Dimensions that can be used when defining plot_types
-plotting_dimensions: ["x", "y", "labels", "color", "facet_col", "facet_row"]
 
 
 # Axis/titles/etc that will be replaced in plots
@@ -43,37 +40,37 @@ plots:
   generic:
     # used as a dummy for plots that are not defined
     plot_type: ""
+
   plot1:
     plot_type: accuracy_vs_read_length
     parameters:
       read_type: whole_genome_single_end
+
   f1_score:
     plot_type: f1_score
+
   accuracy_vs_read_length_and_error_profile:
     plot_type: accuracy_vs_read_length_and_error_profile
-    parameters:
-      method: including_strobealign
-  accuracy_for_various_mapq_thresholds:
-    description: "Accuracy for various mapq thresholds. Divided into reads depending on whether they contain genomic variants or not."
-    plot_type: accuracy
-    parameters:
-      method: all_methods
+
   accuracy_on_various_read_lengths:
     plot_type: accuracy_on_various_read_lengths
+
   accuracy_f1_score:
     plot_type: accuracy_f1_score
-    parameters:
-      method: including_strobealign
+
   memory:
     plot_type: memory_usage
+
   variant_calling_accuracy:
     parameters:
-      n_reads: "20000000"
+      n_reads: 20000000
     plot_type: variant_calling_accuracy
+
   variant_calling_accuracy_test:
     parameters:
-      n_reads: "100000"
+      n_reads: 100000
     plot_type: variant_calling_accuracy
+
   runtime:
     plot_type: runtime
   runtime_with_varying_number_of_threads:
@@ -232,7 +229,7 @@ plot_types:
   variant_calling_accuracy:
     type: "scatter"
     y: variant_calling_recall
-    x: variant_calling_precision
+    x: variant_calling_one_minus_precision
     color: method
     facet_col: variant_calling_type
   accuracy_f1_score:

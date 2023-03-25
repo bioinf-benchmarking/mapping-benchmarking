@@ -35,18 +35,3 @@ rule strobealign_map:
       "mkdir -p $(dirname {output}) && "
       "strobealign --rg SM:sample --rg-id sample -t {wildcards.n_threads} --use-index {input.ref} {input.reads} | "
       "samtools view -o {output} -"
-
-
-
-# have this as separate rule to not be includeded in benchmark time
-rule add_read_group_to_strobealign:
-    input:
-        f"data/{reference_genome}/{{config}}/strobealign/{{n_threads}}/without_readgroup.bam"
-        #f"data/{parameters.until('n_threads')(method='strobealign')}/without_readgroup.bam"
-    output:
-        f"data/{reference_genome}/{{config}}/strobealign/{{n_threads}}/mapped.bam"
-        #f"data/{parameters.until('n_threads')(method='strobealign')}/mapped.bam"
-    conda:
-        "../envs/samtools.yml"
-    shell:
-        "samtools addreplacerg -r 'ID:sample\\tSM:sample' -O bam -o {output} {input}"

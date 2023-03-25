@@ -124,7 +124,7 @@ class VariantCalls:
 @parameters
 class FilteredVariantCalls:
     variant_calls: VariantCalls
-    variant_calling_type: Literal["snps", "indels", "all"] = "all"
+    variant_calling_type: Literal["snps", "indels"] = "snps"
 
 
 @parameters
@@ -136,17 +136,17 @@ class VariantCallingAccuracy:
 
 @result
 class VariantCallingRecall:
-    variant_calls: VariantCalls
+    variant_calls: FilteredVariantCalls
 
 
 @result
 class VariantCallingF1Score:
-    variant_calls: VariantCalls
+    variant_calls: FilteredVariantCalls
 
 
 @result
 class VariantCallingOneMinusPrecision:
-    variant_calls: VariantCalls
+    variant_calls: FilteredVariantCalls
 
 
 @parameters

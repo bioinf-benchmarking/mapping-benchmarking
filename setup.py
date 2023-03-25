@@ -5,14 +5,23 @@
 from setuptools import setup, find_packages
 
 
-requirements = ['snakehelp', 'numpy', 'pandas', 'numpy_alignments']
+requirements = ['snakehelp',
+                'numpy',
+                'pandas',
+                'kaleido',
+                'numpy_alignments',
+                'snakehelp',
+                'graph_read_simulator>=0.0.18',
+                'numpy_alignments>=0.0.10',
+                'tabulate'
+                ]
 
 test_requirements = ['pytest>=3', "hypothesis"]
 
 setup(
     author="Ivar Grytten",
-    author_email='ivar.grytten@gmail.com',
-    python_requires='>=3.8',
+    author_email='ivargry@ifi.uio.no',
+    python_requires='>=3.10',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

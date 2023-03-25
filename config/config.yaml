@@ -69,23 +69,6 @@ result_types_chip_seq: [
   peak_calling_accuracy
 ]
 
-default_parameter_values:
-  genome_build: "hg38"
-  individual: "hg002"
-  dataset_size: "small"
-  read_type: "paired_end"
-  error_profile: "medium_error"
-  read_length: "150"
-  n_reads: "10000"
-  method: "bwa"
-  n_threads: "4"
-  min_mapq: "0"
-  variant_filter: "all"
-  variant_calling_type: "snps"
-  n_peaks: "100"
-  spot: "0.2"
-  peak_read_coverage: "20"
-
 
 # Default parameter groups. Will be used for plotting if not overridden
 default_parameter_sets:

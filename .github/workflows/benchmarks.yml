@@ -26,7 +26,8 @@ jobs:
           #gcc --version
           which python
           python -m pip install --upgrade pip setuptools wheel
-          pip install -r python_requirements.txt
+          #pip install -r python_requirements.txt
+          pip install .
           snakemake --cores 80 --use-conda --rerun-incomplete reports/main.md
 
 

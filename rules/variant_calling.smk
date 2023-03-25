@@ -133,12 +133,12 @@ rule get_variant_calling_result:
             index = 0
 
         names = {"VariantCallingRecall": "METRIC.Recall",
-                 "VariantCallingOneMinusPreicision": "METRIC.Precision",
+                 "VariantCallingOneMinusPrecision": "METRIC.Precision",
                  "VariantCallingF1Score": "METRIC.F1_Score"}
 
-        result = data.iloc[index][names[wildcards.type]]
+        result = data.iloc[index][names[wildcards.accuracy_type]]
         with open(output[0], "w") as f:
-            if wildcards.type == "VariantCallingOneMinusPrecision":
+            if wildcards.accuracy_type == "VariantCallingOneMinusPrecision":
                 result = 1 - result
 
             f.write(str(result) + "\n")

@@ -21,7 +21,7 @@ You will find the latest results [here](https://github.com/ivargr/mapping-benchm
 ### Run benchmarks locally
 1. Install Snakemake and Conda if you havn't already.
 2. Clone this repository
-3. Install Python requirements: `pip install -r python_requirements.txt` 
+3. Install the python package: `cd mapping-benchmarking && pip install . ` 
 4. Run:
 
 You can generate a test report to check that the pipeline is working. This takes about 10 minutes to finish:
@@ -31,7 +31,7 @@ snakemake --use-conda --cores 4 reports/test.md
 
 You can generate a specific plot (defined in config/plots.yml)  like this:
 ```bash
-snakemake --use-conda --cores 4 reports/presets/my_plot.png
+snakemake --use-conda --cores 4 plots/my_plot.png
 ```
 
 Se guide below for more on how to configure types of runs.
@@ -82,7 +82,7 @@ plots:
 We can now ask Snakemake to generate my_plot:
 
 ```bash
-snakemake reports/presets/my_plot.png
+snakemake plots/my_plot.png
 ```
 .. which should create something like this:
 
