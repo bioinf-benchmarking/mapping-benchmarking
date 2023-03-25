@@ -12,7 +12,6 @@ requirements = ['snakehelp',
                 'numpy_alignments',
                 'snakehelp',
                 'graph_read_simulator>=0.0.18',
-                'numpy_alignments>=0.0.10',
                 'tabulate'
                 ]
 
