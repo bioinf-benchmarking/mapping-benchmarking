@@ -1,7 +1,7 @@
 # This file contains all configuration for the plots (reports) that can be generated
 
 # List of quick and small plots used for testing
-test_plots: [peak_calling_accuracy_vs_read_length_yeast, f1_score, accuracy_for_various_mapq_thresholds_yeast, memory]
+test_plots: [peak_calling_accuracy_vs_read_length_yeast, f1_score, accuracy_for_various_mapq_thresholds_yeast, memory, runtime, variant_calling_accuracy_test]
 
 # List of plots that will be generated every night
 #nightly_plots: [accuracy_on_various_read_lengths, variant_calling_accuracy]
@@ -137,7 +137,7 @@ plots:
     description: "Accuracy vs. read length for paired/single end reads. Divided into reads containing and not containing genomic variants."
     plot_type: f1_score_vs_read_length
     parameters:
-      read_length: read_lengths_fine
+      read_length: [75, 100, 125, 150, 175, 200, 225, 250]
       n_threads: 4
       n_reads: 40000
 

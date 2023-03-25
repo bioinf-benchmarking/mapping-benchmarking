@@ -108,10 +108,11 @@ rule report:
         out += "Note: This pipeline is under development, and the results may be wrong or inaccurate.\n\n"
 
         # remove reports/
-        files = ['/'.join(file.split("/")[1:]) for file in input]
+        files = ['../' + file for file in input]
 
         for image, table in zip(files[0::2], files[1::2]):
-            name = image.split("/")[1].split(".")[0]
+            print(image, table)
+            name = image.split("/")[-1].split(".")[0]
             plot_config = config["plots"][name]
             description = ""
             if "description" in plot_config:

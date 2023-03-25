@@ -39,14 +39,27 @@ Se guide below for more on how to configure types of runs.
 
 ### Contribute 
 
-#### 1) Add a new read-mapper
+This is a list of concrete tasks that can be done to contribute to this project. Feel free to reach out if you are interested in doing any of these tasks.
+
+
+#### Help defining the benchmarks
+
+If you have experience with using read mappers, you may have an idea about what are important performance features of read mappers. We want to include benchmarks in this pipeline that show a broad range of relevant features of read mappers. If you see anything that is currently missing, feel free to reach out. For instance, we hope to implement benchmarking on long reads, which would require someone with experience from long read mapping to help us define what is important to benchmark.
+
+#### Helping writing the manuscript
+
+We are currently 
+
+#### 1) Add new read-mappers
 See *Add a new read-mapper* under *Developer guide*.
 
 #### 2) Add plots/cases
 All plots are specified in `config/plots.yaml`. For any plots that rely on already implemented parameters and result types (as defined in `config/config.yaml`), no code is necesary, and the plots can be defined and built only by configuring them in `config/plot.yml`. 
 Feel free to edit that file to add plots you believe are useful, and make a pull request. See Developer guide for how this configuration works. 
 
-#### 3) General help/contribution
+### 3) Add
+
+#### 4) General help/contribution
 This is a simple first attempt at a pipeline that tries to be flexible and allow benchmarking across what we think are the relevant parameters. However, we want this pipeline to be shaped by what the community believe is important. Feel free to open an issue to discuss things that can be changed or added, e.g. cases or benchmarks that are not currently supported.
 
 

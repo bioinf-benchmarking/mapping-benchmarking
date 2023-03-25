@@ -13,7 +13,6 @@ def get_variant_calling_chromosome(wildcards):
 rule make_dict_file:
     input: "{file}.fa"
     output: "{file}.dict"
-    conda: "../envs/picard.yml"
     wrapper:
         "v1.21.4/bio/picard/createsequencedictionary"
 
