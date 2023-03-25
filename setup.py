@@ -9,7 +9,7 @@ requirements = ['snakehelp',
                 'numpy',
                 'pandas',
                 'kaleido',
-                'numpy_alignments',
+                'numpy_alignments>=0.0.10',
                 'snakehelp',
                 'graph_read_simulator>=0.0.19',
                 'tabulate'
