@@ -110,8 +110,7 @@ plots:
     plot_type: runtime_with_varying_number_of_threads
     parameters:
       dataset_size: big
-      n_reads: "10000000"
-      method: including_strobealign
+      n_reads: 10000000
 
   memory_human_whole_genome:
     plot_type: memory_usage

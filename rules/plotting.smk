@@ -17,16 +17,18 @@ result_to_classes_mapping = {
 }
 
 
-def get_plot_type_parameters(plot_type, plot_type_object):
+def get_plot_type_parameters(plot_name, plot_type_object):
     """
     Returns a dict with parameters for the plot type.
     Uses default range values if a parameter is not specified in the config.
     """
+    plot_type = config["plots"][plot_name]["plot_type"]
     plot_type_config = config["plot_types"][plot_type]
+    plot_config = config["plots"][plot_name]
 
     # parse those specified in yaml config
-    if "parameters" in plot_type_config:
-        parameters = plot_type_config["parameters"]
+    if "parameters" in plot_config:
+        parameters = plot_config["parameters"]
     else:
         parameters = {}
 
@@ -59,7 +61,7 @@ def get_plot(plot_name):
 
     out_base_name = f"plots/{plot_name}"
 
-    parameters = get_plot_type_parameters(plot_config["plot_type"],plot_type)
+    parameters = get_plot_type_parameters(plot_name, plot_type)
     plot = plot_type.plot(out_base_name,**parameters)
     return plot
 
