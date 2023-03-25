@@ -11,10 +11,20 @@ class ReadMapper:
 
 
 @parameters
+class GenomeBuild:
+    genome_build: str = "hg38"
+
+
+@parameters
+class Individual:
+    genome_build: GenomeBuild
+    individual: str = "hg002"
+
+
+@parameters
 class ReferenceGenome:
     file_ending = ".fa"
-    genome_build: str = "hg38"
-    individual: str = "hg002"
+    individual: Individual
     dataset_size: Literal["small", "medium", "large"] = "small"
 
 
@@ -91,51 +101,84 @@ class GenericMappedReads:
     file_ending = ".bam"
 
 
+
 @parameters
-class FilteredWholeGenomeMappedReads:
+class MapQFilteredWholeGenomeMappedReads:
     mapped_reads: WholeGenomeMappedReads
     min_mapq: int = 0
+    file_ending = ".bam"
+
+
+@parameters
+class FilteredWholeGenomeMappedReads:
+    mapq_filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
     variant_filter: Literal["all", "variants", "nonvariants"] = "all"
 
 
 @parameters
+class VariantCalls:
+    mapped_reads: MapQFilteredWholeGenomeMappedReads
+    file_ending = ".vcf.gz"
+
+
+@parameters
+class FilteredVariantCalls:
+    variant_calls: VariantCalls
+    variant_calling_type: Literal["snps", "indels", "all"] = "all"
+
+
+@parameters
 class VariantCallingAccuracy:
-    mapped_reads: FilteredWholeGenomeMappedReads
-    variant_type: Literal["snps", "indels", "all"]
-    accuracy_type: Literal["recall", "one_minus_precision", "f1_score"]
+    filtered_variant_calls: FilteredVariantCalls
+    accuracy_type: Literal["VariantCallingRecall", "VariantCallingOneMinusPrecision", "VariantCallingF1Score"]
     file_ending = ".txt"
+
+
+@result
+class VariantCallingRecall:
+    variant_calls: VariantCalls
+
+
+@result
+class VariantCallingF1Score:
+    variant_calls: VariantCalls
+
+
+@result
+class VariantCallingOneMinusPrecision:
+    variant_calls: VariantCalls
 
 
 @parameters
 class MappingAccuracy:
-    filtered_mapped_reads: FilteredWholeGenomeMappedReads
+    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
     accuracy_type: Literal["MappingRecall", "MappingOneMinusPrecision", "MappingF1Score"]
     file_ending = ".txt"
 
 
 @result
 class MappingRecall:
-    filtered_mapped_reads: FilteredWholeGenomeMappedReads
+    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
 
 
 @result
 class MappingOneMinusPrecision:
-    filtered_mapped_reads: FilteredWholeGenomeMappedReads
+    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
 
 
 @result
 class MappingF1Score:
-    filtered_mapped_reads: FilteredWholeGenomeMappedReads
+    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
 
 
 @result
 class Runtime:
-    filtered_mapped_reads: FilteredWholeGenomeMappedReads
+    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
 
 
 @result
 class MemoryUsage:
-    filtered_mapped_reads: FilteredWholeGenomeMappedReads
+    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
 
 
 @result

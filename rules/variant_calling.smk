@@ -1,3 +1,7 @@
+from mapping_benchmarking.config import WholeGenomeMappedReads, FilteredWholeGenomeMappedReads, VariantCalls, \
+    ReferenceGenome, MapQFilteredWholeGenomeMappedReads, Individual, VariantCallingAccuracy
+
+
 # Variant calling is done on a single chromosome to save time
 # but is done on reads mapped to/from the whole genome to not introduce any bias
 
@@ -15,9 +19,9 @@ rule make_dict_file:
 
 rule sambamba_sort:
     input:
-        "{dir}/mapped.bam"
+        "{some_file}.bam"
     output:
-        "{dir}/mapped.sorted.bam"
+        "{some_file}.sorted.bam"
     params:
         ""  # optional parameters
     threads: 2
@@ -27,9 +31,11 @@ rule sambamba_sort:
 
 rule filter_bam_on_mapq:
     input:
-        f"data/{parameters.until('n_threads')}/mapped.bam"
+        WholeGenomeMappedReads.path()
+        #f"data/{parameters.until('n_threads')}/mapped.bam"
     output:
-        f"data/{parameters.until('min_mapq')}/mapped.bam"
+        MapQFilteredWholeGenomeMappedReads.path()
+        #f"data/{parameters.until('min_mapq')}/mapped.bam"
     conda:
         "../envs/samtools.yml"
     shell:
@@ -51,13 +57,18 @@ rule index_bam:
 
 rule call_variants:
     input:
-        sorted_bam = f"data/{parameters.until('min_mapq')}/mapped.sorted.bam",
-        bamindex = f"data/{parameters.until('min_mapq')}/mapped.sorted.bam.bai",
-        reference = f"data/{parameters.until('dataset_size')}/reference.fa",
-        reference_index = f"data/{parameters.until('dataset_size')}/reference.fa.fai",
-        reference_dict = f"data/{parameters.until('dataset_size')}/reference.dict",
+        #sorted_bam = f"data/{parameters.until('min_mapq')}/mapped.sorted.bam",
+        sorted_bam = MapQFilteredWholeGenomeMappedReads.path(file_ending = ".sorted.bam"),
+        bamindex = MapQFilteredWholeGenomeMappedReads.path(file_ending = ".sorted.bam.bai"),
+        #bamindex = f"data/{parameters.until('min_mapq')}/mapped.sorted.bam.bai",
+        #reference = f"data/{parameters.until('dataset_size')}/reference.fa",
+        reference = ReferenceGenome.path(),
+        #reference_index = f"data/{parameters.until('dataset_size')}/reference.fa.fai",
+        reference_index = ReferenceGenome.path(file_ending=".fa.fai"),
+        #reference_dict = f"data/{parameters.until('dataset_size')}/reference.dict",
+        reference_dict= ReferenceGenome.path(file_ending=".dict"),
     output:
-        f"data/{parameters.until('min_mapq')}/variant_calls.vcf.gz"
+        VariantCalls.path()
     params:
         chromosome=get_variant_calling_chromosome
     threads:
@@ -75,10 +86,12 @@ rule call_variants:
 
 rule make_truth_vcf_for_chromosome:
     input:
-        variants="data/{genome_build}/{individual}/variants.vcf.gz",
-        index="data/{genome_build}/{individual}/variants.vcf.gz.tbi",
+        variants=Individual.path() + "/variants.vcf.gz",  # "data/{genome_build}/{individual}/variants.vcf.gz",
+        index=Individual.path() + "/variants.vcf.gz.tbi"  # "data/{genome_build}/{individual}/variants.vcf.gz",
+        #index="data/{genome_build}/{individual}/variants.vcf.gz.tbi",
     output:
-        "data/{genome_build,\w+}/{individual}/{dataset_size}/variant_calling_truth.vcf.gz"
+        ReferenceGenome.path(file_ending="") + "/variant_calling_truth.vcf.gz"
+        #"data/{genome_build,\w+}/{individual}/{dataset_size}/variant_calling_truth.vcf.gz"
     params:
         chromosome=get_variant_calling_chromosome
     conda:
@@ -92,13 +105,13 @@ rule make_truth_vcf_for_chromosome:
 
 rule run_happy:
     input:
-        variant_calls=f"data/{parameters.until('min_mapq')}/variant_calls.vcf.gz",
-        truth_vcf=f"data/{parameters.until('dataset_size')}/variant_calling_truth.vcf.gz",
-        truth_regions=f"data/{parameters.until('individual')}/truth_regions.bed",
-        ref=f"data/{parameters.until('genome_build')}/reference.fa"
+        variant_calls=VariantCalls.path(),
+        truth_vcf=ReferenceGenome.path(file_ending="") + "/variant_calling_truth.vcf.gz",
+        truth_regions= Individual.path() + "/truth_regions.bed",
+        ref=ReferenceGenome.path()
     output:
-        f"data/{parameters.until('min_mapq')}/happy.extended.csv",
-        f"data/{parameters.until('min_mapq')}/happy.summary.csv",
+        VariantCalls.path(file_ending="") + "/happy.extended.csv",
+        VariantCalls.path(file_ending="") + "/happy.summary.csv",
     params:
         output_base_name=lambda wildcards, input, output: output[0].split(".")[0]
     conda:
@@ -117,9 +130,11 @@ rule run_happy:
 
 rule get_variant_calling_result:
     input:
-        f"data/{parameters.until('min_mapq')}/happy.summary.csv"
+        VariantCalls.path(file_ending="") + "/happy.summary.csv",
+        #f"data/{parameters.until('min_mapq')}/happy.summary.csv"
     output:
-        f"data/{parameters}/variant_calling_{{type, recall|one_minus_precision|f1score}}.txt"
+        VariantCallingAccuracy.path()
+        #f"data/{parameters}/variant_calling_{{type, recall|one_minus_precision|f1score}}.txt"
     run:
         import pandas as pd
         data = pd.read_csv(input[0])
@@ -128,14 +143,13 @@ rule get_variant_calling_result:
         if wildcards.variant_calling_type == "indels":
             index = 0
 
-        names = {"recall": "METRIC.Recall",
-                 "one_minus_precision": "METRIC.Precision",
-                 "f1score": "METRIC.F1_Score"}
+        names = {"VariantCallingRecall": "METRIC.Recall",
+                 "VariantCallingOneMinusPreicision": "METRIC.Precision",
+                 "VariantCallingF1Score": "METRIC.F1_Score"}
 
         result = data.iloc[index][names[wildcards.type]]
         with open(output[0], "w") as f:
-            if wildcards.type == "one_minus_precision":
+            if wildcards.type == "VariantCallingOneMinusPrecision":
                 result = 1 - result
 
             f.write(str(result) + "\n")
-

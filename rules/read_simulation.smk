@@ -1,4 +1,4 @@
-from mapping_benchmarking.config import ReferenceGenome, WholeGenomeReads
+from mapping_benchmarking.config import ReferenceGenome, WholeGenomeReads, Individual, GenomeBuild
 
 
 def get_truth_vcf_command(wildcards, input, output):
@@ -14,9 +14,9 @@ def get_truth_vcf_command(wildcards, input, output):
 
 rule get_truth_vcf:
     input:
-        reference="data/{genome_build}/reference.fa"
+        reference=GenomeBuild.path() + "/reference.fa"  #"data/{genome_build}/reference.fa"
     output:
-        vcf="data/{genome_build}/{individual}/variants.vcf.gz"
+        vcf=Individual.path() + "/variants.vcf.gz"  # "data/{genome_build}/{individual}/variants.vcf.gz"
     params:
         command=get_truth_vcf_command
         #url=lambda wildcards: config["genomes"][wildcards.genome_build][wildcards.individual]["vcf_url"]
@@ -28,7 +28,7 @@ rule get_truth_vcf:
 
 rule download_truth_regions:
     output:
-        "data/{genome_build}/{individual}/truth_regions.bed"
+        Individual.path() + "/truth_regions.bed"
     params:
         url=lambda wildcards: config["genomes"][wildcards.genome_build][wildcards.individual]["truth_regions"]
     conda:

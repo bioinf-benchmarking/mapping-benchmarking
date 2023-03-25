@@ -1,4 +1,4 @@
-from mapping_benchmarking.config import MappingF1Score, WholeGenomeMappedReads, Runtime
+from mapping_benchmarking.config import *
 
 
 rule test_that_mappers_work:
@@ -15,6 +15,28 @@ rule test_runtime:
         Runtime.from_flat_params(method="bwa", n_reads=1000).file_path()
     output:
         touch("test_runtime.txt")
+
+
+rule test_filtering_on_mapq:
+    input:
+        FilteredWholeGenomeMappedReads.from_flat_params(method="bwa", n_reads=1000, mapq=10).file_path()
+    output:
+        touch("test_filtering_on_mapq.txt")
+
+
+rule test_variant_calling:
+    input:
+        VariantCalls.from_flat_params(method="bwa", mapq=10).file_path()
+    output:
+        touch("test_variant_calling.txt")
+
+
+rule test_variant_calling_accuracy:
+    input:
+        VariantCallingRecall.from_flat_params().file_path()
+    output:
+        touch("test_variant_calling_accuracy.txt")
+
 
 
 rule test_accuracy:

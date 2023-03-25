@@ -26,10 +26,9 @@ result_to_classes_mapping = {
     "recall": MappingRecall,
     "one_minus_precision": MappingOneMinusPrecision,
     "f1_score": MappingF1Score,
-    "variant_calling_precision": None,
-    "variant_calling_one_minus_precision": None,
-    "variant_calling_recall": None,
-    "variant_calling_f1score": None,
+    "variant_calling_recall": VariantCallingRecall,
+    "variant_calling_one_minus_precision": VariantCallingOneMinusPrecision,
+    "variant_calling_f1_score": VariantCallingF1Score,
     "peak_calling_accuracy": PeakCallingAccuracy
 }
 
