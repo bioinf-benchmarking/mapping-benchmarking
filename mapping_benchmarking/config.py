@@ -25,7 +25,7 @@ class Individual:
 class ReferenceGenome:
     file_ending = ".fa"
     individual: Individual
-    dataset_size: Literal["small", "medium", "large"] = "small"
+    dataset_size: Literal["small", "medium", "big"] = "small"
 
 
 @parameters
