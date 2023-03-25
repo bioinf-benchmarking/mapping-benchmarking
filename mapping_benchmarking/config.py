@@ -151,24 +151,24 @@ class VariantCallingOneMinusPrecision:
 
 @parameters
 class MappingAccuracy:
-    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
+    filtered_mapped_reads: FilteredWholeGenomeMappedReads
     accuracy_type: Literal["MappingRecall", "MappingOneMinusPrecision", "MappingF1Score"]
     file_ending = ".txt"
 
 
 @result
 class MappingRecall:
-    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
+    filtered_mapped_reads: FilteredWholeGenomeMappedReads
 
 
 @result
 class MappingOneMinusPrecision:
-    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
+    filtered_mapped_reads: FilteredWholeGenomeMappedReads
 
 
 @result
 class MappingF1Score:
-    filtered_mapped_reads: MapQFilteredWholeGenomeMappedReads
+    filtered_mapped_reads: FilteredWholeGenomeMappedReads
 
 
 @result

@@ -32,10 +32,8 @@ rule sambamba_sort:
 rule filter_bam_on_mapq:
     input:
         WholeGenomeMappedReads.path()
-        #f"data/{parameters.until('n_threads')}/mapped.bam"
     output:
         MapQFilteredWholeGenomeMappedReads.path()
-        #f"data/{parameters.until('min_mapq')}/mapped.bam"
     conda:
         "../envs/samtools.yml"
     shell:
@@ -57,15 +55,10 @@ rule index_bam:
 
 rule call_variants:
     input:
-        #sorted_bam = f"data/{parameters.until('min_mapq')}/mapped.sorted.bam",
         sorted_bam = MapQFilteredWholeGenomeMappedReads.path(file_ending = ".sorted.bam"),
         bamindex = MapQFilteredWholeGenomeMappedReads.path(file_ending = ".sorted.bam.bai"),
-        #bamindex = f"data/{parameters.until('min_mapq')}/mapped.sorted.bam.bai",
-        #reference = f"data/{parameters.until('dataset_size')}/reference.fa",
         reference = ReferenceGenome.path(),
-        #reference_index = f"data/{parameters.until('dataset_size')}/reference.fa.fai",
         reference_index = ReferenceGenome.path(file_ending=".fa.fai"),
-        #reference_dict = f"data/{parameters.until('dataset_size')}/reference.dict",
         reference_dict= ReferenceGenome.path(file_ending=".dict"),
     output:
         VariantCalls.path()
@@ -86,12 +79,10 @@ rule call_variants:
 
 rule make_truth_vcf_for_chromosome:
     input:
-        variants=Individual.path() + "/variants.vcf.gz",  # "data/{genome_build}/{individual}/variants.vcf.gz",
-        index=Individual.path() + "/variants.vcf.gz.tbi"  # "data/{genome_build}/{individual}/variants.vcf.gz",
-        #index="data/{genome_build}/{individual}/variants.vcf.gz.tbi",
+        variants=Individual.path() + "/variants.vcf.gz",
+        index=Individual.path() + "/variants.vcf.gz.tbi"
     output:
         ReferenceGenome.path(file_ending="") + "/variant_calling_truth.vcf.gz"
-        #"data/{genome_build,\w+}/{individual}/{dataset_size}/variant_calling_truth.vcf.gz"
     params:
         chromosome=get_variant_calling_chromosome
     conda:
@@ -131,10 +122,8 @@ rule run_happy:
 rule get_variant_calling_result:
     input:
         VariantCalls.path(file_ending="") + "/happy.summary.csv",
-        #f"data/{parameters.until('min_mapq')}/happy.summary.csv"
     output:
         VariantCallingAccuracy.path()
-        #f"data/{parameters}/variant_calling_{{type, recall|one_minus_precision|f1score}}.txt"
     run:
         import pandas as pd
         data = pd.read_csv(input[0])

@@ -46,7 +46,7 @@ rule bowtie2_map:
     threads: lambda wildcards: int(wildcards.n_threads)
     conda: "../envs/bowtie2.yml"
     params:
-        input_reads_string=lambda wildcards, input, output: f"-U {input.reads}" if isinstance(input.reads, str) else f"-1 {input.reads[0]} -2 {input.reads[2]}"
+        input_reads_string=lambda wildcards, input, output: f"-U {input.reads}" if isinstance(input.reads, str) else f"-1 {input.reads[0]} -2 {input.reads[1]}"
     shell:
         """
         bowtie2 --rg-id sample --rg "SM:sample" -x {input.idx[0]} -p {wildcards.n_threads} {params.input_reads_string} | samtools view -b -h - > {output} 

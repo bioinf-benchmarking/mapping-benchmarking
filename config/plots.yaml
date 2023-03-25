@@ -187,8 +187,8 @@ plot_types:
   accuracy:
     type: line
     markers: True
-    x: one_minus_precision
-    y: recall
+    x: mapping_one_minus_precision
+    y: mapping_recall
     labels: min_mapq
     color: method
     facet_col: variant_filter
