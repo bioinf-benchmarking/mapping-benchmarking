@@ -69,6 +69,10 @@ As part of this snakemake pipeline, we have developed a small Python package **S
 
 The idea is to use the [Snakehelp](https://github.com/ivargr/snakehelp) package and define paths using dataclasses in Python. All objects are defined in the file `src/mapping_benchmarking/paths.py`. The idea is that you define a dataclass for each type of object and then use `ClassName.path()` in the Snakemake rules instead of manually writing paths. The `path()`-method generated a wildcard-path. See the Snakehelp documentation for more details.
 
+This graph shows the current pipeline:
+
+![Pipeline](dag.png)
+
 ### Creating a plot
 
 This pipeline follows the Snakemake principles, meaning that the user defines what the final result should be, and then the pipeline tries to run the necessary jobs for creating that output. For instance, you can ask for a plot where the x-axis is something, the y-axis is something and the pipeline will try to run what is needed to generate that plot. "Something" needs to be a valid *parameter* or *result_type*. For instance, the x-axis could be `method` (i.e. read mapper) and the y-axis can be `memory_usage` and the pipeline will then run all methods and capture the memory usage and present that.
