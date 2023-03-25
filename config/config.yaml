@@ -8,9 +8,9 @@ methods: ["bwa", "bowtie2", "minimap2"]
 result_types: [
   "runtime",
   "memory_usage",
-  "recall",
-  "one_minus_precision",
-  "f1_score",
+  "mapping_recall",
+  "mapping_one_minus_precision",
+  "mapping_f1_score",
   "variant_calling_precision",
   "variant_calling_one_minus_precision",
   "variant_calling_recall",

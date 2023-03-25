@@ -80,13 +80,13 @@ plot_types:
   accuracy_vs_read_length:
     type: line
     x: read_length
-    y: f1_score
+    y: mapping_f1_score
     color: method
     facet_col: variant_filter
     facet_row: error_profile
 ```
 
-The above defines a plot type with the name `accuracy_vs_read_length`. We tell the pipeline to make a plot type where the x-axis is `read_length` and the y-axis is `f1_score`. The "color" is `method`, which means that we want one line for each available method (color is the term that **Plotly** uses). We want to repeat this plot for different "variant_filters" along the columns (specified by `facet_col`) and for different error profiles along the rows (specified by `facet_row`). Note that only `x` and `y` are mandatory, the rest can be ommited (in that case only a single plot is created).
+The above defines a plot type with the name `accuracy_vs_read_length`. We tell the pipeline to make a plot type where the x-axis is `read_length` and the y-axis is `mapping_f1_score`. The "color" is `method`, which means that we want one line for each available method (color is the term that **Plotly** uses). We want to repeat this plot for different "variant_filters" along the columns (specified by `facet_col`) and for different error profiles along the rows (specified by `facet_row`). Note that only `x` and `y` are mandatory, the rest can be ommited (in that case only a single plot is created).
 
 The above **only** specifies a **plot_type**, not a plot. For instance, we say that the x-axis should have `method`, but we don't tell it *which* methods to include. Using this plot type, we can specify actual plots with data, under the `plots`-section in the same YAML-file:
 
@@ -105,7 +105,7 @@ snakemake plots/my_plot.png
 
 ![Plot example](reports/presets/example.png)
 
-Note that running the above will generate a plot with **default values** for all variables (method, read length etc). This is because no parameters were specified. The default values are specified in `config/config.yaml`. For instance, the default `parameter_set` for read length is `[75, 150, 300]`, specified with the `read_lengths_rough` name. The default individual is `hg002`. If you want to change any of the defaults, you can easily do that. 
+Note that running the above will generate a plot with **default values** for all variables (method, read length etc). This is because no parameters were specified. The default values are specified in python config file at `mapping-benchmarking/config.py`. The default parameter set value are defined in `config/config.yaml`. For instance, the default `parameter_set` for read length is `[75, 150, 300]`. The default individual is `hg002`. If you want to change any of the defaults, you can easily do that. 
 Example: 
 
 ```yaml
@@ -125,11 +125,11 @@ Se `result_types` and `parameter_types` in `config/config.yaml` for a list of va
 
 Read-mappers that are not currently listed in config.yaml can be added. Follow these steps below. We assume you already have some experience with writing Snakemake rules, if not check out the Snakemake documentation first.
 
-1. Add the mapper to the `method` and `all_methods` lists in `config/config.yaml`
+1. Add the mapper where necessary as an allowed value in `mapping-benchmarking/config.py`
 2. Create a `.smk` file in rules for the mapper (e.g. `bwa.smk`)
-3. Implement rules for running single-end and paired-end read mapping. This can e.g. be done using two rules: `NAME_map_single_end` and `NAME_map_paired_end` (replace NAME with the mapper ID, e.g. `bwa`). As input to the single-end rule, you can use the function `single_end_reads` and for the paired-enr-rule, you can use the function `paired_end_reads`. Se the rules in `rules/bowtie2.yml` for a good example of how to do this. 
+3. Implement rules for running single-end and paired-end read mapping. Se the rule in `rules/bwa.yml` for a good example of how to do this. 
 4. The rules can also take an index as input if that is needed, you will then need to implement a rule for creating the index (see the `bwa_index` rule for reference).
-5. As output, the rules should produce this bam-file: `{data}/whole_genome_single_end/[...]/NAME/{n_threads}/mapped.bam`. This path contains a lot of parameters, so we have implemented some Python code to generate the path (see the bowtie-rule for reference, and change bowtie to your mapper).
+5. As output, the rules should produce a bam-file. 
 6. The rule should use the `n_threads` wildcard as a parameter to specify number of threads. 
 7. Either use a Snakemake wrapper or specify a conda-environment for the rule. Nothing should be needed to be installed manually. Note that some Snakemake wrappers do not use the `n_threads` parameter correctly (e.g. the BWA MEM and bowtie wrappers). If that is the case, you need to implement the run-command yourself and use a conda environment.
 
@@ -139,3 +139,5 @@ Reads are currently simulated using ART in the rule `simulate_reads_for_chromoso
 The idea behind read simulation is currently that two haploid references are created and that reads are simulated independently on those. The truth positions are then "translated" to the real reference genome coordinates. This is a bit complicated, and not how read simulation is normally done, but this lets us simulate from a diploid genome and do benchmarking of variant calling and genotyping since we can have heterozygous variants. All the conversion of coordinates is taken care of as long as the read simulation rule outputs the correct files.
 
 The pipeline does currently not support long read sequences, but this could be included by and named `whole_genome_long_reads` for the parameter called `read_type` with a rule similar to `simulate_reads_for_chromosome_and_haplotype`. 
+
+

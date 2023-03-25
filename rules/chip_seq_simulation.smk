@@ -67,8 +67,9 @@ rule simulate_peak_reads:
         n_reads=chip_seq_n_reads
     #conda:
     #    "../envs/chips.yml"
+    # Conda is failing. Using prebuilt chips temporarily
     shell:
-        "chips simreads --spot {wildcards.spot} --numcopies 1000 --frac "
+        "./chips simreads --spot {wildcards.spot} --numcopies 1000 --frac "
         "{params.frac} --seed 1 -t bed -c 5 -p {input.peaks} -f {input.reference} "
         "-o {params.out_base_name} --numreads {params.n_reads} --readlen {wildcards.read_length} "
         "&& gzip -c {params.out_base_name}.fastq > {output}"

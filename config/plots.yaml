@@ -152,6 +152,11 @@ plots:
     parameters:
       read_type: chip_seq
 
+  peak_calling_accuracy_human:
+    plot_type: peak_calling_accuracy
+    parameters:
+      n_peaks: 500
+
   peak_calling_accuracy_vs_read_length_human:
     plot_type: peak_calling_accuracy_vs_read_length
     parameters:
@@ -195,26 +200,26 @@ plot_types:
   accuracy_on_various_read_lengths:
     type: line
     markers: True
-    x: "one_minus_precision"
-    y: "recall"
-    labels: "min_mapq"
-    color: "method"
-    facet_col: "read_length"
+    x: mapping_one_minus_precision
+    y: mapping_recall
+    labels: min_mapq
+    color: method
+    facet_col: read_length
   accuracy_vs_read_length_single_method:
-    type: "line"
-    x: "read_length"
-    y: "f1_score"
+    type: line
+    x: read_length
+    y: mapping_f1_score
   accuracy_vs_read_length_and_error_profile:
-    type: "line"
-    x: "read_length"
-    y: "f1_score"
-    color: "method"
-    facet_col: "variant_filter"
-    facet_row: "error_profile"
+    type: line
+    x: read_length
+    y: mapping_f1_score
+    color: method
+    facet_col: variant_filter
+    facet_row: error_profile
   runtime:
-    type: "bar"
-    y: "runtime"
-    x: "method"
+    type: bar
+    y: runtime
+    x: method
   runtime_with_varying_number_of_threads:
     type: line
     y: runtime
@@ -227,14 +232,14 @@ plot_types:
     y: memory_usage
     x: method
   variant_calling_accuracy:
-    type: "scatter"
+    type: scatter
     y: variant_calling_recall
     x: variant_calling_one_minus_precision
     color: method
     facet_col: variant_calling_type
   accuracy_f1_score:
     type: bar
-    y: f1_score
+    y: mapping_f1_score
     x: method
     facet_col: read_type
   variant_calling_accuracy_vs_mapq_threshold:
@@ -246,7 +251,7 @@ plot_types:
     color: method
   f1_score_vs_read_length:
     type: line
-    y: f1_score
+    y: mapping_f1_score
     x: read_length
     color: method
     facet_col: variant_filter
