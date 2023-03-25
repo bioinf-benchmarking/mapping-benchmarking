@@ -5,7 +5,7 @@ test_plots: [
   peak_calling_accuracy_test,
   f1_score,
   accuracy_for_various_mapq_thresholds_yeast,
-  memory_test,
+  #memory_test,
   runtime_test,
   #variant_calling_accuracy_test
 ]
