@@ -44,26 +44,30 @@ This is a list of concrete tasks that can be done to contribute to this project.
 
 #### Help defining the benchmarks
 
-If you have experience with using read mappers, you may have an idea about what are important performance features of read mappers. We want to include benchmarks in this pipeline that show a broad range of relevant features of read mappers. If you see anything that is currently missing, feel free to reach out. For instance, we hope to implement benchmarking on long reads, which would require someone with experience from long read mapping to help us define what is important to benchmark.
+If you have experience with using read mappers, you may have an idea about what are important performance features of read mappers. We want to include benchmarks in this pipeline that show a broad range of relevant features and how read mappers behave under different circumstance. If you see anything that is currently missing, feel free to reach out. For instance, we hope to implement benchmarking on long reads, which would require someone with experience from long read mapping to help us define what is important to benchmark.
 
 #### Helping writing the manuscript
+We are currently writing a short manuscript describing the project. This will likely be posted in BioRxiv later this spring. If you are interested in helping with the writing, feel free to reach out. It is possible to help writing (describing the project, creating figures, etc) without having to contribute to the code.
 
-We are currently 
 
-#### 1) Add new read-mappers
+#### Add new read-mappers to the pipeline
 See *Add a new read-mapper* under *Developer guide*.
 
-#### 2) Add plots/cases
+#### Add plots/cases to the config
 All plots are specified in `config/plots.yaml`. For any plots that rely on already implemented parameters and result types (as defined in `config/config.yaml`), no code is necesary, and the plots can be defined and built only by configuring them in `config/plot.yml`. 
+
 Feel free to edit that file to add plots you believe are useful, and make a pull request. See Developer guide for how this configuration works. 
 
-### 3) Add
+#### Creating a website with the results
 
-#### 4) General help/contribution
-This is a simple first attempt at a pipeline that tries to be flexible and allow benchmarking across what we think are the relevant parameters. However, we want this pipeline to be shaped by what the community believe is important. Feel free to open an issue to discuss things that can be changed or added, e.g. cases or benchmarks that are not currently supported.
+Currently, all results are just displayed in markdown files. We would like to have a sphinx or mkdocs-generate site hosted at github with the plots, structured in some nice and meaningful way. This should be generated automatically using Github actions. If you any experience with this, or want to give a try at defining how the benchmarkings results can be presented in a nice way, feel free to reach out.
 
 
 ## Developer guide
+
+As part of this snakemake pipeline, we have developed a small Python package **Snakehelp** for making it easier to write rules with many wildcards. We are not sure if our solution is the best, but without this package we ended up with very many rules with copied wildcard-paths which were hard to maintain.
+
+The idea is to use the [Snakehelp](https://github.com/ivargr/snakehelp) package and define paths using dataclasses in Python. All objects are defined in the file `src/mapping_benchmarking/paths.py`. The idea is that you define a dataclass for each type of object and then use `ClassName.path()` in the Snakemake rules instead of manually writing paths. The `path()`-method generated a wildcard-path. See the Snakehelp documentation for more details.
 
 ### Creating a plot
 
