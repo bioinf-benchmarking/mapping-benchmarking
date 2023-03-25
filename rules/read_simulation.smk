@@ -14,12 +14,11 @@ def get_truth_vcf_command(wildcards, input, output):
 
 rule get_truth_vcf:
     input:
-        reference=GenomeBuild.path() + "/reference.fa"  #"data/{genome_build}/reference.fa"
+        reference=GenomeBuild.path() + "/reference.fa"
     output:
-        vcf=Individual.path() + "/variants.vcf.gz"  # "data/{genome_build}/{individual}/variants.vcf.gz"
+        vcf=Individual.path() + "/variants.vcf.gz"
     params:
         command=get_truth_vcf_command
-        #url=lambda wildcards: config["genomes"][wildcards.genome_build][wildcards.individual]["vcf_url"]
     conda:
         "../envs/mason.yml"
     shell:
@@ -115,30 +114,6 @@ def get_art_error_parameters(wildcards):
             " -qs2 " + str(1 / profile["mismatch_scale"])
 
 
-"""
-rule simulate_reads_for_chromosome_and_haplotype:
-    input:
-        haplotype_reference="{individual}/haplotype{haplotype}.fa"
-    output:
-        multiext("{individual}/whole_genome_single_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}", ".fq", ".sam")
-    conda:
-        "../envs/mason.yml"
-    params:
-        error_parameters=get_mason_error_parameters,
-        n_reads=lambda wildcards: int(wildcards.n_reads) // 2,
-        mean_fragment_size=lambda wildcards: int(wildcards.read_length) * 3,
-        min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
-        max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
-    threads:
-        2
-    shell:
-        "mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output[0]} -oa {output[1]} --num-threads 2 {params.error_parameters} "
-        "--illumina-read-length {wildcards.read_length} "
-        "--fragment-mean-size {params.mean_fragment_size} "
-        "--fragment-min-size {params.min_fragment_size} "
-        "--fragment-max-size {params.max_fragment_size} "
-"""
-
 def get_genome_size(wildcards, input, output):
     with open(input.haplotype_reference_fai) as f:
         size = sum((int(l.strip().split()[1]) for l in f))
@@ -215,31 +190,6 @@ rule fix_sam_file_name:
 #    shell: "gzip -c {input} > {output}"
 
 
-"""
-rule simulate_reads_for_chromosome_and_haplotype_paired_end:
-    input:
-        haplotype_reference="{individual}/haplotype{haplotype}.fa"
-    output:
-        reads1=temp("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}-1.fq.gz"),
-        reads2=temp("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}-2.fq.gz"),
-        truth1=temp("{individual}/whole_genome_paired_end/{error_profile}/{read_length}/{n_reads}/{haplotype,\d+}.haplotype_truth.sam"),
-    conda:
-        "../envs/mason.yml"
-    params:
-        error_parameters=get_mason_error_parameters,
-        n_reads=lambda wildcards: int(wildcards.n_reads) // 4,  # divide by 4 for paird end since mason simulates n fragments
-        mean_fragment_size= lambda wildcards: int(wildcards.read_length) * 3,
-        min_fragment_size= lambda wildcards: int(wildcards.read_length) // 2,
-        max_fragment_size= lambda wildcards: int(wildcards.read_length) * 6,
-    threads:
-        2
-    shell:
-        "mason_simulator -ir {input.haplotype_reference} -n {params.n_reads} -o {output.reads1} -or {output.reads2} -oa {output.truth1} --num-threads 2 {params.error_parameters} "
-        "--illumina-read-length {wildcards.read_length} "
-        "--fragment-mean-size {params.mean_fragment_size} "
-        "--fragment-min-size {params.min_fragment_size} "
-        "--fragment-max-size {params.max_fragment_size} "
-"""
 
 rule merge_paired_end_reads:
     input:
@@ -272,12 +222,9 @@ rule add_variant_info_to_truth_sam:
     input:
         truth_positions=WholeGenomeReads.path(file_ending="") + "/{haplotype}.sam",
         coordinate_map=ReferenceGenome.path(file_ending="") + "/coordinate_map_haplotype{haplotype}.npz",
-        #coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
     output:
-        #sam="{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
         sam = WholeGenomeReads.path(file_ending="") + "/{haplotype}.haplotype_truth.with_variant_info.sam",
         txt = WholeGenomeReads.path(file_ending="") + "/{haplotype}.n_variants.txt",
-        #txt="{path}/whole_genome_{pair}_end/{config}/{haplotype}.n_variants.txt",
     script: "../scripts/add_variant_info_to_truth_sam.py"
 
 
@@ -285,11 +232,8 @@ rule add_variant_info_to_truth_sam:
 rule change_truth_alignments_to_reference_coordinates:
     input:
         truth_positions=WholeGenomeReads.path(file_ending="") + "/{haplotype}.haplotype_truth.with_variant_info.sam",
-        #truth_positions = "{path}/whole_genome_{pair}_end/{config}/{haplotype}.haplotype_truth.with_variant_info.sam",
-        #coordinate_map="{path}/coordinate_map_haplotype{haplotype}.npz",
         coordinate_map=ReferenceGenome.path(file_ending="") + "/coordinate_map_haplotype{haplotype}.npz",
     output:
-        #"{path}/whole_genome_{pair}_end/{config}/{haplotype,\d+}.reference_coordinates.sam"
         truth_positions=WholeGenomeReads.path(file_ending="") + "/{haplotype}.reference_coordinates.sam",
     script: "../scripts/change_truth_alignments_to_reference_coordinates.py"
 

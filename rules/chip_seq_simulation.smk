@@ -6,10 +6,8 @@ peak_size = 200
 
 rule simulate_peaks:
     input:
-        #genome=f"data/{reference_genome}/reference.fa.fai"
         genome = ReferenceGenome.path(file_ending=".fa.fai")
     output:
-        #peaks=f"data/{reference_genome}/{chip_seq.until('n_peaks')}/simulated_peaks.bed"
         peaks = SimulatedChipSeqPeaks.path()
     script: "../scripts/simulate_peaks.py"
 
@@ -17,12 +15,9 @@ rule simulate_peaks:
 rule change_peak_coordinates_to_haplotype_coordinates:
     input:
         peaks = SimulatedChipSeqPeaks.path(),
-        #peaks=f"data/{reference_genome}/{chip_seq.until('n_peaks')}/simulated_peaks.bed",
-        #coordinate_map=f"data/{reference_genome}/coordinate_map_haplotype{{haplotype}}.npz"
         coordinate_map = ReferenceGenome.path(file_ending="") + "/coordinate_map_haplotype{haplotype}.npz"
     output:
         peaks = SimulatedChipSeqPeaks.path(file_ending="") + "_haplotype{haplotype}.bed",
-        #peaks = f"data/{reference_genome}/{chip_seq.until('n_peaks')}/simulated_peaks_haplotype{{haplotype,0|1}}.bed"
     shell:
         """
         graph_read_simulator liftover -i {input.peaks} -c {input.coordinate_map} -o {output.peaks} --reverse True
@@ -61,16 +56,11 @@ def chip_seq_n_reads(wildcards):
 
 rule simulate_peak_reads:
     input:
-        #reference=f"data/{reference_genome}/haplotype{{haplotype}}.fa",
         reference = ReferenceGenome.path(file_ending="") + "/haplotype{haplotype}.fa",
         reference_fai = ReferenceGenome.path(file_ending="") + "/haplotype{haplotype}.fa.fai",
-        #reference_fai=f"data/{reference_genome}/haplotype{{haplotype}}.fa.fai",
-        #peaks = f"data/{reference_genome}/{chip_seq.until('n_peaks')(read_type='chip_seq')}/simulated_peaks_haplotype{{haplotype}}.bed"
         peaks = SimulatedChipSeqPeaks.path(file_ending="") + "_haplotype{haplotype}.bed",
-        #peaks = ChipSeq.path() + "/simulated_peaks_haplotype{haplotype}.bed"
     output:
         reads = ChipSeq.path() + "/{haplotype}.fq.gz"
-        #reads=f"data/{reference_genome}/{chip_seq.until('n_peaks')(read_type='chip_seq')}/{{haplotype,0|1}}.fq.gz"
     params:
         out_base_name = lambda wildcards, input, output: ".".join(output.reads.split(".")[:-1]),
         frac = peak_frac,

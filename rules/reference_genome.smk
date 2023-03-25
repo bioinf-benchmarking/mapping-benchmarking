@@ -44,26 +44,12 @@ rule samtools_index2:
         "v1.21.2/bio/samtools/faidx"
 
 
-"""
-rule get_single_chromosome_reference:
-    input:
-        ref="data/{build}/reference.fa",
-        index="data/{build}/reference.fa.fai",
-    output:
-        "data/{build}/raw/{build}_{chromosome}.fa"
-    params:
-        "{chromosome}"
-    wrapper:
-        "v1.21.2/bio/samtools/faidx"
-"""
-
 rule get_dataset_reference:
     input:
         ref = "data/{genome_build}/reference.fa",
         index = "data/{genome_build}/reference.fa.fai",
     output:
         ReferenceGenome.path()
-        #"data/{reference}/{individual}/{size}/reference.fa"
     conda:
         "../envs/samtools.yml"
     params:
@@ -81,3 +67,4 @@ rule tabix:
         "-p vcf",
     wrapper:
         "v1.21.6/bio/tabix/index"
+

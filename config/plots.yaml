@@ -156,7 +156,7 @@ plots:
     plot_type: peak_calling_accuracy_vs_read_length
     parameters:
       read_type: chip_seq
-      read_length: read_lengths_chip_seq
+      read_length: [36, 75, 120, 150]
       genome_build: hg38
       individual: hg002
       n_peaks: 500
@@ -165,7 +165,7 @@ plots:
     plot_type: peak_calling_accuracy_vs_read_length
     parameters:
       read_type: chip_seq
-      read_length: read_lengths_chip_seq
+      read_length: [36, 75, 120, 150]
       genome_build: sacCer3
       individual: simulated
       n_peaks: 50
@@ -252,12 +252,10 @@ plot_types:
     facet_col: variant_filter
     facet_row: read_type
   peak_calling_accuracy:
-    parameter_set: parameters_chip_seq
     type: bar
     x: method
     y: peak_calling_accuracy
   peak_calling_accuracy_vs_read_length:
-    parameter_set: parameters_chip_seq
     type: line
     color: method
     y: peak_calling_accuracy
