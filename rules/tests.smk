@@ -19,7 +19,7 @@ rule test_runtime:
 
 rule test_filtering_on_mapq:
     input:
-        FilteredWholeGenomeMappedReads.from_flat_params(method="bwa", n_reads=1000, mapq=10).file_path()
+        MapQFilteredWholeGenomeMappedReads.from_flat_params(method="bwa", n_reads=1000, mapq=10).file_path()
     output:
         touch("test_filtering_on_mapq.txt")
 
