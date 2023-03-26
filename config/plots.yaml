@@ -55,6 +55,8 @@ plots:
 
   f1_score:
     plot_type: f1_score
+    parameters:
+      n_reads: 1234
 
   accuracy_vs_read_length_and_error_profile:
     plot_type: accuracy_vs_read_length_and_error_profile

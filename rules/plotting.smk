@@ -62,14 +62,15 @@ def get_plot(plot_name):
     out_base_name = f"plots/{plot_name}"
 
     parameters = get_plot_type_parameters(plot_name, plot_type)
-    plot = plot_type.plot(out_base_name,**parameters)
-    return plot
+    plot = plot_type.plot(out_base_name, **parameters)
+    return plot, parameters
 
 
 def get_plot_input_files(wildcards):
     plot_name = wildcards.plot_name
-    plot = get_plot(plot_name)
+    plot, parameters = get_plot(plot_name)
     files = plot.file_names()
+    print("FILES", files)
     return files
 
 
@@ -80,8 +81,8 @@ rule make_plot:
         csv="plots/{plot_name}.csv",
         md="plots/{plot_name}.md",
     run:
-        plot = get_plot(wildcards.plot_name)
-        df = plot._parameter_combinations.get_results_dataframe()
+        plot, parameters = get_plot(wildcards.plot_name)
+        df = plot._parameter_combinations.get_results_dataframe(**parameters)
         plot.plot()
 
         df.to_csv(output.csv, index=False)
