@@ -77,6 +77,9 @@ rule test_peak_calling_accuracy:
 rule test:
     input:
         "test_accuracy.txt",
+        "test_mappers.txt",
+        "test_runtime.txt",
+        "test_filtering_on_mapq.txt",
         "test_peak_calling_accuracy.txt",
     output:
         touch("test.txt")
