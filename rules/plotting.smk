@@ -42,12 +42,10 @@ def get_plot_type_parameters(plot_name, plot_type_object):
 
 def get_plot(plot_name):
     plot_config = config["plots"][plot_name]
-    print("Plot config", str(plot_config))
     plot_type_config = config["plot_types"][plot_config["plot_type"]]
 
     parsed_config = {}
     for name, val in plot_type_config.items():
-        print(name, val)
         if name != "parameters" and name != "layout":
             if val in result_to_classes_mapping:
                 val = result_to_classes_mapping[val]
@@ -55,8 +53,6 @@ def get_plot(plot_name):
 
     # replace literal values with classes
 
-    print("Parsed config")
-    print(parsed_config)
     plot_type = PlotType.from_yaml_dict(parsed_config)
 
     out_base_name = f"plots/{plot_name}"
@@ -70,7 +66,6 @@ def get_plot_input_files(wildcards):
     plot_name = wildcards.plot_name
     plot, parameters = get_plot(plot_name)
     files = plot.file_names()
-    print("FILES", files)
     return files
 
 
@@ -117,10 +112,15 @@ rule report:
             print(image, table)
             name = image.split("/")[-1].split(".")[0]
             plot_config = config["plots"][name]
+            title = plot_config["title"] if "title" in plot_config else name
+            out += "## " + title + "\n\n"
+
             description = ""
             if "description" in plot_config:
                 description = plot_config["description"] + "\n\n"
-            out += "![](" + image + ") \n\n " + description + " [Link to plot data](" + table + ") \n\n"
+
+            out += description
+            out += "![](" + image + ") \n\n [Link to plot data](" + table + ") \n\n"
 
         with open(output[0],"w") as f:
             f.write(out)

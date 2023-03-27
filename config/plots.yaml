@@ -5,7 +5,8 @@ test_plots: [
   peak_calling_accuracy_test,
   f1_score,
   accuracy_for_various_mapq_thresholds_yeast,
-  #memory_test,
+  peak_calling_accuracy_vs_read_length_yeast,
+  memory_test,
   runtime_test,
   #variant_calling_accuracy_test
 ]
@@ -15,11 +16,11 @@ test_plots: [
 nightly_plots: [
   f1_score_vs_read_length,
   accuracy_for_various_mapq_thresholds_human_whole_genome,
-  runtime_human_whole_genome,
-  variant_calling_accuracy_vs_mapq_threshold,
   accuracy_vs_read_length_and_error_profile_human_whole_genome,
+  variant_calling_accuracy_vs_mapq_threshold,
+  peak_calling_accuracy_vs_read_length_human,
+  runtime_human_whole_genome,
   memory_human_whole_genome,
-  peak_calling_accuracy_human
 ]
 
 
@@ -54,6 +55,7 @@ plots:
       read_type: whole_genome_single_end
 
   f1_score:
+    title: "F1 score"
     plot_type: f1_score
     parameters:
       n_reads: 1234
@@ -103,18 +105,24 @@ plots:
       n_reads: "100000"
 
   accuracy_for_various_mapq_thresholds_human_whole_genome:
+    title: "Precision/recall for various MAPQ thresholds"
+    description: "Recall and 1-Precision is shown for different subsets of the reads, depending on the MAPQ-score 
+    (shown as dots in the plot). For every MAPQ-score, only reads with that score or higher are included."
     plot_type: accuracy
     parameters:
       dataset_size: big
       n_reads: "1000000"
 
   runtime_human_whole_genome:
+    title: "Runtime as a function of number of threads used"
+    description: "Shown for single-end and paired-end reads and different read lengths."
     plot_type: runtime_with_varying_number_of_threads
     parameters:
       dataset_size: big
       n_reads: 10000000
 
   memory_human_whole_genome:
+    title: "Memory usage"
     plot_type: memory_usage
     parameters:
       dataset_size: big
@@ -127,12 +135,17 @@ plots:
       n_reads: "5000000"
 
   accuracy_vs_read_length_and_error_profile_human_whole_genome:
+    title: "Accuracy for different error profiles"
+    description: "Showing read mapping accuracy for reads simulated with different error profiles (here described as low, medium and high error rate)."
     plot_type: accuracy_vs_read_length_and_error_profile
     parameters:
       dataset_size: big
       n_reads: "250000"
       
   variant_calling_accuracy_vs_mapq_threshold_quick:
+    title: "Variant calling accuracy"
+    decription: "Recall and 1-precision is shown after filtering the reads on various MAPQ-score before 
+    calling variants with GATK. Accuracy is computed by hap.py after comparing the called variants against a truth set."
     plot_type: variant_calling_accuracy_vs_mapq_threshold
     parameters:
       dataset_size: small
@@ -140,7 +153,10 @@ plots:
       n_threads: 2
       
   variant_calling_accuracy_vs_mapq_threshold:
-    description: "Run on a small genome (chr17-21). Shows precision/recall for various MAPQ thresholds."
+    title: "Variant calling accuracy"
+    decription: "Recall and 1-precision is shown after filtering the reads on various MAPQ-score before 
+    calling variants with GATK. Accuracy is computed by hap.py after comparing the called variants against a truth set.
+    In this experiments, a smaller genome of only chromosome 17-21 has been used."
     plot_type: variant_calling_accuracy_vs_mapq_threshold
     parameters:
       dataset_size: medium
@@ -148,6 +164,7 @@ plots:
       n_threads: 8
 
   variant_calling_accuracy_vs_mapq_threshold_yeast:
+    title: "Variant calling accuracy vs. MAPQ thresholds (yeast)"
     plot_type: variant_calling_accuracy_vs_mapq_threshold
     parameters:
       genome_build: sacCer3
@@ -157,7 +174,10 @@ plots:
       n_threads: 8
 
   f1_score_vs_read_length:
-    description: "Accuracy vs. read length for paired/single end reads. Divided into reads containing and not containing genomic variants."
+    title: "Accuracy vs read length"
+    description: "Accuracy is measured as the F1 score and shown for different read lengths and single/paired end reads. 
+    Further divided into reads containing and not containing genomic variants. A read contains a variant is it has been 
+    simulated so that it contains a variant allele not in the reference genome."
     plot_type: f1_score_vs_read_length
     parameters:
       read_length: [75, 100, 125, 150, 175, 200, 225, 250]
@@ -171,6 +191,8 @@ plots:
       individual: simulated
 
   peak_calling_accuracy_test:
+    title: "Peak calling accuracy"
+    description: "Showing the F1 score for each peak caller on some small simulated data."
     plot_type: peak_calling_accuracy
     parameters:
       genome_build: sacCer3
@@ -183,22 +205,25 @@ plots:
       n_peaks: 500
 
   peak_calling_accuracy_vs_read_length_human:
+    title: "Peak calling accuracy"
+    description: "Peaks are simulated using Chips. The accuracy is the number of peaks found after calling peaks by MACS and selecting the top N peaks where N is the same number of peaks as in the simulated data."
     plot_type: peak_calling_accuracy_vs_read_length
     parameters:
-      read_type: chip_seq
-      read_length: [36, 75, 120, 150]
+      read_length: [36, 75, 150]
       genome_build: hg38
       individual: hg002
       n_peaks: 500
 
   peak_calling_accuracy_vs_read_length_yeast:
+    title: "Peak calling accuracy"
+    description: "Peaks are simulated using Chips. The accuracy is the number of peaks found after calling peaks by MACS and selecting the top N peaks where N is the same number of peaks as in the simulated data."
     plot_type: peak_calling_accuracy_vs_read_length
     parameters:
-      read_type: chip_seq
-      read_length: [36, 75, 120, 150]
+      read_length: [36, 75, 150]
       genome_build: sacCer3
       individual: simulated
       n_peaks: 50
+
 
 
 # The following defines different type of plots
