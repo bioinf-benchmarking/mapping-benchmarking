@@ -123,10 +123,12 @@ plots:
 
   memory_human_whole_genome:
     title: "Memory usage"
+    description: "Memory usage when mapping 2 million reads using 4 threads to hg38."
     plot_type: memory_usage
     parameters:
       dataset_size: big
-      n_reads: "200000"
+      n_reads: 2000000
+      n_threads: 4
 
   variant_calling_accuracy_human_whole_genome:
     plot_type: variant_calling_accuracy
@@ -160,7 +162,7 @@ plots:
     plot_type: variant_calling_accuracy_vs_mapq_threshold
     parameters:
       dataset_size: medium
-      n_reads: "15000000"
+      n_reads: 30000000
       n_threads: 8
 
   variant_calling_accuracy_vs_mapq_threshold_yeast:
@@ -297,6 +299,7 @@ plot_types:
     markers: true
     y: variant_calling_recall
     x: variant_calling_one_minus_precision
+    facet_row: variant_calling_type
     labels: min_mapq
     color: method
   f1_score_vs_read_length:

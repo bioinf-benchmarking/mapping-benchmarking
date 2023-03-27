@@ -28,7 +28,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           #pip install -r python_requirements.txt
           pip install .
-          snakemake --cores 40 --use-conda --rerun-incomplete reports/main.md
+          snakemake --cores 60 --use-conda --rerun-incomplete reports/main.md
 
 
       #- name: Run test
