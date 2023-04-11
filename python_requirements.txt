@@ -7,4 +7,4 @@ bionumpy>=0.2.20
 graph_read_simulator>=0.0.18
 numpy_alignments>=0.0.9
 tabulate
-snakehelp
+snakehelp>=0.0.7
