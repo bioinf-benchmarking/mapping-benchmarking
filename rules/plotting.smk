@@ -84,7 +84,8 @@ rule make_plot:
     run:
         plot, parameters = get_plot(wildcards.plot_name)
         df = plot._parameter_combinations.get_results_dataframe(**parameters)
-        plot.plot(pretty_names_func=pretty_name)
+        #plot.plot(pretty_names_func=pretty_name)
+        plot.plot()
 
         df.to_csv(output.csv, index=False)
 
