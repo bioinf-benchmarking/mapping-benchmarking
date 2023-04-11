@@ -30,12 +30,13 @@ pretty_names:
   variant_calling_one_minus_precision: 1-Precision
   variant_calling_recall: Recall
   variant_calling_f1score: F1 Score
-  one_minus_precision: 1-Precision
-  recall: Recall
+  MappingOneMinusPrecision: 1-Precision
+  MappingRecall: Recall
+  MappingF1Score: F1 Score
   runtime: Runtime (sec)
   n_threads: Number of threads
-  whole_genome_single_end: Single-end reads
-  whole_genome_paired_end: Paired-end reads
+  single_end: Single-end reads
+  paired_end: Paired-end reads
   read_length: Read length (nt)
   f1_score: F1 score
   low_error: Low error

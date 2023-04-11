@@ -17,6 +17,12 @@ result_to_classes_mapping = {
 }
 
 
+def pretty_name(name):
+    if name not in config["pretty_names"]:
+        return name.capitalize()
+    return config["pretty_names"][name]
+
+
 def get_plot_type_parameters(plot_name, plot_type_object):
     """
     Returns a dict with parameters for the plot type.
@@ -78,7 +84,7 @@ rule make_plot:
     run:
         plot, parameters = get_plot(wildcards.plot_name)
         df = plot._parameter_combinations.get_results_dataframe(**parameters)
-        plot.plot()
+        plot.plot(pretty_names_func=pretty_name)
 
         df.to_csv(output.csv, index=False)
 
@@ -86,6 +92,7 @@ rule make_plot:
         print(markdown_table)
         with open(output.md, "w") as f:
             f.write(markdown_table + "\n")
+
 
 
 def get_report_input(wildcards):

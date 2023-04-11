@@ -2,6 +2,6 @@ channels:
   - bioconda
 
 dependencies:
-  - strobealign
+  - strobealign=0.9.0
   - samtools
 
