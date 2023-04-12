@@ -1,0 +1,14 @@
+|    | genome_build   | individual   | dataset_size   | experiment_type   | error_profile   |   read_length |   spot |   peak_read_coverage |   n_peaks | method      |   n_threads |   PeakCallingAccuracy |
+|----|----------------|--------------|----------------|-------------------|-----------------|---------------|--------|----------------------|-----------|-------------|-------------|-----------------------|
+|  0 | hg38           | hg002        | small          | chip_seq          | medium_error    |            36 |    0.2 |                   50 |       500 | bwa         |           4 |                 0.918 |
+|  1 | hg38           | hg002        | small          | chip_seq          | medium_error    |            36 |    0.2 |                   50 |       500 | minimap     |           4 |                 0.908 |
+|  2 | hg38           | hg002        | small          | chip_seq          | medium_error    |            36 |    0.2 |                   50 |       500 | strobealign |           4 |                 0.904 |
+|  3 | hg38           | hg002        | small          | chip_seq          | medium_error    |            36 |    0.2 |                   50 |       500 | bowtie2     |           4 |                 0.918 |
+|  4 | hg38           | hg002        | small          | chip_seq          | medium_error    |            75 |    0.2 |                   50 |       500 | bwa         |           4 |                 0.918 |
+|  5 | hg38           | hg002        | small          | chip_seq          | medium_error    |            75 |    0.2 |                   50 |       500 | minimap     |           4 |                 0.916 |
+|  6 | hg38           | hg002        | small          | chip_seq          | medium_error    |            75 |    0.2 |                   50 |       500 | strobealign |           4 |                 0.912 |
+|  7 | hg38           | hg002        | small          | chip_seq          | medium_error    |            75 |    0.2 |                   50 |       500 | bowtie2     |           4 |                 0.916 |
+|  8 | hg38           | hg002        | small          | chip_seq          | medium_error    |           150 |    0.2 |                   50 |       500 | bwa         |           4 |                 0.908 |
+|  9 | hg38           | hg002        | small          | chip_seq          | medium_error    |           150 |    0.2 |                   50 |       500 | minimap     |           4 |                 0.906 |
+| 10 | hg38           | hg002        | small          | chip_seq          | medium_error    |           150 |    0.2 |                   50 |       500 | strobealign |           4 |                 0.908 |
+| 11 | hg38           | hg002        | small          | chip_seq          | medium_error    |           150 |    0.2 |                   50 |       500 | bowtie2     |           4 |                 0.908 |
