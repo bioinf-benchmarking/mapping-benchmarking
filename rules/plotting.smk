@@ -68,6 +68,7 @@ def get_plot(plot_name):
     return plot, parameters
 
 
+
 def get_plot_input_files(wildcards):
     plot_name = wildcards.plot_name
     plot, parameters = get_plot(plot_name)
