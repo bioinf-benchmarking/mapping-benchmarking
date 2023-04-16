@@ -1,5 +1,5 @@
-#configfile: "config/config.yaml"
-#configfile: "config/plots.yaml"
+configfile: "config/config.yaml"
+configfile: "config/plots.yaml"
 
 from mapping_benchmarking.config import *
 from mapping_benchmarking.util import get_input_reads
