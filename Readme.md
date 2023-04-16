@@ -1,5 +1,5 @@
-[![Test]( https://github.com/ivargr/mapping-benchmarking/actions/workflows/test.yml/badge.svg)](https://github.com/ivargr/mapping-benchmarking/actions/workflows/test.yml)
-[![Benchmarks]( https://github.com/ivargr/mapping-benchmarking/actions/workflows/benchmarks.yml/badge.svg)](https://github.com/ivargr/mapping-benchmarking/blob/benchmarks/reports/main.md)
+[![Test]( https://github.com/bioinf-benchmarking/mapping-benchmarking/actions/workflows/test.yml/badge.svg)](https://github.com/bioinf-benchmarking/mapping-benchmarking/actions/workflows/test.yml)
+[![Benchmarks]( https://github.com/bioinf-benchmarking/mapping-benchmarking/actions/workflows/benchmarks.yml/badge.svg)](https://github.com/bioinf-benchmarking/mapping-benchmarking/blob/benchmarks/reports/main.md)
 
 # Snakemake pipeline for benchmarking read mappers
 
@@ -16,7 +16,7 @@ This pipeline is open source, and anyone can contribute (see the Contribute sect
 ## How to use
 
 ### Latest benchmarking results
-You will find the latest results [here](https://github.com/ivargr/mapping-benchmarking/blob/benchmarks/reports/main.md). If you want these to include other parameters/settings, feel free to edit the configuration files and make a pull-request (see guide below).
+You will find the latest results [here](https://github.com/bioinf-benchmarking/mapping-benchmarking/blob/benchmarks/reports/main.md). If you want these to include other parameters/settings, feel free to edit the configuration files and make a pull-request (see guide below).
 
 ### Run benchmarks locally
 1. Install Snakemake and Conda if you havn't already.

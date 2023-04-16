@@ -12,5 +12,6 @@ for line in sys.stdin:
         continue
 
     l = line.split()
+    l[8] = "GT"
     l[9] = random.choice(genotypes)
     print("\t".join(l).strip())

@@ -1,6 +1,5 @@
-configfile: "config/config.yaml"
-configfile: "config/plots.yaml"
-workflow.use_conda = True
+#configfile: "config/config.yaml"
+#configfile: "config/plots.yaml"
 
 from mapping_benchmarking.config import *
 from mapping_benchmarking.util import get_input_reads
@@ -13,6 +12,7 @@ include: "rules/bowtie2.smk"
 include: "rules/strobealign.smk"
 include: "rules/minimap2.smk"
 include: "rules/reference_genome.smk"
+include: "rules/mason.smk"
 include: "rules/read_simulation.smk"
 include: "rules/chip_seq_simulation.smk"
 include: "rules/chip_seq.smk"
