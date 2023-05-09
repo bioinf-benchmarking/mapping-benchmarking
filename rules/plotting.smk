@@ -57,6 +57,7 @@ def get_plot(plot_name):
 
     parsed_config = {}
     for name, val in plot_type_config.items():
+        print(name)
         if name != "parameters" and name != "layout":
             if val in result_to_classes_mapping:
                 val = result_to_classes_mapping[val]
