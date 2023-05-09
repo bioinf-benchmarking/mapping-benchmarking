@@ -46,6 +46,11 @@ def get_plot_type_parameters(plot_name, plot_type_object):
     return parameters
 
 
+def _is_class(name):
+    if name in dir():
+        return True
+    return False
+
 def get_plot(plot_name):
     plot_config = config["plots"][plot_name]
     plot_type_config = config["plot_types"][plot_config["plot_type"]]
@@ -55,6 +60,9 @@ def get_plot(plot_name):
         if name != "parameters" and name != "layout":
             if val in result_to_classes_mapping:
                 val = result_to_classes_mapping[val]
+            elif _is_class(name):
+                val = eval(val)
+
         parsed_config[name] = val
 
     # replace literal values with classes
