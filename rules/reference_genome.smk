@@ -11,9 +11,27 @@ rule convert_reference_genome_to_fasta:
     input:
         "data/{genome_build}/reference.2bit"
     output:
-        "data/{genome_build}/reference.fa"
+        "data/{genome_build, ^((?!simulated).)*$}/reference.fa"
     wrapper:
         "v1.21.2/bio/ucsc/twoBitToFa"
+
+
+rule simulate_reference_genome:
+    output:
+        "data/{genome_build, (simulated).+}/reference.fa"
+    params:
+        genome_size = lambda wildcards: config["genomes"][wildcards.genome_build]["genome_size"],
+        n_chromosomes = lambda wildcards: config["genomes"][wildcards.genome_build]["n_chromosomes"],
+    run:
+        import bionumpy as bnp
+        sequences = bnp.simulate.simulate_sequences(
+            "ACGT",{f"chr{i}": params.genome_size // params.n_chromosomes for i in range(params.n_chromosomes)})
+
+        with bnp.open(output[0],"w") as f:
+            f.write(sequences)
+
+    #"python3 scripts/simulate_reference_genome.py {params.genome_size} {params.n_chromosomes} {output}"
+
 
 
 rule get_reference_genome_chromosome:
