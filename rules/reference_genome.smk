@@ -11,7 +11,7 @@ rule convert_reference_genome_to_fasta:
     input:
         "data/{genome_build}/reference.2bit"
     output:
-        "data/{genome_build, ^((?!simulated).)*$}/reference.fa"
+        "data/{genome_build, ((?!simulated).)*}/reference.fa"
     wrapper:
         "v1.21.2/bio/ucsc/twoBitToFa"
 
