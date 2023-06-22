@@ -9,7 +9,7 @@ rule strobealign_index:
         ref=ReferenceGenome.path(file_ending=".fa"),
         reads=get_input_reads
     output:
-        touch(ReferenceGenome.path(file_ending="") + "/{read_config}/strobealign-index-created")
+        touch(ReferenceGenome.path(file_ending="") + "/{read_config_unknown_union_params}/strobealign-index-created")
         #touch(f"data/{reference_genome}/{{config}}/strobealign-index-created")
     conda:
         "../envs/strobealign.yml"
@@ -22,7 +22,7 @@ rule strobealign_map:
     reads = get_input_reads,
     ref = ReferenceGenome.path(file_ending=".fa"),
     #ref=f"data/{reference_genome}/reference.fa",
-    checkpoint_index_is_created = ReferenceGenome.path(file_ending="") + "/{read_config}/strobealign-index-created"
+    checkpoint_index_is_created = ReferenceGenome.path(file_ending="") + "/{read_config_unknown_union_params}/strobealign-index-created"
   output:
       #f"data/{reference_genome}/{{config}}/strobealign/{{n_threads}}/without_readgroup.bam"
       reads = GenericMappedReads.as_output(method='strobealign')
