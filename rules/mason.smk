@@ -12,7 +12,8 @@ def get_truth_vcf_command(wildcards, input, output):
 
 rule get_truth_vcf:
     input:
-        reference=GenomeBuild.path() + "/reference.fa"
+        reference=GenomeBuild.path() + "/reference.fa",
+        fai=GenomeBuild.path() + "/reference.fa.fai",
     output:
         vcf=Individual.path() + "/variants.vcf.gz"
     params:

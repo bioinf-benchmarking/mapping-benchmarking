@@ -26,7 +26,7 @@ rule make_chromosome_haplotype_sequence_for_simulation:
         coordinate_map="data/{genome_build}/{individual}/coordinate_map_chromosome{chromosome}_haplotype{haplotype}.npz",
         haplotype_reference="data/{genome_build}/{individual}/chromosome{chromosome}_haplotype{haplotype}_reference.fasta"
     shell:
-        "graph_read_simulator prepare_simulation --chromosome {wildcards.chromosome} --haplotype {wildcards.haplotype} "
+        "graph_read_simulator prepare_simulation --chromosome '{wildcards.chromosome}' --haplotype {wildcards.haplotype} "
         "--vcf {input.vcf} --reference {input.reference} -o data/{wildcards.genome_build}/{wildcards.individual}/"
 
 
