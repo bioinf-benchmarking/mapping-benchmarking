@@ -93,9 +93,9 @@ illumina_error_profiles:
 mason_variator_parameters:
    "--snp-rate 0.001
    --small-indel-rate 0.0001
+   --sv-indel-rate 0
    --min-small-indel-size 1
    --max-small-indel-size 6
-   --sv-indel-rate 0
    --sv-inversion-rate 0
    --sv-translocation-rate 0
    --sv-duplication-rate 0
