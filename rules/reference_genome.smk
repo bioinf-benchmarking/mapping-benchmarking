@@ -36,7 +36,8 @@ rule simulate_reference_genome:
 
 rule get_reference_genome_chromosome:
     input:
-        "data/{genome_build}/reference.fa"
+        ref="data/{genome_build}/reference.fa",
+        index="data/{genome_build}/reference.fa.fai",
     output:
         "data/{genome_build}/reference_genome_by_chromosome/{chromosome}.fa.gz"
     conda:
@@ -51,7 +52,8 @@ rule samtools_index:
     output:
         "{sample}.fa.fai",
     wrapper:
-        "v1.21.2/bio/samtools/faidx"
+        "v2.6.0/bio/samtools/index"
+
 
 rule samtools_index2:
     input:
@@ -59,7 +61,7 @@ rule samtools_index2:
     output:
         "{sample}.fasta.fai",
     wrapper:
-        "v1.21.2/bio/samtools/faidx"
+        "v2.6.0/bio/samtools/index"
 
 
 rule get_dataset_reference:
