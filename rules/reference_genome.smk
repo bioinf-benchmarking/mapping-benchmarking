@@ -51,17 +51,22 @@ rule samtools_index:
         "{sample}.fa",
     output:
         "{sample}.fa.fai",
-    wrapper:
-        "v2.6.0/bio/samtools/faidx"
+    conda:
+        "../envs/samtools.yml"
+    #wrapper:
+    #    "v2.6.0/bio/samtools/faidx"
+    shell:
+        "samtools faidx {input}"
 
 rule samtools_index2:
     input:
         "{sample}.fasta",
     output:
         "{sample}.fasta.fai",
-    wrapper:
-        "v2.6.0/bio/samtools/faidx"
-
+    conda:
+        "../envs/samtools.yml"
+    shell:
+        "samtools faidx {input}"
 
 rule get_dataset_reference:
     input:
