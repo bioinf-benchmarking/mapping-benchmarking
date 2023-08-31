@@ -52,8 +52,7 @@ rule samtools_index:
     output:
         "{sample}.fa.fai",
     wrapper:
-        "v2.6.0/bio/samtools/index"
-
+        "v2.6.0/bio/samtools/faidx"
 
 rule samtools_index2:
     input:
@@ -61,7 +60,7 @@ rule samtools_index2:
     output:
         "{sample}.fasta.fai",
     wrapper:
-        "v2.6.0/bio/samtools/index"
+        "v2.6.0/bio/samtools/faidx"
 
 
 rule get_dataset_reference:
