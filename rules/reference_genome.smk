@@ -58,6 +58,7 @@ rule samtools_index:
     shell:
         "samtools faidx {input}"
 
+
 rule samtools_index2:
     input:
         "{sample}.fasta",
@@ -67,6 +68,7 @@ rule samtools_index2:
         "../envs/samtools.yml"
     shell:
         "samtools faidx {input}"
+
 
 rule get_dataset_reference:
     input:

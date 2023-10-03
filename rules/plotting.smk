@@ -1,4 +1,4 @@
-from mapping_benchmarking.config import *
+from mapping_benchmarking.config import Runtime, MemoryUsage, MappingRecall, MappingOneMinusPrecision, MappingF1Score, VariantCallingRecall, VariantCallingOneMinusPrecision, VariantCallingF1Score, PeakCallingAccuracy
 import itertools
 from snakehelp.plotting import PlotType
 import tabulate
