@@ -55,17 +55,40 @@ def _is_result_class(name):
 
 def get_plot(plot_name):
     plot_config = config["plots"][plot_name]
-    plot_type_config = config["plot_types"][plot_config["plot_type"]]
+    try:
+        plot_type_config = config["plot_types"][plot_config["plot_type"]]
+    except KeyError:
+        print(f"Plot type {plot_config['plot_type']} not found in config {config['plot_types']}")
+        raise
 
     parsed_config = {}
+    result_types = []
     for name, val in plot_type_config.items():
         if name != "parameters" and name != "layout":
             if val in result_to_classes_mapping:
                 val = result_to_classes_mapping[val]
             elif _is_result_class(val):
                 val = eval(val)
-
+                result_types.append(val)
         parsed_config[name] = val
+
+    # Limit ResultType union types if specified
+    # (WHen a Result is unwrapped and there are union-types, we need to know
+    # which type to choose for this plot
+    if "type_limits" in plot_config:
+        print("TYPE limits", plot_config["type_limits"])
+        for i in range(len(result_types)):
+            for field_name, new_field in plot_config["type_limits"].items():
+                result_types[i] = result_types[i].replace_field(field_name, (field_name, new_field, None))
+                print("  Replacing field %s to %s" % (field_name, new_field))
+        """
+        for base_class, limits in plot_config["type_limits"].items():
+            cls = eval(base_class)
+            cls.clear_union_choices()
+            for limit in limits:
+                cls.limit_union_choice(limit)
+                print("  Limiting result %s to %s" % (cls, limit))
+        """
 
     # replace literal values with classes
 
@@ -83,6 +106,8 @@ def get_plot_input_files(wildcards):
     plot_name = wildcards.plot_name
     plot, parameters = get_plot(plot_name)
     files = plot.file_names()
+    print("PLot input files")
+    print(files)
     return files
 
 
