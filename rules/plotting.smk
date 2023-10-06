@@ -62,14 +62,14 @@ def get_plot(plot_name):
         raise
 
     parsed_config = {}
-    result_types = []
+    result_types = {}
     for name, val in plot_type_config.items():
         if name != "parameters" and name != "layout":
             if val in result_to_classes_mapping:
                 val = result_to_classes_mapping[val]
             elif _is_result_class(val):
                 val = eval(val)
-                result_types.append(val)
+                result_types[name] = val
         parsed_config[name] = val
 
     # Limit ResultType union types if specified
@@ -77,10 +77,14 @@ def get_plot(plot_name):
     # which type to choose for this plot
     if "type_limits" in plot_config:
         print("TYPE limits", plot_config["type_limits"])
-        for i in range(len(result_types)):
+        for name, result_type in result_types.items():
             for field_name, new_field in plot_config["type_limits"].items():
-                result_types[i] = result_types[i].replace_field(field_name, (field_name, new_field, None))
-                print("  Replacing field %s to %s" % (field_name, new_field))
+                new_field = eval(new_field)
+                #print("New field", new_field)
+                new_type = result_type.replace_field(field_name,(field_name, new_field, None))
+                #print(new_type)
+                parsed_config[name] = new_type
+                #print("  Replacing parsed config %s, field name %s to %s on %s" % (name, field_name, new_field, result_type))
         """
         for base_class, limits in plot_config["type_limits"].items():
             cls = eval(base_class)
