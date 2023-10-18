@@ -80,7 +80,6 @@ def get_plot(plot_name):
     # (WHen a Result is unwrapped and there are union-types, we need to know
     # which type to choose for this plot
     if "type_limits" in plot_config:
-        print("TYPE limits", plot_config["type_limits"])
         for name, result_type in result_types.items():
             for field_name, new_field in plot_config["type_limits"].items():
                 if name == "type":
@@ -116,8 +115,6 @@ def get_plot_input_files(wildcards):
     plot_name = wildcards.plot_name
     plot, parameters = get_plot(plot_name)
     files = plot.file_names()
-    print("PLot input files")
-    print(files)
     return files
 
 
