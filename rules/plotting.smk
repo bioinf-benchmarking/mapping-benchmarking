@@ -1,7 +1,9 @@
+
 from mapping_benchmarking.config import Runtime, MemoryUsage, MappingRecall, MappingOneMinusPrecision, MappingF1Score, VariantCallingRecall, VariantCallingOneMinusPrecision, VariantCallingF1Score, PeakCallingAccuracy
 import itertools
 from snakehelp.plotting import PlotType
 import tabulate
+from snakehelp import ResultLike
 
 
 result_to_classes_mapping = {
@@ -48,9 +50,11 @@ def get_plot_type_parameters(plot_name, plot_type_object):
 
 def _is_result_class(name):
     try:
-        eval(name)
-        return True
-    except Exception:
+        t = eval(name)
+        if issubclass(t, ResultLike):
+            return True
+        return False
+    except Exception as e:
         return False
 
 def get_plot(plot_name):
@@ -79,12 +83,14 @@ def get_plot(plot_name):
         print("TYPE limits", plot_config["type_limits"])
         for name, result_type in result_types.items():
             for field_name, new_field in plot_config["type_limits"].items():
+                if name == "type":
+                    continue
                 new_field = eval(new_field)
                 #print("New field", new_field)
+                #print("  Replacing parsed config %s, field name %s to %s on %s" % (name, field_name, new_field, result_type))
                 new_type = result_type.replace_field(field_name,(field_name, new_field, None))
                 #print(new_type)
                 parsed_config[name] = new_type
-                #print("  Replacing parsed config %s, field name %s to %s on %s" % (name, field_name, new_field, result_type))
         """
         for base_class, limits in plot_config["type_limits"].items():
             cls = eval(base_class)
