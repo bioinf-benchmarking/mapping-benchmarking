@@ -1,4 +1,5 @@
-
+import logging
+logging.basicConfig(level=logging.INFO)
 from mapping_benchmarking.config import Runtime, MemoryUsage, MappingRecall, MappingOneMinusPrecision, MappingF1Score, VariantCallingRecall, VariantCallingOneMinusPrecision, VariantCallingF1Score, PeakCallingAccuracy
 import itertools
 from snakehelp.plotting import PlotType
@@ -20,6 +21,7 @@ result_to_classes_mapping = {
 
 
 def pretty_name(name):
+    logging.info("Checking pretty name %s against %s" % (name, config["pretty_names"]))
     if name not in config["pretty_names"]:
         return name.capitalize()
     return config["pretty_names"][name]
@@ -127,8 +129,8 @@ rule make_plot:
     run:
         plot, parameters = get_plot(wildcards.plot_name)
         df = plot._parameter_combinations.get_results_dataframe(**parameters)
-        #plot.plot(pretty_names_func=pretty_name)
-        plot.plot()
+        plot.plot(pretty_names_func=pretty_name)
+        #plot.plot()
 
         df.to_csv(output.csv, index=False)
 
